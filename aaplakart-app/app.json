@@ -1,0 +1,91 @@
+{
+  "expo": {
+    "scheme": "aaplakart",
+    "name": "AaplaKart Native",
+    "slug": "aaplakart-native",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/splash-app-icon.png",
+    "splash": {
+      "resizeMode": "cover",
+      "backgroundColor": "#fff7ed"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "android": {
+      "package": "com.aaplakart.app",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "aaplakart",
+              "host": "*",
+              "pathPrefix": "/oauth"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ],
+      "adaptiveIcon": {
+        "backgroundColor": "#fff7ed",
+        "foregroundImage": "./assets/splash-app-icon.png"
+      },
+      "splash": {
+        "resizeMode": "cover",
+        "backgroundColor": "#fff7ed"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyA6k7ivDQ2XyXBNCWLTKRbCOd-JRgKHYpc"
+        }
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIViewControllerBasedStatusBarAppearance": false,
+        "NSLocationWhenInUseUsageDescription": "AaplaKart needs your location to find nearby stores and estimate delivery times.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "AaplaKart needs your location to find nearby stores and estimate delivery times."
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyA6k7ivDQ2XyXBNCWLTKRbCOd-JRgKHYpc"
+      },
+      "splash": {
+        "resizeMode": "cover",
+        "backgroundColor": "#fff7ed"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "build": {
+        "babel": {
+          "include": ["@expo/metro-config"]
+        }
+      }
+    },
+    "plugins": [
+      "expo-web-browser",
+      "expo-font",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "AaplaKart needs your location to find nearby stores and estimate delivery times.",
+          "locationWhenInUsePermission": "AaplaKart needs your location to find nearby stores and estimate delivery times."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#fff7ed",
+          "resizeMode": "cover"
+        }
+      ]
+    ]
+  }
+}

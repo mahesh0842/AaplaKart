@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "AaplaKart Delivery",
+    "slug": "aaplakart-delivery",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "backgroundColor": "#F7F1E8"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.aaplakart.delivery",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyA6k7ivDQ2XyXBNCWLTKRbCOd-JRgKHYpc"
+        }
+      }
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.aaplakart.delivery",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Access your location for deliveries.",
+        "LSApplicationQueriesSchemes": [
+          "maps",
+          "google-maps",
+          "tel"
+        ]
+      }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Access your location for deliveries."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "15bdf4fe-2c75-4187-8fa7-fb63198654c1"
+      }
+    },
+    "owner": "mahesh0842"
+  }
+}

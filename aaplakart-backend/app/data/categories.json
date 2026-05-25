@@ -1,0 +1,223 @@
+[
+  {
+    "id": "section-grocery",
+    "name": "Grocery & Kitchen",
+    "type": "kart",
+    "image": "https://images.unsplash.com/photo-1542838132-92c53300491e?w=200",
+    "categories": [
+      {
+        "id": "cat-vegetables",
+        "name": "Vegetables",
+        "image": "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=200",
+        "subcategories": [
+          {
+            "id": "sub-premium-veggies",
+            "name": "Premium Veggies"
+          },
+          {
+            "id": "sub-root-veggies",
+            "name": "Root Veggies"
+          },
+          {
+            "id": "sub-leafy-greens",
+            "name": "Leafy Greens"
+          }
+        ]
+      },
+      {
+        "id": "cat-dairy",
+        "name": "Dairy",
+        "image": "https://images.unsplash.com/photo-1628088062854-b1870b58a4c6?w=200",
+        "subcategories": [
+          {
+            "id": "sub-milk",
+            "name": "Milk"
+          },
+          {
+            "id": "sub-paneer-curd",
+            "name": "Paneer & Curd"
+          },
+          {
+            "id": "sub-butter-ghee",
+            "name": "Butter & Ghee"
+          }
+        ]
+      },
+      {
+        "id": "cat-fruits",
+        "name": "Fruits",
+        "image": "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=200",
+        "subcategories": [
+          {
+            "id": "sub-premium-fruits",
+            "name": "Premium Fruits"
+          },
+          {
+            "id": "sub-daily-fruits",
+            "name": "Daily Fruits"
+          }
+        ]
+      },
+      {
+        "id": "cat-grains",
+        "name": "Grains & Dal",
+        "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=200",
+        "subcategories": [
+          {
+            "id": "sub-rice",
+            "name": "Rice"
+          },
+          {
+            "id": "sub-flour",
+            "name": "Flour"
+          },
+          {
+            "id": "sub-pulses",
+            "name": "Pulses"
+          }
+        ]
+      },
+      {
+        "id": "cat-spices",
+        "name": "Spices & Masala",
+        "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=200",
+        "subcategories": [
+          {
+            "id": "sub-whole-spices",
+            "name": "Whole Spices"
+          },
+          {
+            "id": "sub-powder-spices",
+            "name": "Powder Spices"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "section-snacks",
+    "name": "Snacks & Drinks",
+    "type": "kart",
+    "image": "https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=200",
+    "categories": [
+      {
+        "id": "cat-biscuits",
+        "name": "Biscuits & Cookies",
+        "image": "https://images.unsplash.com/photo-1590080874088-ec96f2e29e4c?w=200",
+        "subcategories": [
+          {
+            "id": "sub-biscuits",
+            "name": "Biscuits"
+          },
+          {
+            "id": "sub-cookies",
+            "name": "Cookies"
+          }
+        ]
+      },
+      {
+        "id": "cat-beverages",
+        "name": "Beverages",
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=200",
+        "subcategories": [
+          {
+            "id": "sub-juices",
+            "name": "Juices"
+          },
+          {
+            "id": "sub-soft-drinks",
+            "name": "Soft Drinks"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "section-waffle",
+    "name": "The Waffle Guy",
+    "type": "app",
+    "image": "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=200",
+    "categories": [
+      {
+        "id": "cat-classic-waffles",
+        "name": "Classic Waffles",
+        "image": "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=200",
+        "subcategories": [
+          {
+            "id": "sub-original",
+            "name": "Original"
+          },
+          {
+            "id": "sub-savory",
+            "name": "Savory"
+          }
+        ]
+      },
+      {
+        "id": "cat-chocolate-waffles",
+        "name": "Chocolate Waffles",
+        "image": "https://images.unsplash.com/photo-1619134778706-7015533a6150?w=200",
+        "subcategories": [
+          {
+            "id": "sub-choc-lovers",
+            "name": "Chocolate Lovers"
+          },
+          {
+            "id": "sub-signature",
+            "name": "Signature"
+          }
+        ]
+      },
+      {
+        "id": "cat-special-waffles",
+        "name": "Special Waffles",
+        "image": "https://images.unsplash.com/photo-1509365465985-25d11c17e812?w=200",
+        "subcategories": [
+          {
+            "id": "sub-premium",
+            "name": "Premium"
+          },
+          {
+            "id": "sub-seasonal",
+            "name": "Seasonal"
+          }
+        ]
+      },
+      {
+        "id": "cat-beverages-waffle",
+        "name": "Beverages",
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=200",
+        "subcategories": [
+          {
+            "id": "sub-hot-drinks",
+            "name": "Hot Drinks"
+          },
+          {
+            "id": "sub-cold-drinks",
+            "name": "Cold Drinks"
+          }
+        ]
+      },
+      {
+        "id": "cat-mumtaz-dummy",
+        "name": "Mumtaz dummy",
+        "image": "",
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "id": "section-sweety",
+    "name": "Sweety",
+    "type": "app",
+    "image": "",
+    "categories": [
+      {
+        "id": "cat-apppy",
+        "name": "Apppy",
+        "image": "",
+        "subcategories": []
+      }
+    ]
+  }
+]

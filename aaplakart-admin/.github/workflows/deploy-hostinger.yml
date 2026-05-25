@@ -1,0 +1,30 @@
+# 🚀 AaplaKart Admin Panel — Auto Deploy to Hostinger
+# Jab bhi aap master/main branch pe push karenge, yeh workflow:
+# 1. Files ko Hostinger server par FTP upload karega
+# 2. Aapka admin panel turant update ho jayega
+
+name: Deploy Admin Panel to Hostinger
+
+on:
+  push:
+    branches: [master, main]
+  workflow_dispatch:  # Manual trigger bhi kar sakte hain
+
+jobs:
+  deploy:
+    name: 📦 Upload to Hostinger
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📤 Deploy via FTP to Hostinger
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}        # e.g., ftp.aaplakart.org or your server IP
+          username: ${{ secrets.FTP_USERNAME }}   # Hostinger FTP username
+          password: ${{ secrets.FTP_PASSWORD }}   # Hostinger FTP password
+          server-dir: ${{ secrets.FTP_TARGET_DIR }}  # e.g., /public_html/admin or /domains/aaplakart.org/public_html/admin
+          local-dir: ./                          # Puri admin panel folder upload karega
+          dangerous-clean-slate: false           # Purane files delete nahi karega

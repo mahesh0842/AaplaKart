@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AaplaKart — Complete Project Documentation</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1f2937; line-height: 1.6; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.header { background: linear-gradient(135deg, #f97316, #ea580c); color: white; padding: 30px; border-radius: 16px; margin-bottom: 24px; }
+.header h1 { font-size: 28px; font-weight: 900; }
+.header p { font-size: 14px; opacity: 0.9; margin-top: 6px; }
+.section { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; border: 1px solid #e5e7eb; }
+.section h2 { font-size: 20px; font-weight: 800; margin-bottom: 16px; color: #f97316; display: flex; align-items: center; gap: 8px; }
+.section h3 { font-size: 16px; font-weight: 700; margin: 16px 0 8px; color: #374151; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+th { background: #fff7ed; text-align: left; padding: 10px 12px; font-weight: 700; color: #c2410c; border: 1px solid #fed7aa; }
+td { padding: 8px 12px; border: 1px solid #e5e7eb; }
+tr:hover { background: #f9fafb; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+.tag-get { background: #dbeafe; color: #1d4ed8; }
+.tag-post { background: #dcfce7; color: #15803d; }
+.tag-patch { background: #fef3c7; color: #92400e; }
+.tag-delete { background: #fee2e2; color: #b91c1c; }
+.tag-put { background: #f3e8ff; color: #7c3aed; }
+.tag-auth { background: #f1f5f9; color: #64748b; font-size: 10px; }
+.tag-ws { background: #f0fdf4; color: #166534; }
+.code { background: #1e293b; color: #e2e8f0; padding: 12px 16px; border-radius: 8px; font-size: 13px; overflow-x: auto; font-family: 'Cascadia Code', monospace; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+.badge-backend { background: #dcfce7; color: #15803d; }
+.badge-app { background: #dbeafe; color: #1d4ed8; }
+.badge-delivery { background: #fef3c7; color: #92400e; }
+.badge-admin { background: #f3e8ff; color: #7c3aed; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 16px 0; }
+.stat-card { background: #fff7ed; border-radius: 12px; padding: 16px; text-align: center; border: 1px solid #fed7aa; }
+.stat-num { font-size: 28px; font-weight: 900; color: #f97316; }
+.stat-label { font-size: 12px; color: #6b7280; margin-top: 4px; font-weight: 600; }
+.flow-chart { background: #f8fafc; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb; margin: 12px 0; font-family: monospace; font-size: 13px; line-height: 1.8; }
+.note { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 8px; margin: 12px 0; font-size: 13px; }
+.critical { background: #fef2f2; border-left: 4px solid #ef4444; padding: 12px 16px; border-radius: 8px; margin: 12px 0; font-size: 13px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid #e5e7eb; background: white; cursor: pointer; font-weight: 600; font-size: 13px; }
+.tab-btn.active { background: #f97316; color: white; border-color: #f97316; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📦 AaplaKart — Complete Project Documentation</h1>
+  <p>4 Components • 60+ API Endpoints • WebSocket • React Native • FastAPI</p>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-num">4</div><div class="stat-label">Total Apps</div></div>
+  <div class="stat-card"><div class="stat-num">67</div><div class="stat-label">API Endpoints</div></div>
+  <div class="stat-card"><div class="stat-num">3</div><div class="stat-label">WebSocket Clients</div></div>
+  <div class="stat-card"><div class="stat-num">56</div><div class="stat-label">Products</div></div>
+  <div class="stat-card"><div class="stat-num">44+</div><div class="stat-label">Orders</div></div>
+  <div class="stat-card"><div class="stat-num">1077</div><div class="stat-label">JS Modules</div></div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs" id="tabHeaders">
+  <button class="tab-btn active" onclick="switchTab('overview')">🏛️ Overview</button>
+  <button class="tab-btn" onclick="switchTab('backend')">📡 Backend APIs</button>
+  <button class="tab-btn" onclick="switchTab('mainapp')">📱 Main App APIs</button>
+  <button class="tab-btn" onclick="switchTab('delivery')">🚚 Delivery APIs</button>
+  <button class="tab-btn" onclick="switchTab('admin')">🖥️ Admin APIs</button>
+  <button class="tab-btn" onclick="switchTab('websocket')">🔌 WebSocket</button>
+  <button class="tab-btn" onclick="switchTab('architecture')">🏗️ Architecture</button>
+</div>
+
+<!-- ════════════ TAB: OVERVIEW ════════════ -->
+<div id="tab-overview" class="tab-content active">
+<div class="section">
+  <h2>🏛️ Project Structure</h2>
+  <div class="code">aaplakart/<br>├── aaplakart-app/        ← React Native Customer App (Expo)<br>├── aaplakart-backend/     ← FastAPI Python Backend<br>├── aaplakart-admin/       ← Vanilla HTML Admin Panel<br>├── aaplakart-delivery/    ← React Native Delivery App (Expo)<br>├── start-all.ps1          ← Start all services<br>├── start-all.bat          ← Batch launcher<br>├── CONTEXT.md             ← Project context<br>└── ARCHITECTURE_OVERVIEW.md</div>
+</div>
+
+<div class="section">
+  <h2>📡 Data Flow</h2>
+  <div class="flow-chart">
+┌──────────┐    ┌──────────────┐    ┌──────────────┐<br>│ Main App │──▶│              │──▶│   SQLite DB   │<br>│ (:8081)  │    │   FastAPI    │    │  aaplakart.db │<br>│ Customer │    │  Backend     │    ├──────────────┤<br>├──────────┤    │  (:8000)     │    │  JSON Files   │<br>│ Delivery │──▶│              │──▶│  products     │<br>│ (:8082)  │    │              │    │  categories   │<br>│ Partner  │    │              │    │  promos       │<br>├──────────┤    │              │    ├──────────────┤<br>│ Admin    │──▶│              │──▶│  Firebase     │<br>│ (:3000)  │    │              │    │  (opt)        │<br>└──────────┘    └──────┬───────┘    └──────────────┘<br>                      │<br>               ┌──────▼───────┐<br>               │  WebSocket    │<br>               │  /ws/orders   │<br>               └──────────────┘</div>
+</div>
+
+<div class="section">
+  <h2>📊 Database Schema</h2>
+  <div class="code">Tables (SQLite — auto-created):<br><br>users       — uid (PK), phone_number, email, display_name, role, is_test_user<br>addresses   — id (PK), user_uid (FK), full_name, phone, line1/2, city, pincode, lat/lon<br>orders      — id (PK), user_uid (FK), status, subtotal, delivery_fee, total, payment_method, address snapshot...<br>order_items — id, order_id (FK), product_id, name, price, quantity, weight, image_path<br>shops       — id, name, latitude, longitude, address, active</div>
+  <div class="note">⚠️ Order status format: HYPHEN-SEPARATED (e.g. <b>out-for-delivery</b>)</div>
+</div>
+
+<div class="section">
+  <h2>🔐 Auth Token System</h2>
+  <table>
+    <tr><th>Token</th><th>Source</th><th>Role</th><th>Prefix</th></tr>
+    <tr><td>Admin</td><td>admin / admin@123</td><td>admin</td><td><code>admin-dev-*</code></td></tr>
+    <tr><td>Delivery</td><td>Any phone + 123456</td><td>delivery</td><td><code>delivery-dev-*</code></td></tr>
+    <tr><td>Customer</td><td>Any phone + 123456</td><td>user</td><td><code>mock-dev-*</code></td></tr>
+    <tr><td>Firebase</td><td>Real SMS OTP</td><td>user</td><td>Firebase ID Token</td></tr>
+  </table>
+</div>
+</div>
+
+<!-- ════════════ TAB: BACKEND ════════════ -->
+<div id="tab-backend" class="tab-content">
+<div class="section">
+  <h2>📡 Backend — All API Endpoints (57 Total)</h2>
+
+  <h3>🔐 Auth (11 endpoints)</h3>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/test-login</code></td><td><span class="tag tag-auth">No</span></td><td>Sign in with test custom token</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/mock-login</code></td><td><span class="tag tag-auth">No</span></td><td>Dev mock token generation</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/admin-login</code></td><td><span class="tag tag-auth">No</span></td><td>Admin login (admin/admin@123)</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/delivery-login</code></td><td><span class="tag tag-auth">No</span></td><td>Delivery partner login</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/simple-login</code></td><td><span class="tag tag-auth">No</span></td><td>Dev login — any phone, no OTP</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/send-otp</code></td><td><span class="tag tag-auth">No</span></td><td>Send OTP via Firebase REST</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/verify-otp</code></td><td><span class="tag tag-auth">No</span></td><td>Verify OTP code</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/verify-token</code></td><td><span class="tag tag-auth">No</span></td><td>Verify Firebase ID token</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/google</code></td><td><span class="tag tag-auth">No</span></td><td>Google sign-in</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/auth/me</code></td><td><span class="tag tag-auth">🔒</span></td><td>Current user profile</td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span></td><td><code>/api/auth/me</code></td><td><span class="tag tag-auth">🔒</span></td><td>Update profile</td></tr>
+  </table>
+
+  <h3>📋 Orders (3 endpoints)</h3>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/orders/</code></td><td><span class="tag tag-auth">🔒</span></td><td>Place new order</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/orders/</code></td><td><span class="tag tag-auth">🔒</span></td><td>List my orders (last 10)</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/orders/{id}</code></td><td><span class="tag tag-auth">🔒</span></td><td>Single order detail</td></tr>
+  </table>
+
+  <h3>📍 Addresses (3 endpoints)</h3>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/addresses/</code></td><td><span class="tag tag-auth">🔒</span></td><td>List addresses</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/addresses/</code></td><td><span class="tag tag-auth">🔒</span></td><td>Save new address</td></tr>
+    <tr><td><span class="tag tag-delete">DELETE</span></td><td><code>/api/addresses/{id}</code></td><td><span class="tag tag-auth">🔒</span></td><td>Delete address</td></tr>
+  </table>
+
+  <h3>📦 Products (7 endpoints)</h3>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/products</code></td><td><span class="tag tag-auth">No</span></td><td>List products (brand, category, search, pagination)</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/products/{id}</code></td><td><span class="tag tag-auth">No</span></td><td>Single product</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/products</code></td><td><span class="tag tag-auth">🔒 Admin</span></td><td>Create product</td></tr>
+    <tr><td><span class="tag tag-put">PUT</span></td><td><code>/api/products/{id}</code></td><td><span class="tag tag-auth">🔒 Admin</span></td><td>Update product</td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span></td><td><code>/api/products/{id}/status</code></td><td><span class="tag tag-auth">🔒 Admin</span></td><td>Toggle stock status</td></tr>
+    <tr><td><span class="tag tag-delete">DELETE</span></td><td><code>/api/products/{id}</code></td><td><span class="tag tag-auth">🔒 Admin</span></td><td>Delete product</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/products/categories/list</code></td><td><span class="tag tag-auth">No</span></td><td>Category names list</td></tr>
+  </table>
+
+  <h3>🏷️ Categories (3 endpoints)</h3>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/categories/sections</code></td><td><span class="tag tag-auth">No</span></td><td>Sections with nested categories</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/categories</code></td><td><span class="tag tag-auth">No</span></td><td>Flat categories list</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/categories/subcategories</code></td><td><span class="tag tag-auth">No</span></td><td>Subcategories</td></tr>
+  </table>
+
+  <h3>💰 Payments (2 endpoints)</h3>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/payments/create-order</code></td><td><span class="tag tag-auth">No</span></td><td>Create Razorpay order</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/payments/verify-payment</code></td><td><span class="tag tag-auth">No</span></td><td>Verify payment signature</td></tr>
+  </table>
+
+  <h3>⚙️ Config (6 endpoints)</h3>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/config</code></td><td><span class="tag tag-auth">No</span></td><td>Global app config</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/config/delivery-slots</code></td><td><span class="tag tag-auth">No</span></td><td>Delivery time slots</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/config/payment-methods</code></td><td><span class="tag tag-auth">No</span></td><td>Payment methods</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/config/order-statuses</code></td><td><span class="tag tag-auth">No</span></td><td>Status labels</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/config/promos</code></td><td><span class="tag tag-auth">No</span></td><td>Promo banners</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/config/promos/{id}</code></td><td><span class="tag tag-auth">No</span></td><td>Single promo</td></tr>
+  </table>
+
+  <h3>🛡️ Admin (22 endpoints)</h3>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/health</code></td><td>System health (DB, Firebase, Redis)</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/stats</code></td><td>Dashboard stats</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/admin/products/bulk-status</code></td><td>Bulk enable/disable products</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/admin/categories/section</code></td><td>Create section</td></tr>
+    <tr><td><span class="tag tag-put">PUT</span></td><td><code>/api/admin/categories/section/{id}</code></td><td>Update section</td></tr>
+    <tr><td><span class="tag tag-delete">DELETE</span></td><td><code>/api/admin/categories/section/{id}</code></td><td>Delete section</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/admin/categories/{sid}/category</code></td><td>Add category</td></tr>
+    <tr><td><span class="tag tag-put">PUT</span></td><td><code>/api/admin/categories/{sid}/category/{cid}</code></td><td>Update category</td></tr>
+    <tr><td><span class="tag tag-delete">DELETE</span></td><td><code>/api/admin/categories/{sid}/category/{cid}</code></td><td>Delete category</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/orders</code></td><td>All orders (paginated, filtered)</td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span></td><td><code>/api/admin/orders/{id}/status</code></td><td>Update order status</td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span></td><td><code>/api/admin/orders/{id}/edit</code></td><td>Edit order</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/orders/export</code></td><td>Export CSV</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/promos</code></td><td>List promos (all)</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/admin/promos</code></td><td>Create promo</td></tr>
+    <tr><td><span class="tag tag-put">PUT</span></td><td><code>/api/admin/promos/{id}</code></td><td>Update promo</td></tr>
+    <tr><td><span class="tag tag-delete">DELETE</span></td><td><code>/api/admin/promos/{id}</code></td><td>Delete promo</td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span></td><td><code>/api/admin/promos/{id}/toggle</code></td><td>Toggle active</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/config</code></td><td>Get config</td></tr>
+    <tr><td><span class="tag tag-put">PUT</span></td><td><code>/api/admin/config</code></td><td>Update config</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/users</code></td><td>List users</td></tr>
+  </table>
+
+  <h3>🏪 Shops (6 endpoints)</h3>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/shops/active</code></td><td><span class="tag tag-auth">No</span></td><td>Get active shop (delivery app)</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/shops/</code></td><td><span class="tag tag-auth">🔒 Admin</span></td><td>List shops</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/admin/shops/</code></td><td><span class="tag tag-auth">🔒 Admin</span></td><td>Create shop</td></tr>
+    <tr><td><span class="tag tag-put">PUT</span></td><td><code>/api/admin/shops/{id}</code></td><td><span class="tag tag-auth">🔒 Admin</span></td><td>Update shop</td></tr>
+    <tr><td><span class="tag tag-delete">DELETE</span></td><td><code>/api/admin/shops/{id}</code></td><td><span class="tag tag-auth">🔒 Admin</span></td><td>Delete shop</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/shops/nearest</code></td><td><span class="tag tag-auth">🔒 Admin</span></td><td>Nearest shop to coords</td></tr>
+  </table>
+
+  <h3>🚚 Delivery (2 endpoints)</h3>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/delivery/orders</code></td><td><span class="tag tag-auth">🔒</span></td><td>Active orders (lat/lon/radius filter)</td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span></td><td><code>/api/delivery/orders/{id}/status</code></td><td><span class="tag tag-auth">🔒</span></td><td>Delivery partner status update</td></tr>
+  </table>
+
+  <h3>🔧 System (2 endpoints)</h3>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/health</code></td><td>System health check</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/static/{path}</code></td><td>Static files (product images)</td></tr>
+  </table>
+</div>
+</div>
+
+<!-- ════════════ TAB: MAIN APP ════════════ -->
+<div id="tab-mainapp" class="tab-content">
+<div class="section">
+  <h2>📱 Main App — Consumed APIs (30 calls)</h2>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>When Called</th></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/send-otp</code></td><td>Login → Send OTP</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/verify-otp</code></td><td>Login → Verify OTP</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/verify-token</code></td><td>After Firebase auth</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/test-login</code></td><td>Dev login</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/mock-login</code></td><td>Mock login</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/simple-login</code></td><td>Dev simple login</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/google</code></td><td>Google sign-in</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/auth/me</code></td><td>Profile page</td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span></td><td><code>/api/auth/me</code></td><td>Profile update</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/orders/</code></td><td>Checkout → Place order</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/orders</code></td><td>Orders screen (30s poll)</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/orders/{id}</code></td><td>Order detail</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/addresses</code></td><td>Addresses screen</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/addresses</code></td><td>Save address</td></tr>
+    <tr><td><span class="tag tag-delete">DELETE</span></td><td><code>/api/addresses/{id}</code></td><td>Delete address</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/products</code></td><td>Home + Category screens</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/categories/sections</code></td><td>Category browser</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/categories</code></td><td>Category list</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/categories/subcategories</code></td><td>Subcategory filter</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/payments/create-order</code></td><td>Razorpay payment</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/payments/verify-payment</code></td><td>Payment verification</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/config</code></td><td>App config load</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/config/promos</code></td><td>Promo slider</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/config/delivery-slots</code></td><td>Checkout time slots</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/config/payment-methods</code></td><td>Checkout payment options</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/config/order-statuses</code></td><td>Order status labels</td></tr>
+  </table>
+
+  <h3>📁 Key Files</h3>
+  <div class="code">src/services/api.js    — HTTP client (auth headers, timeout, error handling)<br>src/services/firebase.js — Firebase Auth init<br>src/services/razorpay.js — Payment gateway<br>src/services/locationService.js — GPS + Nominatim geocoding<br>src/services/googleAuth.js — Google Sign-In<br>src/services/imageService.js — Firebase Storage image cache</div>
+
+  <h3>🏪 Zustand Stores</h3>
+  <table>
+    <tr><th>Store</th><th>File</th><th>Persist Key</th><th>Data</th></tr>
+    <tr><td>Cart</td><td>src/store/cartStore.js</td><td>aaplakart-cart</td><td>items[]</td></tr>
+    <tr><td>Address</td><td>src/store/addressStore.js</td><td>aaplakart-addresses</td><td>addresses[]</td></tr>
+    <tr><td>Orders</td><td>src/store/ordersStore.js</td><td>aaplakart-orders</td><td>orders[]</td></tr>
+  </table>
+
+  <h3>📱 Screens</h3>
+  <div class="code">HomeScreen — Products, search, promo slider<br>BrandCategoryScreen — Category grid → PLP<br>CartScreen — Cart management<br>CheckoutScreen — 3-step checkout<br>ProfileScreen — User menu<br>OrdersScreen — History (30s poll)<br>AddressBookScreen — CRUD addresses<br>LoginScreen — Phone OTP + Google<br>InfoScreen — About / Privacy</div>
+</div>
+</div>
+
+<!-- ════════════ TAB: DELIVERY APP ════════════ -->
+<div id="tab-delivery" class="tab-content">
+<div class="section">
+  <h2>🚚 Delivery App — Consumed APIs (8 calls)</h2>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>When Called</th></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/delivery-login</code></td><td>Login → OTP verify</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/auth/me</code></td><td>Session restore on app open</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/delivery/orders?radius_km=10</code></td><td>Fetch assigned orders</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/delivery/orders</code></td><td>Dashboard (5s polling)</td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span></td><td><code>/api/delivery/orders/{id}/status</code></td><td>Status update button</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/orders/{id}</code></td><td>Order detail screen</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/orders</code></td><td>All orders fallback</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/shops/active</code></td><td>Shop location on load</td></tr>
+  </table>
+
+  <h3>📁 Key Files</h3>
+  <div class="code">src/store/authStore.js      — Auth with persist (skipHydration)<br>src/store/deliveryStore.js  — Orders, shop location, status update<br>src/services/api.js          — HTTP client<br>src/services/realtime.js     — 5s polling engine (NOT WebSocket!)<br>src/components/DeliveryMap.jsx — MapMyIndia map + route<br>src/components/NavigationOverlay.jsx — In-app nav (Mappls SDK)</div>
+
+  <h3>📱 Screens</h3>
+  <div class="code">LoginScreen — Phone + OTP (123456)<br>DashboardScreen — Stats (active/delivered) + orders list<br>OrderDetailScreen — Map + items + status buttons<br>AssignedOrdersScreen — All orders list</div>
+
+  <div class="note">⚠️ Delivery app uses <b>5s polling (NOT WebSocket)</b>. Backend's WebSocket (/ws/orders) is unused by delivery app.</div>
+</div>
+</div>
+
+<!-- ════════════ TAB: ADMIN ════════════ -->
+<div id="tab-admin" class="tab-content">
+<div class="section">
+  <h2>🖥️ Admin Panel — Consumed APIs (26 calls)</h2>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Admin Tab</th></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/admin-login</code></td><td>Login screen</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/health</code></td><td>Dashboard + Health tab</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/stats</code></td><td>Dashboard</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/orders</code></td><td>Orders tab (30s auto-refresh)</td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span></td><td><code>/api/admin/orders/{id}/status</code></td><td>Orders → status buttons</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/products</code></td><td>Products tab</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/products</code></td><td>Products → Add</td></tr>
+    <tr><td><span class="tag tag-put">PUT</span></td><td><code>/api/products/{id}</code></td><td>Products → Edit</td></tr>
+    <tr><td><span class="tag tag-delete">DELETE</span></td><td><code>/api/products/{id}</code></td><td>Products → Delete</td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span></td><td><code>/api/products/{id}/status</code></td><td>Products → Toggle stock</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/categories/sections</code></td><td>Categories tab</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/admin/categories/section</code></td><td>Categories → Add section</td></tr>
+    <tr><td><span class="tag tag-delete">DELETE</span></td><td><code>/api/admin/categories/section/{id}</code></td><td>Categories → Delete section</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/shops/</code></td><td>Shops tab</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/admin/shops/</code></td><td>Shops → Add</td></tr>
+    <tr><td><span class="tag tag-put">PUT</span></td><td><code>/api/admin/shops/{id}</code></td><td>Shops → Edit</td></tr>
+    <tr><td><span class="tag tag-delete">DELETE</span></td><td><code>/api/admin/shops/{id}</code></td><td>Shops → Delete</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/promos</code></td><td>Promos tab</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/admin/promos</code></td><td>Promos → Add</td></tr>
+    <tr><td><span class="tag tag-put">PUT</span></td><td><code>/api/admin/promos/{id}</code></td><td>Promos → Edit</td></tr>
+    <tr><td><span class="tag tag-delete">DELETE</span></td><td><code>/api/admin/promos/{id}</code></td><td>Promos → Delete</td></tr>
+    <tr><td><span class="tag tag-patch">PATCH</span></td><td><code>/api/admin/promos/{id}/toggle</code></td><td>Promos → Toggle active</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/config</code></td><td>Config tab</td></tr>
+    <tr><td><span class="tag tag-put">PUT</span></td><td><code>/api/admin/config</code></td><td>Config → Save</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/users</code></td><td>Users tab</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/admin/orders/export</code></td><td>Orders → CSV export</td></tr>
+  </table>
+
+  <h3>📁 Files</h3>
+  <div class="code">index.html — Full SPA (~1500 lines, all UI + logic)<br>api.js — HTTP client with auto-detected base URL<br>styles.css — All styles</div>
+
+  <h3>📋 Admin Tabs</h3>
+  <div class="code">📊 Dashboard — Stats + system health<br>📦 Products — CRUD, search, filter, stock toggle<br>📋 Orders — Status filter, pagination, status update<br>🏷️ Categories — Section/category CRUD<br>🎯 Promos — CRUD + toggle active<br>🏪 Shops — Shop CRUD with location<br>🔬 System Health — DB, Firebase, Redis checks<br>⚙️ Config — App configuration<br>👥 Users — User list</div>
+</div>
+</div>
+
+<!-- ════════════ TAB: WEBSOCKET ════════════ -->
+<div id="tab-websocket" class="tab-content">
+<div class="section">
+  <h2>🔌 WebSocket — Real-time Order Updates</h2>
+
+  <h3>📡 WebSocket Endpoint</h3>
+  <div class="code">ws://&lt;host&gt;:8000/ws/orders</div>
+  <div class="code">Message Protocol:<br>Client → {"type": "ping"}<br>Server → {"type": "pong"}<br>Server → {"type": "order_update", "order_id": "...", "status": "...", "updated_by": "..."}<br>Server → {"type": "new_order", "order_id": "...", "status": "pending", "total": 250, ...}</div>
+
+  <h3>📊 WebSocket Usage by App</h3>
+  <table>
+    <tr><th>App</th><th>Uses WebSocket?</th><th>Mechanism</th><th>File</th></tr>
+    <tr><td>🗄️ Backend Server</td><td><span class="tag tag-ws">✅ Server</span></td><td>Accepts WS connections, broadcasts to all clients</td><td>app/main.py (line 83)</td></tr>
+    <tr><td>🖥️ Admin Panel</td><td><span class="tag tag-ws">✅ Client</span></td><td>Connects via WS, falls back to 30s polling if fails</td><td>index.html (line 1687)</td></tr>
+    <tr><td>🚚 Delivery App</td><td><span class="tag tag-ws">❌ Polling</span></td><td>Uses 5s HTTP polling instead of WebSocket!</td><td>src/services/realtime.js</td></tr>
+    <tr><td>📱 Main App</td><td><span class="tag tag-ws">❌ Polling</span></td><td>Uses 30s HTTP polling for order status</td><td>App.js / OrdersScreen.jsx</td></tr>
+  </table>
+
+  <div class="critical">⚠️ Delivery app and Main app don't use WebSocket! They poll every 5s/30s. Backend's WS infrastructure is ready but unutilized by mobile apps.</div>
+
+  <h3>🔧 WebSocket Manager</h3>
+  <div class="code">File: app/services/websocket_manager.py<br>Features:<br>  • ConnectionManager class — tracks all active WS connections<br>  • broadcast() — sends message to ALL connected clients<br>  • broadcast_to_role() — sends to specific user roles<br>  • connect/disconnect — track client lifecycle<br><br>Events that trigger broadcasts:<br>  • Order status change → "order_update" event<br>  • New order placed → "new_order" event</div>
+</div>
+</div>
+
+<!-- ════════════ TAB: ARCHITECTURE ════════════ -->
+<div id="tab-architecture" class="tab-content">
+<div class="section">
+  <h2>🏗️ Complete Architecture</h2>
+
+  <h3>📱 Main App (Customer)</h3>
+  <div class="code">Expo SDK 54 • React 19.1 • React Navigation 7 (Bottom Tabs)<br>Zustand 5.0.13 • AsyncStorage • Firebase JS SDK<br>react-native-maps • Razorpay (WebView)<br><br>9 Screens: Home → Categories → Waffle → Cart → Profile<br>                    → Checkout → Orders → Address → Info<br><br>Order polling: 30s interval on OrdersScreen</div>
+
+  <h3>🚚 Delivery App (Partner)</h3>
+  <div class="code">Expo SDK 54 • React 19.1 • React Navigation 7 (Native Stack)<br>Zustand 5.0.12 • AsyncStorage<br>react-native-maps + MapMyIndia (Mappls SDK)<br><br>4 Screens: Login → Dashboard → OrderDetail → AssignedOrders<br><br>Order polling: 5s interval (no WebSocket!)<br>MapMyIndia: In-app navigation with Mappls Direction Widget</div>
+
+  <h3>🗄️ Backend (FastAPI)</h3>
+  <div class="code">FastAPI • SQLite (dev) / PostgreSQL (prod)<br>SQLAlchemy async • Firebase Admin SDK<br>Razorpay API • Redis (optional)<br>WebSocket (ws/orders) • loguru logging<br><br>11 Route Modules: auth, orders, products, categories,<br>addresses, payments, admin, delivery, shops,<br>shops_public, config<br><br>Data Sources: SQLite DB + JSON files (products/categories/promos)</div>
+
+  <h3>🖥️ Admin Panel (Web)</h3>
+  <div class="code">Vanilla HTML/CSS/JS (single-page app)<br>Python HTTP server (port 3000)<br><br>9 Tabs: Dashboard, Products, Orders, Categories,<br>            Promos, Shops, Health, Config, Users<br><br>WebSocket connected (real-time updates)<br>30s polling fallback if WS fails</div>
+
+  <h3>🔗 Service Links</h3>
+  <table>
+    <tr><th>Service</th><th>URL</th><th>Port</th></tr>
+    <tr><td>Backend API</td><td>http://localhost:8000</td><td>8000</td></tr>
+    <tr><td>API Docs (Swagger)</td><td>http://localhost:8000/docs</td><td>8000</td></tr>
+    <tr><td>Admin Panel</td><td>http://localhost:3000</td><td>3000</td></tr>
+    <tr><td>Main App</td><td>exp://IP:8081</td><td>8081</td></tr>
+    <tr><td>Delivery App</td><td>exp://IP:8082</td><td>8082</td></tr>
+    <tr><td>WebSocket</td><td>ws://localhost:8000/ws/orders</td><td>8000</td></tr>
+  </table>
+</div>
+</div>
+
+</div>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
