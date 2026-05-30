@@ -1,0 +1,24 @@
+{
+  "name": "aaplakart-backend",
+  "version": "1.0.0",
+  "description": "> **FastAPI Python Backend** — Handles auth, products, orders, payments, delivery, admin APIs\r > \r > **Last Updated: May 25, 2026**",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mahesh0842/aaplakart-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mahesh0842/aaplakart-backend/issues"
+  },
+  "homepage": "https://github.com/mahesh0842/aaplakart-backend#readme",
+  "dependencies": {
+    "ws": "^8.21.0"
+  }
+}

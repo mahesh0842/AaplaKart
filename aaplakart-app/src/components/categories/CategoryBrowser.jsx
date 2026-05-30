@@ -17,6 +17,7 @@ import {
   Animated,
   FlatList,
   Image,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -193,13 +194,15 @@ const CategoryBrowser = memo(({
     return () => { active = false; };
   }, [propSections, type]);
 
-  // ── Animate category switch ─────────────────────────────────────
+  // ── Category selection (instant, no animation) ──────────────────
   const handleCategoryPress = useCallback((category) => {
-    Animated.sequence([
-      Animated.timing(fadeAnim, { toValue: 0.6, duration: 80, useNativeDriver: true }),
-      Animated.timing(fadeAnim, { toValue: 1, duration: 150, useNativeDriver: true }),
-    ]).start();
-
+    // "All" category → deselect and show everything
+    if (category?.id === 'cat-all') {
+      setActiveCategory(null);
+      onSelectCategory?.(null);
+      return;
+    }
+    // Toggle: tap same category again → deselect
     if (category && activeCategory?.id === category.id) {
       setActiveCategory(null);
       onSelectCategory?.(null);
@@ -207,7 +210,7 @@ const CategoryBrowser = memo(({
       setActiveCategory(category);
       onSelectCategory?.(category);
     }
-  }, [activeCategory, onSelectCategory, fadeAnim]);
+  }, [activeCategory, onSelectCategory]);
 
   const handleSubcategorySelect = useCallback((sub) => {
     onSelectSubcategory?.(sub);
@@ -218,6 +221,7 @@ const CategoryBrowser = memo(({
     try {
       const res = await fetchSections({ type });
       if (res?.sections) setInternalSections(res.sections);
+
     } catch (e) {
       console.log('[CategoryBrowser] Refresh failed:', e?.message);
     } finally {
@@ -231,6 +235,8 @@ const CategoryBrowser = memo(({
   // ── Build flat category list for chips mode ────────────────────
   const allCategories = useMemo(() => {
     const cats = [];
+    // Prepend "All" chip — deselects category, shows all products
+    cats.push({ id: 'cat-all', name: 'All', sectionName: '', sectionType: '', image: '' });
     sections.forEach((sec) => {
       (sec.categories || []).forEach((cat) => {
         cats.push({ ...cat, sectionName: sec.name, sectionType: sec.type });
@@ -267,24 +273,35 @@ const CategoryBrowser = memo(({
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.chipsScrollContent}
         >
-          <Pressable
-            onPress={() => handleCategoryPress(null)}
-            style={[styles.chip, !activeCategory && styles.chipActive]}
-          >
-            <Text style={[styles.chipLabel, !activeCategory && styles.chipLabelActive]}>All</Text>
-          </Pressable>
-          {allCategories.map((cat) => {
-            const active = activeCategory?.id === cat.id;
+          {allCategories.map((cat, idx) => {
+            const isAll = cat.id === 'cat-all';
+            const active = isAll ? !activeCategory : activeCategory?.id === cat.id;
             return (
               <Pressable
-                key={cat.id}
+                key={cat.id + '-' + (cat.sectionId || cat.sectionName || idx)}
                 onPress={() => handleCategoryPress(cat)}
-                style={[styles.chip, active && styles.chipActive]}
+                style={({ pressed }) => [
+                  styles.chip,
+                  active && styles.chipActive,
+                  pressed && !active && styles.chipPressed,
+                ]}
               >
-                {cat.image && (
+                {isAll ? (
+                  <Ionicons
+                    name="apps-outline"
+                    size={18}
+                    color={active ? '#fff' : '#9ca3af'}
+                  />
+                ) : cat.image ? (
                   <Image
                     source={{ uri: resolveImage(cat.image) }}
                     style={styles.chipIconImg}
+                  />
+                ) : (
+                  <Ionicons
+                    name="grid-outline"
+                    size={18}
+                    color={active ? '#fff' : '#9ca3af'}
                   />
                 )}
                 <Text style={[styles.chipLabel, active && styles.chipLabelActive]}>
@@ -531,26 +548,52 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   chipsScrollContent: {
-    paddingHorizontal: 20,
-    paddingRight: 10,
+    paddingHorizontal: 16,
     gap: 8,
+    paddingVertical: 4,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
     borderRadius: 999,
-    backgroundColor: COLORS.mutedBg,
+    backgroundColor: '#fff',
+    borderWidth: 1.5,
+    borderColor: '#e5e7eb',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOpacity: 0.04,
+        shadowRadius: 3,
+        shadowOffset: { width: 0, height: 1 },
+      },
+      android: { elevation: 1 },
+    }),
   },
   chipActive: {
     backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.primary,
+        shadowOpacity: 0.30,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 3 },
+      },
+      android: { elevation: 6 },
+    }),
+  },
+  chipPressed: {
+    backgroundColor: '#f9fafb',
+    borderColor: '#d1d5db',
+    transform: [{ scale: 0.96 }],
   },
   chipLabel: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
-    color: COLORS.mutedText,
+    color: '#374151',
   },
   chipLabelActive: {
     color: '#fff',

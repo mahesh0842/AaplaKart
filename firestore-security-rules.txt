@@ -1,0 +1,85 @@
+/*
+╔═══════════════════════════════════════════════════════════════════╗
+║  FIRESTORE SECURITY RULES — AaplaKart                            ║
+║  Apply at: https://console.firebase.google.com/project/aaplakart ║
+║            /firestore/rules                                      ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+NOTE: 
+- Backend uses Firebase Admin SDK → bypasses these rules entirely
+- Admin panel uses Firebase Web SDK without Firebase Auth → needs open access
+- Mobile apps use backend API → don't hit Firestore directly
+- For production: switch to authenticated rules and add Firebase Auth to admin panel
+*/
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Open read/write for admin panel + backend compatibility ──
+    // Admin panel runs without Firebase Auth so we allow all access.
+    // Backend Admin SDK bypasses rules anyway.
+    // ⚠️ Tighten these when admin panel gets Firebase Auth.
+
+    match /orders/{orderId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+    }
+
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+    }
+
+    match /sections/{sectionId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+    }
+
+    match /shops/{shopId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+    }
+
+    match /promos/{promoId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+    }
+
+    match /config/{configId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+    }
+
+    match /addresses/{addressId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+    }
+
+    // ── Default deny ──
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

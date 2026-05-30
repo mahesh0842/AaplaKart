@@ -42,7 +42,7 @@ def get_promos(
     position: Optional[str] = None,
     active_only: bool = True,
 ) -> list[dict]:
-    """Return promo banners, optionally filtered."""
+    """Return promo banners, optionally filtered. Local JSON only (Firestore is user/delivery only)."""
     promos = _load_json(PROMOS_FILE)
 
     if active_only:
@@ -61,7 +61,7 @@ def get_promos(
 
 
 def get_promo_by_id(promo_id: str) -> Optional[dict]:
-    """Get a single promo by ID."""
+    """Get a single promo by ID from local JSON."""
     promos = _load_json(PROMOS_FILE)
     for p in promos:
         if p.get("id") == promo_id:
@@ -70,12 +70,9 @@ def get_promo_by_id(promo_id: str) -> Optional[dict]:
 
 
 def add_promo(data: dict) -> dict:
-    """Create a new promo banner."""
+    """Create a new promo banner. Local JSON only (Firestore is user/delivery only)."""
     promos = _load_json(PROMOS_FILE)
-
-    # Generate ID
     base_id = data.get("id", f"promo-{data.get('brand', 'general')}-{len(promos) + 1}")
-
     new_promo = {
         "id": base_id,
         "title": data.get("title", ""),
@@ -90,10 +87,8 @@ def add_promo(data: dict) -> dict:
         "sortOrder": data.get("sortOrder", len(promos) + 1),
         "createdAt": datetime.now(timezone.utc).isoformat(),
     }
-
     promos.append(new_promo)
     _save_json(PROMOS_FILE, promos)
-    logger.info(f"Promo created: {new_promo['id']} - {new_promo['title']}")
     return new_promo
 
 
@@ -140,8 +135,8 @@ def toggle_promo(promo_id: str) -> Optional[dict]:
 
 
 def get_app_config() -> dict:
-    """Return global app configuration values."""
-    return {
+    """Return global app configuration values. Local JSON + defaults only (Firestore is user/delivery only)."""
+    defaults = {
         "free_delivery_threshold": 199,
         "delivery_fee": 30,
         "promo_code": "FREEDEL",
@@ -156,6 +151,10 @@ def get_app_config() -> dict:
         "maintenance_mode": False,
         "maintenance_message": "",
     }
+
+    # Merge with saved JSON file
+    saved = _load_config_file()
+    return {**defaults, **saved}
 
 
 _CONFIG_FILE = Path(__file__).resolve().parent.parent / "data" / "config.json"
@@ -180,11 +179,10 @@ def _save_config_file(data: dict) -> None:
 
 
 def update_app_config(updates: dict) -> dict:
-    """Update app configuration and persist to JSON file."""
+    """Update app configuration. Local JSON only (Firestore is user/delivery only)."""
     defaults = get_app_config()
     saved = _load_config_file()
     merged = {**defaults, **saved, **updates}
-    # Remove non-config keys
     merged = {k: v for k, v in merged.items() if k in defaults}
     _save_config_file(merged)
     logger.info(f"App config updated: {list(updates.keys())}")
@@ -205,25 +203,18 @@ def get_payment_methods() -> list[dict]:
     """Return available payment methods."""
     return [
         {
-            "id": "cod",
-            "label": "Cash on Delivery",
-            "description": "Pay when your order arrives",
-            "icon": "cash-outline",
-            "iconFamily": "Ionicons",
-        },
-        {
-            "id": "online",
-            "label": "Online Payment",
-            "description": "Pay securely via Razorpay — Cards, UPI, NetBanking",
-            "icon": "shield-check-outline",
-            "iconFamily": "MaterialCommunityIcons",
-        },
-        {
             "id": "upi",
             "label": "UPI",
             "description": "Google Pay, PhonePe, Paytm & more",
             "icon": "qrcode-scan",
             "iconFamily": "MaterialCommunityIcons",
+        },
+        {
+            "id": "cod",
+            "label": "Cash on Delivery",
+            "description": "Pay when your order arrives",
+            "icon": "cash-outline",
+            "iconFamily": "Ionicons",
         },
     ]
 

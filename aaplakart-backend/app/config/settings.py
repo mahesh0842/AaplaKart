@@ -77,6 +77,19 @@ class Settings:
         default_factory=lambda: _env("GOOGLE_MAPS_API_KEY")
     )
 
+    # ── SMS OTP Provider ─────────────────────────────────────────────
+    # Supported: fast2sms, twilio, msg91, mock
+    # mock = no real SMS (dev mode), fast2sms = cheapest in India (₹0.15/SMS)
+    sms_provider: str = field(
+        default_factory=lambda: _env("SMS_PROVIDER", "mock")
+    )
+    sms_api_key: str = field(
+        default_factory=lambda: _env("SMS_API_KEY", "")
+    )
+    sms_sender_id: str = field(
+        default_factory=lambda: _env("SMS_SENDER_ID", "AAPLKRT")
+    )
+
     # ── Server ───────────────────────────────────────────────────────
     host: str = field(default_factory=lambda: _env("HOST", "0.0.0.0"))
     port: int = field(default_factory=lambda: int(_env("PORT", "8000")))

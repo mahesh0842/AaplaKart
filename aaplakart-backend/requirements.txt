@@ -1,14 +1,9 @@
-fastapi
+﻿fastapi
 uvicorn[standard]
 firebase-admin
 python-dotenv
 httpx
 pyjwt[crypto]
 loguru
-sqlalchemy[asyncio]
-aiosqlite
 razorpay
 redis[hiredis]
-# For Cloud SQL PostgreSQL in production, uncomment:
-# asyncpg
-# cloud-sql-python-connector[pg8000]

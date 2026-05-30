@@ -173,9 +173,11 @@ const ProductListingPage = memo(({
         product={item}
         quantity={quantities[item.id] || 0}
         onAdd={handleAdd}
+        isAuthenticated={isAuthenticated}
+        onShowLogin={onShowLogin}
       />
     </View>
-  ), [quantities, handleAdd]);
+  ), [quantities, handleAdd, isAuthenticated, onShowLogin]);
 
   const headerHeight = 52;
 

@@ -1,39 +1,39 @@
-// Small floating checkout bubble — centered above tab bar.
-// Appears when cart has items. Tap → direct checkout.
+// Floating cart bubble — tap opens Checkout directly
+// Compact: cart icon + count, orange (1 item) or green (2+ items)
 import React, { useMemo, useCallback } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../../utils/constants';
-import { formatCurrency, getCartCount, getCartSubtotal, getShadowStyle } from '../../utils/helpers';
+import { getCartCount, getShadowStyle } from '../../utils/helpers';
 import { useCartStore } from '../../store/cartStore';
 
-const FloatingCartBar = ({ onCheckout }) => {
+const FloatingCartBar = ({ onNavigateCart }) => {
   const items = useCartStore((state) => state.items);
   const insets = useSafeAreaInsets();
 
   const itemCount = useMemo(() => getCartCount(items), [items]);
-  const subtotal = useMemo(() => getCartSubtotal(items), [items]);
 
   const handlePress = useCallback(() => {
-    onCheckout?.();
-  }, [onCheckout]);
+    onNavigateCart?.();
+  }, [onNavigateCart]);
 
   if (itemCount === 0) return null;
+
+  const bgColor = itemCount > 1 ? '#16a34a' : COLORS.primary;
 
   return (
     <View style={[styles.wrapper, { bottom: 68 + Math.max(insets.bottom, 8) }]}>
       <Pressable
         onPress={handlePress}
-        style={({ pressed }) => [styles.bubble, pressed && styles.bubblePressed]}
+        style={({ pressed }) => [
+          styles.bubble,
+          { backgroundColor: bgColor },
+          pressed && styles.bubblePressed,
+        ]}
       >
-        <View style={styles.iconWrap}>
-          <Ionicons name="cart" size={20} color="#fff" />
-        </View>
-       
-        <View style={styles.arrowWrap}>
-          <Ionicons name="chevron-forward" size={14} color="#fff" />
-        </View>
+        <Ionicons name="cart" size={24} color="#fff" />
+        <Text style={styles.count}>{itemCount}</Text>
       </Pressable>
     </View>
   );
@@ -48,30 +48,19 @@ const styles = StyleSheet.create({
   bubble: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: COLORS.primary,
-    borderRadius: 24,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    justifyContent: 'center',
+    gap: 8,
+    borderRadius: 28,
+    paddingVertical: 14,
+    paddingHorizontal: 22,
+    minWidth: 68,
     ...getShadowStyle(COLORS.primary),
   },
   bubblePressed: { opacity: 0.88 },
-  iconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
- 
-  arrowWrap: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  count: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '800',
   },
 });
 

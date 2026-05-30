@@ -1,13 +1,15 @@
 // GUI category: Screen. Fixed header → search → categories (backend) → products (backend).
 // Uses universal CategoryBrowser for all category/subcategory UI.
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import Header from '../components/header/Header';
 import CategoryBrowser from '../components/categories/CategoryBrowser';
 import ProductGrid from '../components/products/ProductGrid';
 import Container from '../components/common/Container';
 import PromoSlider from '../components/promo/PromoSlider';
+// ActiveOrderTracker inlined to avoid import resolution issues
+import ActiveOrderTracker from '../components/common/ActiveOrderTracker';
 import { fetchProducts } from '../services/api';
 import { useCartStore } from '../store/cartStore';
 
@@ -49,7 +51,7 @@ const HomeScreen = ({ isAuthenticated, onShowLogin }) => {
     return () => { active = false; clearTimeout(timer); };
   }, [selectedCategory, selectedSubcategory, searchValue]);
 
-  const handleAddProduct = useCallback((product) => {
+  const handleAddProduct = useCallback((product, qty = 1) => {
     if (!isAuthenticated) {
       Toast.show({
         type: 'info',
@@ -59,12 +61,11 @@ const HomeScreen = ({ isAuthenticated, onShowLogin }) => {
       onShowLogin();
       return;
     }
-    addItem(product);
-    Toast.show({
-      type: 'success',
-      text1: 'Added to cart',
-      text2: `${product.name} has been added to your cart.`,
-    });
+    addItem(product, qty);
+    // Quick haptic-like feedback — Toast for confirmation
+    if (qty > 1) {
+      Toast.show({ type: 'success', text1: `${qty}x Added!`, text2: product.name, visibilityTime: 1200 });
+    }
   }, [isAuthenticated, addItem, onShowLogin]);
 
   const quantities = useMemo(
@@ -105,6 +106,10 @@ const HomeScreen = ({ isAuthenticated, onShowLogin }) => {
     <Container contentStyle={styles.containerContent}>
       {/* Fixed top: header with logo + search */}
       <Header searchValue={searchValue} onSearchChange={setSearchValue} />
+      {/* Active order tracker — shows only when there's a live order */}
+      <View style={styles.trackerRow}>
+        <ActiveOrderTracker />
+      </View>
       {/* Category + subcategory chips (universal component, data from backend) */}
       <CategoryBrowser
         layout="chips"
@@ -131,6 +136,7 @@ const HomeScreen = ({ isAuthenticated, onShowLogin }) => {
           quantities={quantities}
           onAddProduct={handleAddProduct}
           showHeading={false}
+          cardProps={{ isAuthenticated, onShowLogin }}
         />
       </ScrollView>
     </Container>
@@ -143,6 +149,9 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingBottom: 24,
+  },
+  trackerRow: {
+    marginBottom: 2,
   },
 });
 

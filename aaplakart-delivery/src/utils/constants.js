@@ -16,7 +16,6 @@ export const ORDER_STATUS = {
   PENDING: 'pending',
   CONFIRMED: 'confirmed',
   PREPARING: 'preparing',
-  PICKED_UP: 'picked_up',
   OUT_FOR_DELIVERY: 'out-for-delivery',
   DELIVERED: 'delivered',
   CANCELLED: 'cancelled',
@@ -26,7 +25,6 @@ export const STATUS_LABELS = {
   pending: 'New Order',
   confirmed: 'Confirmed',
   preparing: 'Preparing',
-  picked_up: 'Picked Up',
   'out-for-delivery': 'Out for Delivery',
   delivered: 'Delivered',
   cancelled: 'Cancelled',
@@ -36,13 +34,12 @@ export const STATUS_COLORS = {
   pending: '#f97316',
   confirmed: '#2563eb',
   preparing: '#16a34a',
-  picked_up: '#7c3aed',
   'out-for-delivery': '#7c3aed',
   delivered: '#15803d',
   cancelled: '#b91c1c',
 };
 
-export const STATUS_FLOW = ['pending', 'confirmed', 'preparing', 'picked_up', 'out-for-delivery', 'delivered'];
+export const STATUS_FLOW = ['pending', 'confirmed', 'preparing', 'out-for-delivery', 'delivered'];
 
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
@@ -96,16 +93,32 @@ export function isWithinDeliveryRadius(orderLat, orderLon) {
   return dist <= DELIVERY_RADIUS_KM;
 }
 
-// ── MapMyIndia (In-App Map + Directions) ──────────────────────
-export const MAPMYINDIA_KEY = process.env.EXPO_PUBLIC_MAPMYINDIA_KEY || '14618ac29b15178af1abc49f975bb25e';
+// ── Google Maps (In-App Map + Directions) ──────────────────────
+export const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
-// Map tile URL template (for react-native-maps <UrlTile>)
-export const MAPMYINDIA_TILE_URL = (key) =>
-  `https://apis.mapmyindia.com/advancedmaps/v1/${key || MAPMYINDIA_KEY}/map_tiles?x={x}&y={y}&z={z}`;
+// Google Maps tile URL template (for react-native-maps <UrlTile>)
+export const GOOGLE_MAPS_TILE_URL = (key) =>
+  `https://maps.googleapis.com/maps/api/staticmap?center={x},{y}&zoom={z}&size=512x512&key=${key || GOOGLE_MAPS_API_KEY}`;
 
-// Directions API — returns polyline route between two points
-export const MAPMYINDIA_DIRECTIONS_URL =
-  'https://apis.mapmyindia.com/advancedmaps/v1';
+// Google Directions API — returns polyline route between two points
+export const GOOGLE_DIRECTIONS_URL =
+  'https://maps.googleapis.com/maps/api/directions/json';
 
-// Check if MapMyIndia is configured
-export const hasMapMyIndia = () => MAPMYINDIA_KEY.length > 20;
+// Check if Google Maps is configured
+export const hasGoogleMaps = () => GOOGLE_MAPS_API_KEY.length > 0;
+
+// Decode Google encoded polyline (used by Directions API)
+export function decodePolyline(encoded) {
+  const points = [];
+  let index = 0, lat = 0, lng = 0;
+  while (index < encoded.length) {
+    let b, shift = 0, result = 0;
+    do { b = encoded.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lat += (result & 1) ? ~(result >> 1) : (result >> 1);
+    shift = 0; result = 0;
+    do { b = encoded.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+    points.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
+  }
+  return points;
+}

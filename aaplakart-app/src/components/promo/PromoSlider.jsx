@@ -6,7 +6,7 @@ import { getShadowStyle } from '../../utils/helpers';
 import { fetchPromos } from '../../services/api';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = SCREEN_WIDTH - 40;
+const CARD_WIDTH = SCREEN_WIDTH - 24;
 const CARD_HEIGHT = Math.max(120, SCREEN_WIDTH * 0.32);
 
 const resolveImage = (img) => {
@@ -82,7 +82,7 @@ const PromoSlider = ({ brand = 'kart', position = 'home_banner', onPromoPress, a
   }, [promos.length, autoScrollInterval]);
 
   const onScroll = useCallback((e) => {
-    setActiveIndex(Math.round(e.nativeEvent.contentOffset.x / CARD_WIDTH));
+    setActiveIndex(Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH));
   }, []);
 
   const handlePromoPress = useCallback((promo) => { onPromoPress?.(promo); }, [onPromoPress]);
@@ -109,10 +109,13 @@ const PromoSlider = ({ brand = 'kart', position = 'home_banner', onPromoPress, a
       <FlatList
         ref={flatListRef} data={promos} keyExtractor={(item) => item.id}
         horizontal pagingEnabled showsHorizontalScrollIndicator={false}
-        snapToInterval={CARD_WIDTH + 8} decelerationRate="fast"
-        contentContainerStyle={styles.listContent}
+        decelerationRate="fast"
         onScroll={onScroll} scrollEventThrottle={16}
-        renderItem={({ item }) => <PromoCard item={item} onPress={handlePromoPress} />}
+        renderItem={({ item }) => (
+          <View style={styles.cardWrap}>
+            <PromoCard item={item} onPress={handlePromoPress} />
+          </View>
+        )}
       />
       {promos.length > 1 && <PaginationDots total={promos.length} activeIndex={activeIndex} color={promos[activeIndex]?.bgColor || '#f97316'} />}
     </View>
@@ -121,8 +124,8 @@ const PromoSlider = ({ brand = 'kart', position = 'home_banner', onPromoPress, a
 
 const styles = StyleSheet.create({
   container: { alignItems: 'center', marginTop: 6 },
-  listContent: { paddingHorizontal: 4 },
-  card: { width: CARD_WIDTH, height: CARD_HEIGHT, marginHorizontal: 4, borderRadius: 18, overflow: 'hidden', ...getShadowStyle('#00000022') },
+  cardWrap: { width: SCREEN_WIDTH, alignItems: 'center', justifyContent: 'center' },
+  card: { width: CARD_WIDTH, height: CARD_HEIGHT, borderRadius: 18, overflow: 'hidden', ...getShadowStyle('#00000022') },
   cardInner: { flex: 1, flexDirection: 'row', alignItems: 'center', padding: 18 },
   textArea: { flex: 1, marginRight: 12, justifyContent: 'center' },
   title: { fontSize: 17, fontWeight: '800', marginBottom: 4 },
@@ -133,7 +136,7 @@ const styles = StyleSheet.create({
   imageAlt: { width: 72, height: 72, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center' },
   dotsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 10, gap: 6 },
   dot: { height: 6, borderRadius: 3 },
-  skeletonCard: { width: CARD_WIDTH, height: CARD_HEIGHT, backgroundColor: '#e5e7eb', borderRadius: 18, marginHorizontal: 4 },
+  skeletonCard: { width: CARD_WIDTH, height: CARD_HEIGHT, backgroundColor: '#e5e7eb', borderRadius: 18 },
   skeletonContent: { flex: 1, flexDirection: 'row', alignItems: 'center', padding: 18 },
   skeletonText: { flex: 1, marginRight: 12 },
   skelLine: { height: 14, backgroundColor: '#d1d5db', borderRadius: 6, width: '80%' },

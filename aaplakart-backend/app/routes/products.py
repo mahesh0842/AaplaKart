@@ -55,13 +55,13 @@ async def list_products(
     end = start + page_size
     page_products = all_products[start:end]
 
-    return ProductsResponse(
-        success=True,
-        count=total,
-        page=page,
-        page_size=page_size,
-        products=[ProductSchema(**p) for p in page_products],
-    )
+    return {
+        "success": True,
+        "count": total,
+        "page": page,
+        "page_size": page_size,
+        "products": page_products,
+    }
 
 
 # ── GET /products/{product_id} ────────────────────────────────────

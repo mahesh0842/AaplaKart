@@ -1,7 +1,7 @@
 // GUI category: Screen. Displays order history with delivery slot info, status, and a circular empty state.
 // Auto-syncs with backend every 30s for real-time status updates.
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -30,13 +30,13 @@ const paymentLabel = {
   upi: 'UPI',
 };
 
-const OrderCard = ({ order }) => {
+const OrderCard = ({ order, onPress }) => {
   const itemCount = (order.items || []).reduce((sum, item) => sum + item.quantity, 0);
   const statusCol = statusColor[order.status] || COLORS.mutedText;
   const placedDate = new Date(order.placedAt);
 
   return (
-    <View style={styles.card}>
+    <Pressable onPress={() => onPress?.(order)} style={styles.card}> 
       <View style={styles.cardHeader}>
         <View style={styles.orderIdSection}>
           <Text style={styles.orderId}>{order.id}</Text>
@@ -109,7 +109,7 @@ const OrderCard = ({ order }) => {
           <Text style={styles.deliveredText}>Delivered on {placedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</Text>
         </View>
       )}
-    </View>
+    </Pressable>
   );
 };
 
@@ -117,6 +117,7 @@ const OrdersScreen = ({ onBack }) => {
   const orders = useOrdersStore((state) => state.orders);
   const insets = useSafeAreaInsets();
   const [syncing, setSyncing] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   // ── Poll backend every 30s for status updates ────────────────
   const syncOrders = useCallback(async () => {
@@ -207,7 +208,7 @@ const OrdersScreen = ({ onBack }) => {
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[styles.listContent, { paddingBottom: 24 + insets.bottom }]}
-          renderItem={({ item }) => <OrderCard order={item} />}
+          renderItem={({ item }) => <OrderCard order={item} onPress={setSelectedOrder} />}
           ListFooterComponent={
             orders.length > 5 ? (
               <View style={styles.limitNotice}>
@@ -217,6 +218,82 @@ const OrdersScreen = ({ onBack }) => {
           }
         />
       )}
+
+      {/* ═══ Order Detail Modal ═══ */}
+      <Modal
+        visible={!!selectedOrder}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSelectedOrder(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            {/* Header */}
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Order Details</Text>
+              <Pressable onPress={() => setSelectedOrder(null)} style={styles.modalClose}>
+                <Ionicons name="close" size={22} color="#475569" />
+              </Pressable>
+            </View>
+
+            {selectedOrder && (
+              <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+                <Text style={styles.modalOrderId}>{selectedOrder.id}</Text>
+                <View style={[styles.modalStatusBadge, { backgroundColor: (statusColor[selectedOrder.status] || '#6b7280') + '18' }]}>
+                  <Text style={[styles.modalStatusText, { color: statusColor[selectedOrder.status] || '#6b7280' }]}>
+                    {ORDER_STATUS_LABELS[selectedOrder.status]}
+                  </Text>
+                </View>
+
+                {/* Items */}
+                <Text style={styles.modalSectionTitle}>🛒 Items ({(selectedOrder.items || []).length})</Text>
+                {(selectedOrder.items || []).map((item, idx) => (
+                  <View key={idx} style={styles.modalItemRow}>
+                    <View style={styles.modalItemLeft}>
+                      <Text style={styles.modalItemQty}>×{item.quantity}</Text>
+                      <View>
+                        <Text style={styles.modalItemName}>{item.name}</Text>
+                        {item.weight ? (
+                          <Text style={styles.modalItemWeight}>{item.weight}</Text>
+                        ) : null}
+                      </View>
+                    </View>
+                    <Text style={styles.modalItemPrice}>₹{(item.price * item.quantity).toFixed(0)}</Text>
+                  </View>
+                ))}
+
+                {/* Payment */}
+                <Text style={styles.modalSectionTitle}>💰 Payment</Text>
+                <View style={styles.modalPaymentRow}>
+                  <Text style={styles.modalPayLabel}>Method</Text>
+                  <Text style={styles.modalPayValue}>
+                    {selectedOrder.paymentMethod === 'cod' ? '💵 Cash on Delivery' : '📱 UPI'}
+                  </Text>
+                </View>
+                <View style={styles.modalPaymentRow}>
+                  <Text style={styles.modalPayLabel}>Subtotal</Text>
+                  <Text style={styles.modalPayValue}>₹{Number(selectedOrder.subtotal || 0).toFixed(0)}</Text>
+                </View>
+                <View style={styles.modalPaymentRow}>
+                  <Text style={styles.modalPayLabel}>Delivery</Text>
+                  <Text style={styles.modalPayValue}>{selectedOrder.deliveryFee === 0 ? 'FREE' : `₹${Number(selectedOrder.deliveryFee || 0).toFixed(0)}`}</Text>
+                </View>
+                <View style={[styles.modalPaymentRow, styles.modalPaymentTotal]}>
+                  <Text style={styles.modalPayLabelBold}>Total</Text>
+                  <Text style={styles.modalPayValueBold}>₹{Number(selectedOrder.total || 0).toFixed(0)}</Text>
+                </View>
+
+                {selectedOrder.deliverySlotLabel && (
+                  <View style={styles.modalSlotRow}>
+                    <Ionicons name="time-outline" size={14} color={COLORS.primary} />
+                    <Text style={styles.modalSlotText}>Delivery: {selectedOrder.deliverySlotLabel}</Text>
+                  </View>
+                )}
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
     </Container>
   );
 };
@@ -253,6 +330,53 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.mutedText,
   },
+
+  // ── Order Detail Modal ──
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalCard: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '80%',
+    paddingBottom: 24,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  modalTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text },
+  modalClose: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#f1f5f9', alignItems: 'center', justifyContent: 'center' },
+  modalBody: { padding: 16 },
+  modalOrderId: { fontSize: 13, fontWeight: '600', color: COLORS.mutedText, marginBottom: 8 },
+  modalStatusBadge: { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12, marginBottom: 16 },
+  modalStatusText: { fontSize: 13, fontWeight: '700' },
+  modalSectionTitle: { fontSize: 14, fontWeight: '800', color: COLORS.text, marginTop: 16, marginBottom: 10 },
+  modalItemRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10,
+    backgroundColor: '#f8fafc', marginBottom: 6,
+  },
+  modalItemLeft: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
+  modalItemQty: { fontSize: 14, fontWeight: '800', color: COLORS.primary, minWidth: 28 },
+  modalItemName: { fontSize: 13, fontWeight: '600', color: COLORS.text },
+  modalItemWeight: { fontSize: 10, fontWeight: '600', color: COLORS.mutedText, marginTop: 1 },
+  modalItemPrice: { fontSize: 14, fontWeight: '800', color: COLORS.text },
+  modalPaymentRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
+  modalPaymentTotal: { borderBottomWidth: 0, marginTop: 4 },
+  modalPayLabel: { fontSize: 13, color: COLORS.mutedText },
+  modalPayValue: { fontSize: 13, fontWeight: '600', color: COLORS.text },
+  modalPayLabelBold: { fontSize: 15, fontWeight: '800', color: COLORS.text },
+  modalPayValueBold: { fontSize: 15, fontWeight: '800', color: COLORS.text },
+  modalSlotRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 12, paddingHorizontal: 4 },
+  modalSlotText: { fontSize: 12, color: COLORS.mutedText, fontWeight: '500' },
   subtitle: {
     marginTop: 6,
     color: COLORS.mutedText,

@@ -1,46 +1,64 @@
-// GUI category: Auth. Handles phone number and OTP login via backend API.
-// Sends OTP through backend -> Firebase REST API, verifies via backend.
-// Mobile-only (uses Platform.OS check). No web support.
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+/**
+ * PhoneLogin — Phone OTP login with step-by-step flow
+ *
+ * Features:
+ *  ✅ Step 1: Phone number entry with country code picker
+ *  ✅ Step 2: OTP entry with auto-verify (4 digits)
+ *  ✅ Smart OTP sender: Mock → Backend REST → Firebase SDK (fallback chain)
+ *  ✅ Resend cooldown timer
+ *  ✅ Inline error messages (no Toast dependency for OTP flow)
+ *  ✅ Loading states with spinner
+ *  ✅ Smooth step transitions
+ *  ✅ Keyboard-aware layout
+ */
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
+  Keyboard,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Toast from 'react-native-toast-message';
 import CountryCodePicker from './CountryCodePicker';
 import OTPInput from './OTPInput';
-import AuthFooter from './AuthFooter';
-import { COLORS, MOCK_OTP_CODE } from '../../utils/constants';
-import { getShadowStyle, normalizePhoneNumber, sleep } from '../../utils/helpers';
-import { mockOtpEnabled } from '../../services/firebase';
-import { requestLocationPermission, getCurrentLocation } from '../../services/locationService';
-import { useGoogleAuth, handleGoogleSignInResponse } from '../../services/googleAuth';
-import { sendOtp as apiSendOtp, verifyOtp as apiVerifyOtp } from '../../services/api';
+import { COLORS } from '../../utils/constants';
+import { normalizePhoneNumber } from '../../utils/helpers';
+import { mockOtpEnabled, firebaseReady } from '../../services/firebase';
+import {
+  clearRecaptchaVerifier,
+  smartSendOtp,
+  smartConfirmOtp,
+} from '../../services/authService';
 
-const RESEND_COOLDOWN = 120; // 2 minutes
+const RESEND_COOLDOWN = 30;
 
 const PhoneLogin = ({ onAuthenticated }) => {
   const [countryCode, setCountryCode] = useState('+91');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otpCode, setOtpCode] = useState('');
-  const [step, setStep] = useState('phone');
+  const [step, setStep] = useState('phone'); // 'phone' | 'otp'
   const [loading, setLoading] = useState(false);
-  const [sessionInfo, setSessionInfo] = useState(null);
-  const [otpError, setOtpError] = useState('');
+  const [confirmation, setConfirmation] = useState(null);
+  const [otpMethod, setOtpMethod] = useState(null);
+  const [error, setError] = useState('');
   const [resendTimer, setResendTimer] = useState(0);
-  const [usingMockFallback, setUsingMockFallback] = useState(false);
 
   const timerRef = useRef(null);
+  const phoneInputRef = useRef(null);
 
-  // ── 2-minute resend timer ──────────────────────────────────────
+  // ── Derived ─────────────────────────────────────────────────
+  const fullPhoneNumber = useMemo(
+    () => normalizePhoneNumber(countryCode, phoneNumber),
+    [countryCode, phoneNumber],
+  );
+
+  const isPhoneValid = fullPhoneNumber.length >= 11;
+
+  // ── Resend timer ────────────────────────────────────────────
   useEffect(() => {
     if (resendTimer > 0) {
       timerRef.current = setInterval(() => {
@@ -56,18 +74,21 @@ const PhoneLogin = ({ onAuthenticated }) => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [resendTimer > 0]); // eslint-disable-line
+  }, [resendTimer > 0]);
 
-  const startResendTimer = () => setResendTimer(RESEND_COOLDOWN);
+  // Cleanup reCAPTCHA on unmount
+  useEffect(() => {
+    return () => {
+      clearRecaptchaVerifier();
+    };
+  }, []);
 
-  const googleAuth = useGoogleAuth();
-
-  const fullPhoneNumber = useMemo(
-    () => normalizePhoneNumber(countryCode, phoneNumber),
-    [countryCode, phoneNumber]
+  const startResendTimer = useCallback(
+    () => setResendTimer(RESEND_COOLDOWN),
+    [],
   );
 
-  // ── Block web ───────────────────────────────────────────────────
+  // ── Block web ───────────────────────────────────────────────
   if (Platform.OS === 'web') {
     return (
       <View style={styles.webBlock}>
@@ -76,634 +97,410 @@ const PhoneLogin = ({ onAuthenticated }) => {
         <Text style={styles.webBlockText}>
           Open Expo Go on your phone and scan the QR code to log in.
         </Text>
-        <Text style={styles.webBlockHint}>Google Sign-In will be available on web soon.</Text>
       </View>
     );
   }
 
-  // ── Google Sign-In ─────────────────────────────────────────────
-  const handleGoogleSignIn = async () => {
-    try {
-      if (!googleAuth.promptAsync) {
-        Toast.show({
-          type: 'error',
-          text1: 'Google Sign-In unavailable',
-          text2: 'Google client ID is not configured.',
-        });
-        return;
-      }
+  // ── Send OTP ────────────────────────────────────────────────
+  const handleSendOtp = useCallback(async () => {
+    Keyboard.dismiss();
+    setError('');
 
-      const result = await googleAuth.promptAsync();
-
-      if (result?.type === 'cancel' || result?.type === 'dismiss') {
-        // User cancelled — silently ignore
-        return;
-      }
-
-      const session = await handleGoogleSignInResponse(result);
-
-      if (!session.success) {
-        if (!session.cancelled) {
-          Toast.show({
-            type: 'error',
-            text1: 'Google Sign-In failed',
-            text2: session.message || 'Please try again.',
-          });
-        }
-        return;
-      }
-
-      const locationResult = await requestLocationPermission();
-      if (locationResult.granted) {
-        const loc = await getCurrentLocation();
-        if (loc.success) {
-          session.latitude = loc.latitude;
-          session.longitude = loc.longitude;
-        }
-      }
-
-      if (onAuthenticated) {
-        await onAuthenticated(session);
-      }
-
-      Toast.show({
-        type: 'success',
-        text1: 'Welcome to AaplaKart',
-        text2: session.provider === 'google-fallback'
-          ? 'Signed in with Google.'
-          : 'Signed in with Google successfully.',
-      });
-    } catch (error) {
-      console.log('[Google] Sign-In error:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Google Sign-In error',
-        text2: error?.message || 'Could not complete Google Sign-In.',
-      });
-    }
-  };
-
-  // ── Send OTP ───────────────────────────────────────────────────
-  const handleSendOtp = async () => {
-    if (!fullPhoneNumber || fullPhoneNumber.length < 11) {
-      Toast.show({
-        type: 'error',
-        text1: 'Enter a valid phone number',
-        text2: 'Please enter a complete mobile number (e.g., 98765 43210).',
-      });
+    if (!isPhoneValid) {
+      setError('Please enter a complete mobile number.');
       return;
     }
 
-    setLoading(true);
-    setOtpError('');
-
-    try {
-      // Mock mode – no API call needed
-      if (mockOtpEnabled) {
-        await sleep(700);
-        setSessionInfo('mock-session');
-        setUsingMockFallback(false);
-        setStep('otp');
-        setOtpCode('');
-        startResendTimer();
-        Toast.show({
-          type: 'info',
-          text1: 'Mock OTP sent',
-          text2: `Use ${MOCK_OTP_CODE} to continue in demo mode.`,
-        });
-        return;
-      }
-
-      // Real mode – try calling backend API
-      try {
-        const result = await apiSendOtp(fullPhoneNumber);
-        setSessionInfo(result.session_info);
-        setUsingMockFallback(false);
-        setStep('otp');
-        setOtpCode('');
-        startResendTimer();
-        Toast.show({
-          type: 'success',
-          text1: 'OTP sent',
-          text2: `A verification code was sent to ${fullPhoneNumber}.`,
-        });
-      } catch (apiError) {
-        // Auto-fallback: if backend is unreachable, use mock mode
-        console.log('[PhoneLogin] Backend unreachable, falling back to mock OTP:', apiError?.message);
-        await sleep(500);
-        setSessionInfo('mock-session');
-        setUsingMockFallback(true);
-        setStep('otp');
-        setOtpCode('');
-        startResendTimer();
-        Toast.show({
-          type: 'info',
-          text1: 'Demo OTP mode',
-          text2: `Backend unavailable — use ${MOCK_OTP_CODE} to continue.`,
-        });
-      }
-    } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Could not send OTP',
-        text2: error?.message || 'An unexpected error occurred. Please try again.',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ── Verify OTP ─────────────────────────────────────────────────
-  const handleVerifyOtp = async () => {
-    // Clear any previous error immediately on new attempt
-    setOtpError('');
-
-    if (otpCode.length !== 6) {
-      Toast.show({
-        type: 'error',
-        text1: 'Enter the 6-digit OTP',
-        text2: 'Please enter the full six-digit code.',
-      });
-      return;
-    }
-
-    if (!sessionInfo) {
-      Toast.show({
-        type: 'error',
-        text1: 'Session expired',
-        text2: 'Please go back and request a new OTP.',
-      });
+    if (!firebaseReady && !mockOtpEnabled) {
+      setError('Firebase is not configured. Set EXPO_PUBLIC_FIREBASE_* env vars.');
       return;
     }
 
     setLoading(true);
 
     try {
-      let session;
+      const { method, data } = await smartSendOtp(
+        fullPhoneNumber,
+        'recaptcha-container',
+      );
 
-      if (sessionInfo === 'mock-session') {
-        // ── Mock verification ─────────────────────────────────
-        await sleep(600); // simulate network delay
-
-        if (otpCode !== MOCK_OTP_CODE) {
-          setOtpError('OTP Mismatch, please enter again');
-          setOtpCode(''); // clear OTP so user can retry
-          Toast.show({
-            type: 'error',
-            text1: 'Invalid OTP',
-            text2: `The code you entered is incorrect. Try ${MOCK_OTP_CODE} in demo mode.`,
-          });
-          setLoading(false);
-          return;
-        }
-
-        session = {
-          uid: `mock-${Date.now()}`,
-          phoneNumber: fullPhoneNumber,
-          provider: 'mock',
-          idToken: '',
-        };
+      setOtpMethod(method);
+      setConfirmation(data);
+      setStep('otp');
+      setOtpCode('');
+      startResendTimer();
+    } catch (err) {
+      const msg = (err?.message || '').toLowerCase();
+      if (msg.includes('invalid-phone')) {
+        setError('Invalid phone number. Please check and try again.');
+      } else if (msg.includes('too-many') || msg.includes('quota')) {
+        setError('Too many requests. Please try again later.');
+      } else if (msg.includes('network') || msg.includes('timeout')) {
+        setError('Network error. Check your connection and try again.');
       } else {
-        // ── Real verification via backend API ─────────────────
-        try {
-          const result = await apiVerifyOtp(fullPhoneNumber, otpCode, sessionInfo);
-          session = {
-            uid: result.uid,
-            phoneNumber: result.phone_number || fullPhoneNumber,
-            provider: 'firebase',
-            idToken: result.id_token || '',
-          };
-        } catch (apiError) {
-          const msg = (apiError?.message || '').toLowerCase();
-
-          if (msg.includes('invalid') || msg.includes('expired') || msg.includes('mismatch') || msg.includes('wrong')) {
-            setOtpError('OTP Mismatch, please enter again');
-            setOtpCode(''); // clear so user can retry
-            Toast.show({
-              type: 'error',
-              text1: 'Invalid OTP',
-              text2: 'The code is incorrect or expired. Please try again.',
-            });
-            setLoading(false);
-            return;
-          }
-
-          // Other errors – also allow retry
-          setOtpError('Verification failed, please try again');
-          Toast.show({
-            type: 'error',
-            text1: 'Verification failed',
-            text2: apiError?.message || 'Could not verify. Try again.',
-          });
-          setLoading(false);
-          return;
-        }
+        setError(err?.message || 'Could not send OTP. Please try again.');
       }
-
-      // ── Success – attach location if available ──────────────
-      try {
-        const locationResult = await requestLocationPermission();
-        if (locationResult.granted) {
-          const loc = await getCurrentLocation();
-          if (loc.success) {
-            session.latitude = loc.latitude;
-            session.longitude = loc.longitude;
-          }
-        }
-      } catch {
-        // location is optional, ignore errors
-      }
-
-      // ── Navigate to home ────────────────────────────────────
-      if (onAuthenticated) {
-        await onAuthenticated(session);
-      }
-
-      Toast.show({
-        type: 'success',
-        text1: 'Welcome to AaplaKart',
-        text2: 'Your phone number has been verified successfully.',
-      });
-    } catch (error) {
-      setOtpError('Unexpected error, please try again');
-      Toast.show({
-        type: 'error',
-        text1: 'Something went wrong',
-        text2: error?.message || 'Please try again.',
-      });
     } finally {
       setLoading(false);
     }
-  };
+  }, [fullPhoneNumber, isPhoneValid, startResendTimer]);
 
-  const handleBackToPhone = () => {
+  // ── Verify OTP ──────────────────────────────────────────────
+  const handleVerifyOtp = useCallback(async () => {
+    setError('');
+
+    if (otpCode.length !== 4) return;
+
+    if (!confirmation) {
+      setError('Session expired. Please request a new code.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const session = await smartConfirmOtp(
+        otpMethod,
+        confirmation,
+        fullPhoneNumber,
+        otpCode,
+      );
+
+      if (onAuthenticated) {
+        await onAuthenticated(session);
+      }
+    } catch (err) {
+      const msg = (err?.message || '').toLowerCase();
+      if (
+        msg.includes('invalid') ||
+        msg.includes('expired') ||
+        msg.includes('mismatch') ||
+        msg.includes('wrong')
+      ) {
+        setError('Invalid or expired OTP. Please try again.');
+        setOtpCode('');
+      } else {
+        setError(err?.message || 'Verification failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [otpCode, confirmation, otpMethod, fullPhoneNumber, onAuthenticated]);
+
+  // ── Go back to phone step ───────────────────────────────────
+  const handleBackToPhone = useCallback(() => {
     setStep('phone');
     setOtpCode('');
-    setOtpError('');
-    setSessionInfo(null);
-    setUsingMockFallback(false);
-  };
+    setError('');
+    setConfirmation(null);
+    setOtpMethod(null);
+    clearRecaptchaVerifier();
+  }, []);
 
+  // ── Resend handler ─────────────────────────────────────────
+  const handleResend = useCallback(() => {
+    if (resendTimer > 0) return;
+    handleSendOtp();
+  }, [handleSendOtp, resendTimer]);
+
+  // ── Format timer ────────────────────────────────────────────
   const formatTimer = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
+  // ── OTP change handler ──────────────────────────────────────
+  const handleOtpChange = useCallback(
+    (val) => {
+      setOtpCode(val);
+      if (error) setError('');
+    },
+    [error],
+  );
+
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.hero}>
-          <Text style={styles.eyebrow}>Fresh groceries in a few taps</Text>
-          <Text style={styles.title}>Login with your phone</Text>
-          <Text style={styles.subtitle}>
-            Enter your number to continue shopping with quick OTP verification.
-          </Text>
-        </View>
+    <View style={styles.wrapper}>
+      {/* Hidden reCAPTCHA container */}
+      <View nativeID="recaptcha-container" style={styles.recaptcha} />
 
-        <View style={styles.card}>
-          {step === 'phone' ? (
-            <>
-              <Text style={styles.sectionTitle}>Phone Number</Text>
-              <Text style={styles.sectionSubtitle}>
-                We will send a one-time password to verify your account.
-              </Text>
-              <View style={styles.inputRow}>
-                <CountryCodePicker value={countryCode} onChange={setCountryCode} />
-                <TextInput
-                  accessibilityLabel="Enter phone number"
-                  placeholder="98765 43210"
-                  placeholderTextColor={COLORS.mutedText}
-                  keyboardType="phone-pad"
-                  value={phoneNumber}
-                  onChangeText={(text) => setPhoneNumber(text.replace(/\D/g, ''))}
-                  maxLength={10}
-                  style={styles.phoneInput}
-                />
-              </View>
-              <Pressable
-                accessibilityLabel="Send OTP"
-                onPress={handleSendOtp}
-                disabled={loading}
-                style={({ pressed }) => [
-                  styles.primaryButton,
-                  pressed && !loading && styles.buttonPressed,
-                ]}
-              >
-                {loading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.primaryButtonText}>Send OTP</Text>
-                )}
-              </Pressable>
-
-              <View style={styles.dividerRow}>
-                <View style={styles.dividerLine} />
-                <Text style={styles.dividerText}>OR</Text>
-                <View style={styles.dividerLine} />
-              </View>
-
-              <Pressable
-                accessibilityLabel="Sign in with Google"
-                onPress={handleGoogleSignIn}
-                style={({ pressed }) => [
-                  styles.googleButton,
-                  pressed && styles.buttonPressed,
-                ]}
-              >
-                <View style={styles.googleIconWrap}>
-                  <Text style={styles.googleIconText}>G</Text>
-                </View>
-                <Text style={styles.googleButtonText}>Sign in with Google</Text>
-              </Pressable>
-            </>
-          ) : (
-            <>
-              <Text style={styles.sectionTitle}>Enter OTP</Text>
-              <Text style={styles.sectionSubtitle}>
-                We sent a 6-digit code to {fullPhoneNumber}.
-              </Text>
-
-              {/* Show hint when using mock/demo mode */}
-              {(mockOtpEnabled || usingMockFallback) && (
-                <View style={styles.demoHintWrap}>
-                  <Ionicons name="information-circle-outline" size={14} color={COLORS.primaryDark} />
-                  <Text style={styles.demoHintText}>
-                    Demo mode — use code <Text style={styles.demoHintCode}>{MOCK_OTP_CODE}</Text>
-                  </Text>
-                </View>
-              )}
-
-              <OTPInput
-                value={otpCode}
-                onChange={(val) => {
-                  setOtpCode(val);
-                  if (otpError) setOtpError(''); // clear error on edit
+      {/* ── Phone Input Step ──────────────────────────────── */}
+      {step === 'phone' ? (
+        <>
+          <View style={styles.inputCard}>
+            <View style={styles.inputRow}>
+              <CountryCodePicker value={countryCode} onChange={setCountryCode} />
+              <View style={styles.inputDivider} />
+              <TextInput
+                ref={phoneInputRef}
+                autoFocus
+                placeholder="Enter mobile number"
+                placeholderTextColor="#c4b5a5"
+                keyboardType="phone-pad"
+                value={phoneNumber}
+                onChangeText={(t) => {
+                  setPhoneNumber(t.replace(/\D/g, ''));
+                  if (error) setError('');
                 }}
-                hasError={!!otpError}
+                maxLength={10}
+                style={styles.phoneField}
+                selectionColor={COLORS.primary}
+                editable={!loading}
               />
+            </View>
+          </View>
 
-              {/* OTP Mismatch / Error message */}
-              {otpError ? (
-                <View style={styles.otpErrorWrap}>
-                  <Ionicons name="alert-circle-outline" size={16} color={COLORS.dangerText} />
-                  <Text style={styles.otpErrorText}>{otpError}</Text>
-                </View>
-              ) : null}
+          {/* Error */}
+          {error ? (
+            <View style={styles.errorWrap}>
+              <Ionicons name="alert-circle" size={16} color={COLORS.dangerText} />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : null}
 
-              <Pressable
-                accessibilityLabel="Verify OTP"
-                onPress={handleVerifyOtp}
-                disabled={loading || otpCode.length !== 6}
-                style={({ pressed }) => [
-                  styles.primaryButton,
-                  pressed && !loading && styles.buttonPressed,
-                  (loading || otpCode.length !== 6) && styles.buttonDisabled,
-                ]}
-              >
-                {loading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.primaryButtonText}>Verify OTP</Text>
-                )}
-              </Pressable>
-
-              <View style={styles.secondaryActions}>
-                <Pressable accessibilityLabel="Edit phone number" onPress={handleBackToPhone}>
-                  <Text style={styles.secondaryText}>Edit number</Text>
-                </Pressable>
-
-                {/* Resend with 2-minute timer */}
-                {resendTimer > 0 ? (
-                  <View style={styles.resendTimerWrap}>
-                    <Text style={styles.resendTimerText}>
-                      Resend in {formatTimer(resendTimer)}
-                    </Text>
-                  </View>
-                ) : (
-                  <Pressable accessibilityLabel="Resend OTP" onPress={handleSendOtp}>
-                    <Text style={styles.secondaryText}>Resend OTP</Text>
-                  </Pressable>
-                )}
+          {/* Send OTP button */}
+          <Pressable
+            onPress={handleSendOtp}
+            disabled={loading || !isPhoneValid}
+            style={({ pressed }) => [
+              styles.ctaButton,
+              (!isPhoneValid || loading) && styles.ctaButtonDisabled,
+              pressed && !loading && isPhoneValid && styles.ctaButtonPressed,
+            ]}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <View style={styles.ctaInner}>
+                <Ionicons name="arrow-forward" size={20} color="#fff" />
+                <Text style={styles.ctaText}>Send OTP</Text>
               </View>
-            </>
-          )}
-          <AuthFooter />
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            )}
+          </Pressable>
+
+          <Text style={styles.hint}>
+            We&apos;ll send a 4-digit code to verify your number.
+          </Text>
+        </>
+      ) : (
+        /* ── OTP Step ───────────────────────────────────────── */
+        <>
+          {/* OTP Input */}
+          <View style={styles.otpSection}>
+            {/* Edit number row — clean, no phone visible */}
+            <View style={styles.otpHeader}>
+              <Text style={styles.otpTitle}>Enter verification code</Text>
+              <Pressable
+                onPress={handleBackToPhone}
+                hitSlop={8}
+                disabled={loading}
+              >
+                <Text style={styles.editNumberText}>Edit number</Text>
+              </Pressable>
+            </View>
+
+            <OTPInput
+              value={otpCode}
+              onChange={handleOtpChange}
+              hasError={!!error}
+              onComplete={handleVerifyOtp}
+              disabled={loading}
+            />
+
+            {/* Error */}
+            {error ? (
+              <View style={styles.errorWrap}>
+                <Ionicons name="alert-circle" size={16} color={COLORS.dangerText} />
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            ) : null}
+
+            {/* Loading */}
+            {loading && (
+              <ActivityIndicator
+                color={COLORS.primary}
+                size="small"
+                style={styles.otpLoader}
+              />
+            )}
+
+            {/* Resend */}
+            <View style={styles.otpActions}>
+              {resendTimer > 0 ? (
+                <Text style={styles.timerText}>
+                  Resend in {formatTimer(resendTimer)}
+                </Text>
+              ) : (
+                <Pressable onPress={handleResend} hitSlop={12} disabled={loading}>
+                  <Text style={styles.secondaryText}>Resend code</Text>
+                </Pressable>
+              )}
+            </View>
+          </View>
+        </>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
+  wrapper: {
+    paddingHorizontal: 14,
+    paddingVertical: 14,
   },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 28,
+  recaptcha: {
+    height: 0,
+    width: 0,
+    opacity: 0,
+    position: 'absolute',
   },
-  hero: {
-    marginBottom: 26,
-  },
-  eyebrow: {
-    color: COLORS.primaryDark,
-    fontSize: 13,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-  },
-  title: {
-    marginTop: 8,
-    color: COLORS.text,
-    fontSize: 30,
-    fontWeight: '800',
-  },
-  subtitle: {
-    marginTop: 10,
-    color: COLORS.mutedText,
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  card: {
-    backgroundColor: COLORS.card,
-    borderRadius: 28,
-    padding: 22,
-    borderWidth: 1,
-    borderColor: '#fde6cf',
-    ...getShadowStyle(COLORS.shadow),
-  },
-  sectionTitle: {
-    color: COLORS.text,
-    fontSize: 20,
-    fontWeight: '800',
-  },
-  sectionSubtitle: {
-    marginTop: 8,
-    color: COLORS.mutedText,
-    fontSize: 14,
-    lineHeight: 20,
+
+  // ── Phone input ──────────────────────────────────────────────
+  inputCard: {
+    backgroundColor: '#faf7f2',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#ede4d5',
+    marginBottom: 14,
+    overflow: 'hidden',
   },
   inputRow: {
     flexDirection: 'row',
-    marginTop: 18,
+    alignItems: 'center',
+    minHeight: 50,
   },
-  phoneInput: {
+  inputDivider: {
+    width: 1,
+    height: 28,
+    backgroundColor: '#e5d9c6',
+    marginHorizontal: 4,
+  },
+  phoneField: {
     flex: 1,
-    backgroundColor: '#fff7ed',
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    color: COLORS.text,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  primaryButton: {
-    marginTop: 20,
-    borderRadius: 18,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 54,
-    paddingHorizontal: 18,
-  },
-  primaryButtonText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '800',
-  },
-  buttonPressed: {
-    opacity: 0.92,
-  },
-  secondaryActions: {
-    marginTop: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  secondaryText: {
-    color: COLORS.primaryDark,
+    fontSize: 18,
     fontWeight: '700',
-  },
-  otpErrorWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: COLORS.dangerBg,
-    borderRadius: 12,
-  },
-  otpErrorText: {
-    color: COLORS.dangerText,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  demoHintWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: '#fff7ed',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#fed7aa',
-  },
-  demoHintText: {
-    color: COLORS.primaryDark,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  demoHintCode: {
-    fontWeight: '800',
+    color: '#1a1a1a',
+    paddingVertical: 14,
+    paddingRight: 12,
     letterSpacing: 2,
   },
-  resendTimerWrap: {
-    paddingVertical: 2,
-  },
-  resendTimerText: {
-    color: COLORS.mutedText,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  webBlock: {
-    flex: 1,
+
+  // ── CTA Button ───────────────────────────────────────────────
+  ctaButton: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 40,
+    minHeight: 50,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  ctaButtonDisabled: {
+    opacity: 0.5,
+  },
+  ctaButtonPressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
+  },
+  ctaInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  ctaText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+    marginLeft: 8,
+  },
+  hint: {
+    fontSize: 12,
+    color: COLORS.mutedText,
+    textAlign: 'center',
+    marginTop: 12,
+    lineHeight: 18,
+  },
+
+  // ── OTP section ──────────────────────────────────────────────
+  otpSection: {
+    alignItems: 'stretch',
+  },
+  otpHeader: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 4,
+    gap: 8,
+  },
+  otpTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+  editNumberText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.primary,
+    textDecorationLine: 'underline',
+  },
+  otpLoader: {
+    marginTop: 14,
+  },
+  otpActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 14,
+    paddingHorizontal: 2,
+  },
+
+  // ── Shared ───────────────────────────────────────────────────
+  errorWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    backgroundColor: COLORS.dangerBg,
+    borderRadius: 10,
+    marginBottom: 12,
+  },
+  errorText: {
+    fontSize: 13,
+    color: COLORS.dangerText,
+    fontWeight: '500',
+    flex: 1,
+    marginLeft: 8,
+  },
+  secondaryText: {
+    color: COLORS.primary,
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  timerText: {
+    color: COLORS.mutedText,
+    fontSize: 13,
+  },
+
+  // ── Web block ────────────────────────────────────────────────
+  webBlock: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 32,
   },
   webBlockTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '800',
     color: COLORS.text,
-    marginBottom: 12,
+    marginTop: 16,
   },
   webBlockText: {
     fontSize: 14,
     color: COLORS.mutedText,
     textAlign: 'center',
-    lineHeight: 22,
-  },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 4,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#fed7aa',
-  },
-  dividerText: {
-    marginHorizontal: 14,
-    color: COLORS.mutedText,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  googleButton: {
-    marginTop: 16,
-    borderRadius: 18,
-    borderWidth: 1.5,
-    borderColor: '#dadce0',
-    backgroundColor: '#fff',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    minHeight: 54,
-    paddingHorizontal: 18,
-  },
-  googleIconWrap: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  googleIconText: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#4285F4',
-    fontFamily: Platform.OS === 'ios' ? 'Arial' : 'sans-serif',
-  },
-  googleButtonText: {
-    color: '#1f1f1f',
-    fontSize: 15,
-    fontWeight: '600',
+    marginTop: 8,
+    lineHeight: 20,
   },
 });
 

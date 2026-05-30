@@ -1,13 +1,12 @@
-// ── Delivery Map — MapMyIndia In-App Map + Route ──
-// Features: MapMyIndia tiles, shop↔customer route polyline,
+// ── Delivery Map — Google Maps In-App Map + Route ──
+// Features: Google Maps tiles, shop↔customer route polyline,
 // distance, ETA, markers. No external app needed.
-// Fallback: If no API key → basic MapView / address card
 import React, { useEffect, useState } from 'react';
 import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
-  COLORS, getDistanceInKm, MAPMYINDIA_KEY, MAPMYINDIA_TILE_URL,
-  MAPMYINDIA_DIRECTIONS_URL, hasMapMyIndia,
+  COLORS, getDistanceInKm, GOOGLE_MAPS_API_KEY, GOOGLE_MAPS_TILE_URL,
+  GOOGLE_DIRECTIONS_URL, hasGoogleMaps, decodePolyline,
 } from '../utils/constants';
 import { useDeliveryStore } from '../store/deliveryStore';
 
@@ -21,38 +20,22 @@ try {
   UrlTile = maps.UrlTile;
 } catch {}
 
-// ── Fetch route from MapMyIndia Directions API ──────────────────
+// ── Fetch route from Google Maps Directions API ────────────────
 async function fetchRoute(originLat, originLon, destLat, destLon) {
-  if (!hasMapMyIndia()) return null;
+  if (!hasGoogleMaps()) return null;
   try {
-    const url = `${MAPMYINDIA_DIRECTIONS_URL}/${MAPMYINDIA_KEY}/route_adv/driving/${originLon},${originLat};${destLon},${destLat}?geometries=polyline&overview=full`;
+    const url = `${GOOGLE_DIRECTIONS_URL}?origin=${originLat},${originLon}&destination=${destLat},${destLon}&key=${GOOGLE_MAPS_API_KEY}&mode=driving`;
     const resp = await fetch(url);
     const json = await resp.json();
-    if (json.code === 'Ok' && json.routes?.length) {
+    if (json.status === 'OK' && json.routes?.length) {
       const route = json.routes[0];
-      const encoded = route.geometry;
+      const encoded = route.overview_polyline?.points;
       if (!encoded) return null;
       const coords = decodePolyline(encoded);
-      return { coords, distance: route.distance / 1000, duration: Math.round(route.duration / 60) };
+      return { coords, distance: route.legs?.[0]?.distance?.value / 1000, duration: Math.round(route.legs?.[0]?.duration?.value / 60) };
     }
   } catch {}
   return null;
-}
-
-// ── Polyline decoder (Google encoded format) ────────────────────
-function decodePolyline(encoded) {
-  const points = [];
-  let index = 0, lat = 0, lng = 0;
-  while (index < encoded.length) {
-    let b, shift = 0, result = 0;
-    do { b = encoded.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
-    lat += (result & 1) ? ~(result >> 1) : (result >> 1);
-    shift = 0; result = 0;
-    do { b = encoded.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
-    lng += (result & 1) ? ~(result >> 1) : (result >> 1);
-    points.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
-  }
-  return points;
 }
 
 const DeliveryMap = ({ latitude, longitude, address, customerName, customerPhone, status, distanceFromShop }) => {
@@ -61,9 +44,9 @@ const DeliveryMap = ({ latitude, longitude, address, customerName, customerPhone
   const [routeData, setRouteData] = useState(null);
   const [routeLoading, setRouteLoading] = useState(false);
 
-  // ── Fetch MapMyIndia route on mount ─────────────────────────
+  // ── Fetch Google Maps route on mount ─────────────────────────
   useEffect(() => {
-    if (!hasMapMyIndia() || !latitude || !longitude) return;
+    if (!hasGoogleMaps() || !latitude || !longitude) return;
     setRouteLoading(true);
     fetchRoute(shop.latitude, shop.longitude, latitude, longitude)
       .then(setRouteData)
@@ -74,7 +57,7 @@ const DeliveryMap = ({ latitude, longitude, address, customerName, customerPhone
     ? getDistanceInKm(shop.latitude, shop.longitude, latitude, longitude) : null);
   const eta = routeData?.duration || null;
   const hasMap = MapView && latitude != null && longitude != null;
-  const mmiReady = hasMapMyIndia();
+  const gmReady = hasGoogleMaps();
 
 
   const midLat = (shop.latitude + latitude) / 2;
@@ -91,7 +74,7 @@ const DeliveryMap = ({ latitude, longitude, address, customerName, customerPhone
             initialRegion={{ latitude: midLat, longitude: midLon, latitudeDelta: delta, longitudeDelta: delta }}
             scrollEnabled={true} zoomEnabled={true} rotateEnabled={false}
           >
-            {mmiReady && <UrlTile urlTemplate={MAPMYINDIA_TILE_URL(MAPMYINDIA_KEY)} maximumZ={19} flipY={false} />}
+            {gmReady && <UrlTile urlTemplate={GOOGLE_MAPS_TILE_URL(GOOGLE_MAPS_API_KEY)} maximumZ={19} flipY={false} />}
             <Marker coordinate={{ latitude: shop.latitude, longitude: shop.longitude }} title={shop.name} pinColor="#16a34a" />
             <Marker coordinate={{ latitude, longitude }} title="Delivery" description={address} pinColor={COLORS.primary} />
             {routeData?.coords?.length > 0 && (
@@ -142,9 +125,9 @@ const DeliveryMap = ({ latitude, longitude, address, customerName, customerPhone
         ) : null}
       </View>
 
-      {mmiReady && (
+      {gmReady && (
         <View style={s.branding}>
-          <Text style={s.brandText}>© MapmyIndia</Text>
+          <Text style={s.brandText}>Google Maps</Text>
         </View>
       )}
     </View>

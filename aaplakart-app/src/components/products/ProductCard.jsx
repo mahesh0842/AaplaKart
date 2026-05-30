@@ -32,6 +32,39 @@ const ProductCardSkeleton = memo(() => (
   </View>
 ));
 
+// ── Lazy Image with fade-in ─────────────────────────────────────
+
+const LazyImage = memo(({ uri, style }) => {
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+
+  if (!uri || error) {
+    return (
+      <View style={[style, styles.placeholder]}>
+        <Ionicons name="image-outline" size={28} color={COLORS.mutedText} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={style}>
+      {!loaded && (
+        <View style={[StyleSheet.absoluteFill, styles.placeholder]}>
+          <Ionicons name="image-outline" size={28} color={COLORS.mutedText} />
+        </View>
+      )}
+      <Image
+        source={{ uri }}
+        style={[style, loaded ? styles.imageLoaded : styles.imageHidden]}
+        resizeMode="cover"
+        fadeDuration={300}
+        onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
+      />
+    </View>
+  );
+});
+
 // ── Stars (inline rating) ───────────────────────────────────────
 
 const Stars = memo(({ rating, size = 10 }) => {
@@ -53,17 +86,26 @@ const Stars = memo(({ rating, size = 10 }) => {
 
 // ── Quantity stepper ────────────────────────────────────────────
 
-const QuantityStepper = memo(({ quantity, onIncrement, onDecrement }) => (
-  <View style={styles.stepper}>
-    <Pressable onPress={onDecrement} style={styles.stepperBtn}>
-      <Ionicons name="remove" size={13} color={COLORS.primary} />
-    </Pressable>
-    <Text style={styles.stepperQty}>{quantity}</Text>
-    <Pressable onPress={onIncrement} style={styles.stepperBtn}>
-      <Ionicons name="add" size={13} color={COLORS.primary} />
-    </Pressable>
-  </View>
-));
+const QuantityStepper = memo(({ quantity, maxQuantity, onIncrement, onDecrement }) => {
+  const atMax = maxQuantity && quantity >= maxQuantity;
+  return (
+    <View style={styles.stepperOuter}>
+      <View style={styles.stepper}>
+        <Pressable onPress={onDecrement} style={styles.stepperBtn}>
+          <Ionicons name="remove" size={13} color={COLORS.primary} />
+        </Pressable>
+        <Text style={styles.stepperQty}>{quantity}</Text>
+        <Pressable
+          onPress={atMax ? null : onIncrement}
+          style={[styles.stepperBtn, atMax && styles.stepperBtnDisabled]}
+        >
+          <Ionicons name="add" size={13} color={atMax ? COLORS.mutedText : COLORS.primary} />
+        </Pressable>
+      </View>
+      {atMax && <Text style={styles.maxLabel}>Max</Text>}
+    </View>
+  );
+});
 
 // ── Main ProductCard ────────────────────────────────────────────
 
@@ -74,8 +116,11 @@ const ProductCard = memo(({
   onWishlistToggle,
   isWishlisted = false,
   isSkeleton = false,
+  isAuthenticated = true,   // from parent — check before opening variant modal
+  onShowLogin,              // from parent — show login if not authenticated
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [preselectedVariant, setPreselectedVariant] = useState(0);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
 
   if (isSkeleton) return <ProductCardSkeleton />;
@@ -93,28 +138,45 @@ const ProductCard = memo(({
   const badges = product.badges || [];
   const stockLeft = product.stockLeft ?? product.stock ?? null;
   const unit = product.unit || product.weight || '';
+  const maxQty = product.maxQuantity || product.maxQuantity_ || 10;
+
+  // ── Cheapest variant weight for unit badge ──
+  const cheapestVariantWeight = hasOpts && product.options?.length
+    ? product.options.reduce((best, opt) =>
+        (opt.price || 0) < (best.price || Infinity) ? opt : best
+      ).weight || product.options[0]?.weight
+    : null;
 
   // ── Handlers ──────────────────────────────────────────────────
 
+  const openVariantModal = useCallback((variantIndex = 0) => {
+    setPreselectedVariant(variantIndex);
+    setModalVisible(true);
+  }, []);
+
   const handleAddPress = useCallback(() => {
     if (!inStock) return;
-    if (hasOpts) { setModalVisible(true); return; }
-    onAdd?.(product);
-  }, [inStock, hasOpts, product, onAdd]);
+    if (!isAuthenticated) { onShowLogin?.(); return; }
+    if (hasOpts) { openVariantModal(0); return; }
+    // Direct add — no modal for products without variants
+    onAdd?.(product, 1);
+  }, [inStock, isAuthenticated, hasOpts, product, onAdd, onShowLogin, openVariantModal]);
 
   const handleIncrement = useCallback(() => {
-    if (hasOpts) { setModalVisible(true); return; }
-    if (quantity === 0) onAdd?.(product);
+    if (!isAuthenticated) { onShowLogin?.(); return; }
+    if (hasOpts) { openVariantModal(0); return; }
+    if (quantity === 0) onAdd?.(product, 1);
     else updateQuantity(product.id, quantity + 1);
-  }, [hasOpts, quantity, product, onAdd, updateQuantity]);
+  }, [isAuthenticated, hasOpts, quantity, product, onAdd, updateQuantity, onShowLogin, openVariantModal]);
 
   const handleDecrement = useCallback(() => {
     updateQuantity(product.id, quantity - 1);
   }, [product.id, quantity, updateQuantity]);
 
   const handleModalAdd = useCallback((cartProduct, selectedOption, qty) => {
+    // Merge selected variant data into product for cart
     const merged = selectedOption
-      ? { ...cartProduct, price: selectedOption.price, weight: selectedOption.weight }
+      ? { ...cartProduct, price: selectedOption.price, weight: selectedOption.weight || selectedOption.label, selectedOption }
       : cartProduct;
     onAdd?.(merged, qty || 1);
   }, [onAdd]);
@@ -124,13 +186,7 @@ const ProductCard = memo(({
       <View style={[styles.card, !inStock && styles.cardOutOfStock]}>
         {/* ══════ TOP: IMAGE AREA (~60% of card) ══════ */}
         <View style={styles.imageWrap}>
-          {imageUrl ? (
-            <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
-          ) : (
-            <View style={[styles.image, styles.placeholder]}>
-              <Ionicons name="image-outline" size={28} color={COLORS.mutedText} />
-            </View>
-          )}
+          <LazyImage uri={imageUrl} style={styles.image} />
 
           {/* Badge — top-left */}
           {isAd && (
@@ -168,15 +224,30 @@ const ProductCard = memo(({
               <Text style={styles.outText}>Out of Stock</Text>
             </View>
           )}
+
+          {/* Unit/Weight badge — bottom-left overlay on image (unified style) */}
+          {hasOpts && cheapestVariantWeight ? (
+            <Pressable
+              onPress={() => openVariantModal(0)}
+              style={({ pressed }) => [styles.weightOverlay, pressed && styles.weightOverlayPressed]}
+            >
+              <Text style={styles.weightOverlayText}>{cheapestVariantWeight}</Text>
+            </Pressable>
+          ) : unit ? (
+            <View style={styles.weightOverlay}>
+              <Text style={styles.weightOverlayText}>per {unit}</Text>
+            </View>
+          ) : null}
         </View>
 
-        {/* ══════ MIDDLE: UNIT + ADD BUTTON ══════ */}
+        {/* ══════ MIDDLE: ADD BUTTON ONLY ══════ */}
         <View style={styles.middleRow}>
-          <Text style={styles.unitText} numberOfLines={1}>{unit || ' '}</Text>
+          <View style={styles.spacer} />
           {inStock ? (
             quantity > 0 ? (
               <QuantityStepper
                 quantity={quantity}
+                maxQuantity={maxQty}
                 onIncrement={handleIncrement}
                 onDecrement={handleDecrement}
               />
@@ -234,6 +305,7 @@ const ProductCard = memo(({
         onClose={() => setModalVisible(false)}
         product={product}
         onAddToCart={handleModalAdd}
+        preselectedIndex={preselectedVariant}
       />
     </>
   );
@@ -257,6 +329,8 @@ const styles = StyleSheet.create({
   // ── Image area (~60% of card) ──
   imageWrap: { position: 'relative', width: '100%', aspectRatio: 1 },
   image: { width: '100%', height: '100%' },
+  imageLoaded: { opacity: 1 },
+  imageHidden: { opacity: 0, position: 'absolute' },
   placeholder: { backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center' },
 
   // ── Badge (top-left pill) ──
@@ -291,21 +365,45 @@ const styles = StyleSheet.create({
   },
   outText: { color: '#fff', fontSize: 12, fontWeight: '800', letterSpacing: 0.5 },
 
-  // ── Middle row: unit (left) + ADD/stepper (right) ──
+  // ── Weight overlay on image (bottom-left, unified style) ──
+  weightOverlay: {
+    position: 'absolute',
+    bottom: 4,
+    left: 4,
+    borderRadius: 5,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 2,
+  },
+  weightOverlayPressed: {
+    backgroundColor: 'rgba(0,0,0,0.70)',
+    transform: [{ scale: 0.96 }],
+  },
+  weightOverlayText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#fff',
+  },
+
+  // ── Middle row: ADD button only (right aligned) ──
   middleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     paddingHorizontal: SPACING.card,
     paddingVertical: SPACING.cardSm,
     borderBottomWidth: 1,
     borderBottomColor: '#fef3c7',
   },
-  unitText: {
+  spacer: {
     flex: 1,
-    fontSize: 11,
-    fontWeight: '600',
-    color: COLORS.mutedText,
   },
 
   // ── ADD button (right side in middle row) ──
@@ -338,6 +436,9 @@ const styles = StyleSheet.create({
   },
 
   // ── Quantity stepper ──
+  stepperOuter: {
+    alignItems: 'center',
+  },
   stepper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -352,10 +453,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff7ed',
     width: 28, height: 28,
   },
+  stepperBtnDisabled: {
+    backgroundColor: '#f3f4f6',
+  },
   stepperQty: {
     minWidth: 24, textAlign: 'center',
     fontSize: 12, fontWeight: '800',
     color: COLORS.text, paddingHorizontal: 4,
+  },
+  maxLabel: {
+    fontSize: 8, fontWeight: '700',
+    color: '#ef4444',
+    marginTop: 2,
   },
 
   // ── Info wrap ──

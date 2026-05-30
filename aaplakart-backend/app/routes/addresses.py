@@ -50,6 +50,14 @@ async def list_addresses(
     db: AsyncSession = Depends(get_session),
 ):
     uid = user.get("uid", "")
+
+    # Try Firestore first
+    from app.services.firestore_service import fs_get_addresses
+    fs_addrs = await fs_get_addresses(uid)
+    if fs_addrs is not None:
+        return [AddressSchema(**a) for a in fs_addrs]
+
+    # Fallback to DB
     result = await db.execute(
         select(Address).where(Address.user_uid == uid).order_by(Address.created_at.desc())
     )
@@ -63,7 +71,20 @@ async def create_address(
     db: AsyncSession = Depends(get_session),
 ):
     uid = user.get("uid", "")
-    addr = Address(user_uid=uid, **body.model_dump())
+    import uuid
+    addr_id = uuid.uuid4().hex[:12]
+
+    # Write to Firestore
+    from app.services.firestore_service import fs_create_address
+    fs_data = {
+        "id": addr_id,
+        "user_uid": uid,
+        **body.model_dump(),
+    }
+    fs_ok = await fs_create_address(addr_id, fs_data)
+
+    # Also write to SQLite
+    addr = Address(id=addr_id, user_uid=uid, **body.model_dump())
     db.add(addr)
     await db.commit()
     await db.refresh(addr)
@@ -77,6 +98,12 @@ async def delete_address(
     db: AsyncSession = Depends(get_session),
 ):
     uid = user.get("uid", "")
+
+    # Delete from Firestore
+    from app.services.firestore_service import fs_delete_address
+    await fs_delete_address(address_id)
+
+    # Delete from SQLite
     result = await db.execute(
         select(Address).where(Address.id == address_id, Address.user_uid == uid)
     )

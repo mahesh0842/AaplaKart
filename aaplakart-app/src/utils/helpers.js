@@ -103,10 +103,11 @@ export const isInStock = (product) => Number(product?.stock || 0) > 0;
 
 /**
  * Returns true if the product has selectable options/variants (e.g., weight options).
- * Products with options should open AddToCartModal instead of being added directly.
+ * Products with options + showVariants=true open AddToCartModal instead of being added directly.
+ * Admin controls this via "Show Variants" toggle in catalog panel.
  */
 export const hasOptions = (product) =>
-  Array.isArray(product?.options) && product.options.length > 0;
+  product?.showVariants === true && Array.isArray(product?.options) && product.options.length > 0;
 
 /**
  * Converts category string array to CategoryPanel-compatible list.

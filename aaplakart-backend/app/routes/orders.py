@@ -271,33 +271,9 @@ async def create_order(
 
     await db.commit()
 
-    # Sync order to Firebase Firestore (in background thread to avoid greenlet conflicts)
-    import asyncio
-    try:
-        loop = asyncio.get_running_loop()
-        loop.run_in_executor(None, _sync_firestore_sync, {
-            "id": order.id,
-            "user_uid": uid,
-            "status": order.status,
-            "subtotal": order.subtotal,
-            "delivery_fee": order.delivery_fee,
-            "total": order.total,
-            "payment_method": order.payment_method,
-            "delivery_slot": order.delivery_slot,
-            "delivery_slot_label": order.delivery_slot_label,
-            "address_full_name": order.address_full_name,
-            "address_phone": order.address_phone,
-            "address_line1": order.address_line1,
-            "address_city": order.address_city,
-            "address_pincode": order.address_pincode,
-            "items": items_data,
-            "placed_at": order.placed_at.isoformat() if order.placed_at else "",
-            "estimated_delivery": order.estimated_delivery.isoformat() if order.estimated_delivery else "",
-            "razorpay_payment_id": getattr(body, 'razorpay_payment_id', '') or '',
-            "razorpay_order_id": getattr(body, 'razorpay_order_id', '') or '',
-        })
-    except Exception as firestore_err:
-        logger.warning(f"[Firestore] Order sync skipped: {firestore_err}")
+    # ── Firestore: SKIP individual sync — orders stay in SQLite.
+    # Only synced in batch via auto-archive when 20+ delivered accumulate.
+    # This saves Firestore read/write quota (no per-order Firestore cost).
 
     # ── Cache in Redis (last 3 orders, FIFO) ──
     await cache_recent_order(uid, {
@@ -315,17 +291,24 @@ async def create_order(
     logger.info("Order {} placed by user {}", order.id, uid)
 
     # Broadcast new order via WebSocket
+    order_data = {
+        "id": order.id,
+        "status": order.status,
+        "total": order.total,
+        "payment_method": order.payment_method,
+        "placed_at": order.placed_at.isoformat() if order.placed_at else "",
+        "address_city": order.address_city or "",
+        "items_count": len(items_data),
+    }
     try:
         from app.services.websocket_manager import manager
-        await manager.broadcast_new_order({
-            "id": order.id,
-            "status": order.status,
-            "total": order.total,
-            "payment_method": order.payment_method,
-            "placed_at": order.placed_at.isoformat() if order.placed_at else "",
-            "address_city": order.address_city or "",
-            "items_count": len(items_data),
-        })
+        await manager.broadcast_new_order(order_data)
+    except Exception:
+        pass
+    # Also notify the specific customer who placed this order
+    try:
+        from app.services.user_websocket_manager import user_manager as usr_mgr
+        await usr_mgr.send_new_order_to_user(uid, order_data)
     except Exception:
         pass
 
@@ -352,7 +335,7 @@ async def create_order(
     )
 
 
-# ── List My Orders (Redis-cached, last 5) ─────────────────────────
+# ── List My Orders (Firestore → Redis-cached) ────────────────────
 
 
 @router.get("/", response_model=list[OrderResponse])
@@ -363,7 +346,8 @@ async def list_my_orders(
     uid = user.get("uid", "")
 
     try:
-        # Always fetch from DB to get real-time status updates
+        # SQLite only — no Firestore reads (saves quota).
+        # Orders stay in SQLite until batch-archived at 20+ delivered.
         from sqlalchemy.orm import selectinload
         stmt = (
             select(Order)
@@ -392,8 +376,13 @@ async def get_order(
     db: AsyncSession = Depends(get_session),
 ):
     uid = user.get("uid", "")
+
+    # SQLite only — no Firestore reads (saves quota)
+    from sqlalchemy.orm import selectinload
     result = await db.execute(
-        select(Order).where(Order.id == order_id, Order.user_uid == uid)
+        select(Order)
+        .options(selectinload(Order.items))
+        .where(Order.id == order_id, Order.user_uid == uid)
     )
     order = result.scalar_one_or_none()
     if order is None:

@@ -24,6 +24,12 @@ const isPlaceholder = (val) => !val || val.includes('YOUR_') || val.includes('yo
 const hasValidConfig = hasRequiredConfig && !isPlaceholder(firebaseConfig.appId) && !isPlaceholder(firebaseConfig.apiKey);
 
 export const firebaseReady = hasValidConfig;
+
+/**
+ * Mock OTP switch — only for development/demo when Firebase phone auth is not available.
+ * Set EXPO_PUBLIC_USE_MOCK_OTP=true in .env to enable mock mode.
+ * When false (default), real SMS is sent via Firebase signInWithPhoneNumber.
+ */
 export const mockOtpEnabled = process.env.EXPO_PUBLIC_USE_MOCK_OTP === 'true';
 
 let appInstance = null;

@@ -1,4 +1,4 @@
-// GUI category: Auth. Offers a lightweight country-code picker for the phone login flow.
+// GUI category: Auth. Modern country-code picker for phone login.
 import React, { useMemo, useState } from 'react';
 import {
   Modal,
@@ -14,6 +14,9 @@ const OPTIONS = [
   { label: 'India', code: '+91', flag: '🇮🇳' },
   { label: 'United States', code: '+1', flag: '🇺🇸' },
   { label: 'United Kingdom', code: '+44', flag: '🇬🇧' },
+  { label: 'Canada', code: '+1', flag: '🇨🇦' },
+  { label: 'Australia', code: '+61', flag: '🇦🇺' },
+  { label: 'UAE', code: '+971', flag: '🇦🇪' },
 ];
 
 const CountryCodePicker = ({ value, onChange }) => {
@@ -33,26 +36,38 @@ const CountryCodePicker = ({ value, onChange }) => {
       >
         <Text style={styles.flag}>{selectedOption.flag}</Text>
         <Text style={styles.code}>{selectedOption.code}</Text>
-        <Ionicons name="chevron-down" size={16} color={COLORS.mutedText} />
+        <Ionicons name="chevron-down" size={14} color={COLORS.mutedText} />
       </Pressable>
 
       <Modal transparent visible={visible} animationType="fade" onRequestClose={() => setVisible(false)}>
         <Pressable style={styles.overlay} onPress={() => setVisible(false)}>
           <View style={styles.sheet}>
-            {OPTIONS.map((option) => (
+            <View style={styles.sheetHeader}>
+              <Text style={styles.sheetTitle}>Select Country</Text>
+              <Pressable onPress={() => setVisible(false)} hitSlop={8}>
+                <Ionicons name="close" size={22} color={COLORS.mutedText} />
+              </Pressable>
+            </View>
+            {OPTIONS.map((option, idx) => (
               <Pressable
-                key={option.code}
+                key={`${option.code}-${idx}`}
                 onPress={() => {
                   onChange(option.code);
                   setVisible(false);
                 }}
-                style={styles.option}
+                style={[
+                  styles.option,
+                  option.code === value && styles.optionSelected,
+                ]}
               >
                 <Text style={styles.optionFlag}>{option.flag}</Text>
                 <View style={styles.optionTextWrap}>
                   <Text style={styles.optionLabel}>{option.label}</Text>
                   <Text style={styles.optionCode}>{option.code}</Text>
                 </View>
+                {option.code === value && (
+                  <Ionicons name="checkmark-circle" size={22} color={COLORS.primary} />
+                )}
               </Pressable>
             ))}
           </View>
@@ -66,42 +81,59 @@ const styles = StyleSheet.create({
   trigger: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff7ed',
-    borderRadius: 16,
+    backgroundColor: 'transparent',
+    borderRadius: 12,
     paddingHorizontal: 12,
-    paddingVertical: 14,
-    marginRight: 10,
+    paddingVertical: 12,
+    gap: 6,
   },
   flag: {
-    fontSize: 16,
-    marginRight: 8,
+    fontSize: 18,
   },
   code: {
     color: COLORS.text,
     fontSize: 15,
     fontWeight: '700',
-    marginRight: 4,
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(17,24,39,0.3)',
+    backgroundColor: 'rgba(17,24,39,0.4)',
     justifyContent: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: 28,
   },
   sheet: {
-    backgroundColor: COLORS.card,
+    backgroundColor: '#fff',
     borderRadius: 24,
     paddingVertical: 8,
+    overflow: 'hidden',
+  },
+  sheetHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 18,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f0ea',
+  },
+  sheetTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: COLORS.text,
   },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 18,
-    paddingVertical: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+  },
+  optionSelected: {
+    backgroundColor: '#fff7ed',
   },
   optionFlag: {
-    fontSize: 18,
-    marginRight: 12,
+    fontSize: 20,
+    marginRight: 14,
   },
   optionTextWrap: {
     flex: 1,
@@ -109,11 +141,12 @@ const styles = StyleSheet.create({
   optionLabel: {
     color: COLORS.text,
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   optionCode: {
     color: COLORS.mutedText,
-    marginTop: 3,
+    marginTop: 2,
+    fontSize: 13,
   },
 });
 

@@ -56,14 +56,18 @@ const BrandCategoryScreen = ({ brand = 'kart', isAuthenticated, onShowLogin }) =
     return () => { active = false; };
   }, [brand, config.type]);
 
-  const handleAddProduct = useCallback((product) => {
+  const handleAddProduct = useCallback((product, qty = 1) => {
     if (!isAuthenticated) {
       Toast.show({ type: 'info', text1: 'Login required', text2: 'Please sign in to add items.' });
       onShowLogin?.();
       return;
     }
-    addItem(product);
-    Toast.show({ type: 'success', text1: 'Added!', text2: `${product.name} added to cart.` });
+    addItem(product, qty);
+    if (qty > 1) {
+      Toast.show({ type: 'success', text1: `${qty}x Added!`, text2: product.name, visibilityTime: 1200 });
+    } else {
+      Toast.show({ type: 'success', text1: 'Added!', text2: `${product.name} added to cart.` });
+    }
   }, [isAuthenticated, addItem, onShowLogin]);
 
   const handleCategorySelect = useCallback((category) => {
@@ -101,7 +105,7 @@ const BrandCategoryScreen = ({ brand = 'kart', isAuthenticated, onShowLogin }) =
           category={selectedCategory}
           products={categoryProducts}
           loading={false}
-          onBack={() => { setSelectedCategory(null); setSelectedSubcategory(null); }}
+          onBack={() => handleCategorySelect(null)}
           onAddProduct={handleAddProduct}
           isAuthenticated={isAuthenticated}
           onShowLogin={onShowLogin}

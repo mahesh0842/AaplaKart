@@ -1,11 +1,19 @@
 // GUI category: Products. Responsive grid — auto 2/3 cols, or force via `numColumns` prop. Memoized.
-import React, { memo, useMemo } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import React, { memo, useMemo, useCallback } from 'react';
+import { FlatList, Platform, StyleSheet, Text, View } from 'react-native';
 import ProductCard from './ProductCard';
 import { COLORS, SPACING } from '../../utils/constants';
 import { isTablet, getCardWidth } from '../../utils/helpers';
 
 const DEFAULT_GAP = SPACING.gridGap;
+
+// Performance: batch render 6 items at a time, keep 3 screens rendered
+const PERF = {
+  initialNumToRender: 6,
+  maxToRenderPerBatch: 6,
+  windowSize: 3,
+  removeClippedSubviews: Platform.OS === 'android',
+};
 
 const ProductGrid = memo(({
   products,
@@ -22,14 +30,37 @@ const ProductGrid = memo(({
 
   const cardWidth = useMemo(() => getCardWidth(numColumns, gap), [numColumns, gap]);
 
+  const renderItem = useCallback(({ item }) => (
+    <View style={{ width: cardWidth }}>
+      <ProductCard
+        product={item}
+        quantity={quantities[item.id] || 0}
+        onAdd={onAddProduct}
+        {...cardProps}
+      />
+    </View>
+  ), [cardWidth, quantities, onAddProduct, cardProps]);
+
+  const keyExtractor = useCallback((item) => item.id, []);
+
+  // Deduplicate products by ID — prevents "two children with same key" errors
+  const uniqueProducts = useMemo(() => {
+    const seen = new Set();
+    return (products || []).filter((p) => {
+      if (!p?.id || seen.has(p.id)) return false;
+      seen.add(p.id);
+      return true;
+    });
+  }, [products]);
+
   return (
     <View style={styles.container}>
       {showHeading && <Text style={styles.heading}>{heading}</Text>}
       <FlatList
-        data={products}
+        data={uniqueProducts}
         numColumns={numColumns}
         scrollEnabled={false}
-        keyExtractor={(item) => item.id}
+        keyExtractor={keyExtractor}
         columnWrapperStyle={styles.columnWrapper}
         contentContainerStyle={[styles.content, { gap }]}
         ListEmptyComponent={
@@ -40,16 +71,8 @@ const ProductGrid = memo(({
             </Text>
           </View>
         }
-        renderItem={({ item }) => (
-          <View style={{ width: cardWidth }}>
-            <ProductCard
-              product={item}
-              quantity={quantities[item.id] || 0}
-              onAdd={onAddProduct}
- v              {...cardProps}
-            />
-          </View>
-        )}
+        renderItem={renderItem}
+        {...PERF}
       />
     </View>
   );

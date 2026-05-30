@@ -11,7 +11,8 @@
     "active": true,
     "position": "home_banner",
     "sortOrder": 1,
-    "createdAt": "2026-04-30T00:00:00Z"
+    "createdAt": "2026-04-30T00:00:00Z",
+    "updated_at": "2026-05-29T06:50:55.068926+00:00"
   },
   {
     "id": "promo-home-2",

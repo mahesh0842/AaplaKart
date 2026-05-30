@@ -11,18 +11,33 @@
         "image": "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=200",
         "subcategories": [
           {
-            "id": "sub-premium-veggies",
-            "name": "Premium Veggies"
+            "id": "sub-premium veggies",
+            "name": "Premium Veggies",
+            "categoryId": "cat-vegetables",
+            "categoryName": "Vegetables"
           },
           {
-            "id": "sub-root-veggies",
-            "name": "Root Veggies"
+            "id": "sub-root veggies",
+            "name": "Root Veggies",
+            "categoryId": "cat-vegetables",
+            "categoryName": "Vegetables"
           },
           {
-            "id": "sub-leafy-greens",
-            "name": "Leafy Greens"
+            "id": "sub-leafy greens",
+            "name": "Leafy Greens",
+            "categoryId": "cat-vegetables",
+            "categoryName": "Vegetables"
+          },
+          {
+            "id": "sub-summers",
+            "name": "SUMMERS",
+            "categoryId": "cat-vegetables",
+            "categoryName": "Vegetables"
           }
-        ]
+        ],
+        "sectionId": "section-grocery",
+        "sectionName": "Grocery & Kitchen",
+        "type": "kart"
       },
       {
         "id": "cat-dairy",
@@ -31,17 +46,26 @@
         "subcategories": [
           {
             "id": "sub-milk",
-            "name": "Milk"
+            "name": "Milk",
+            "categoryId": "cat-dairy",
+            "categoryName": "Dairy"
           },
           {
             "id": "sub-paneer-curd",
-            "name": "Paneer & Curd"
+            "name": "Paneer & Curd",
+            "categoryId": "cat-dairy",
+            "categoryName": "Dairy"
           },
           {
             "id": "sub-butter-ghee",
-            "name": "Butter & Ghee"
+            "name": "Butter & Ghee",
+            "categoryId": "cat-dairy",
+            "categoryName": "Dairy"
           }
-        ]
+        ],
+        "sectionId": "section-grocery",
+        "sectionName": "Grocery & Kitchen",
+        "type": "kart"
       },
       {
         "id": "cat-fruits",
@@ -50,13 +74,20 @@
         "subcategories": [
           {
             "id": "sub-premium-fruits",
-            "name": "Premium Fruits"
+            "name": "Premium Fruits",
+            "categoryId": "cat-fruits",
+            "categoryName": "Fruits"
           },
           {
             "id": "sub-daily-fruits",
-            "name": "Daily Fruits"
+            "name": "Daily Fruits",
+            "categoryId": "cat-fruits",
+            "categoryName": "Fruits"
           }
-        ]
+        ],
+        "sectionId": "section-grocery",
+        "sectionName": "Grocery & Kitchen",
+        "type": "kart"
       },
       {
         "id": "cat-grains",
@@ -65,17 +96,26 @@
         "subcategories": [
           {
             "id": "sub-rice",
-            "name": "Rice"
+            "name": "Rice",
+            "categoryId": "cat-grains",
+            "categoryName": "Grains & Dal"
           },
           {
             "id": "sub-flour",
-            "name": "Flour"
+            "name": "Flour",
+            "categoryId": "cat-grains",
+            "categoryName": "Grains & Dal"
           },
           {
             "id": "sub-pulses",
-            "name": "Pulses"
+            "name": "Pulses",
+            "categoryId": "cat-grains",
+            "categoryName": "Grains & Dal"
           }
-        ]
+        ],
+        "sectionId": "section-grocery",
+        "sectionName": "Grocery & Kitchen",
+        "type": "kart"
       },
       {
         "id": "cat-spices",
@@ -84,13 +124,84 @@
         "subcategories": [
           {
             "id": "sub-whole-spices",
-            "name": "Whole Spices"
+            "name": "Whole Spices",
+            "categoryId": "cat-spices",
+            "categoryName": "Spices & Masala"
           },
           {
             "id": "sub-powder-spices",
-            "name": "Powder Spices"
+            "name": "Powder Spices",
+            "categoryId": "cat-spices",
+            "categoryName": "Spices & Masala"
           }
-        ]
+        ],
+        "sectionId": "section-grocery",
+        "sectionName": "Grocery & Kitchen",
+        "type": "kart"
+      },
+      {
+        "id": "cat-books",
+        "name": "books",
+        "image": "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=200",
+        "subcategories": [
+          {
+            "id": "sub-pens",
+            "name": "pens",
+            "categoryId": "cat-books",
+            "categoryName": "books"
+          },
+          {
+            "id": "sub-copy",
+            "name": "copy",
+            "categoryId": "cat-books",
+            "categoryName": "books"
+          },
+          {
+            "id": "sub-tapes",
+            "name": "tapes",
+            "categoryId": "cat-books",
+            "categoryName": "books"
+          },
+          {
+            "id": "sub-rubbers",
+            "name": "rubbers",
+            "categoryId": "cat-books",
+            "categoryName": "books"
+          },
+          {
+            "id": "sub-geometry boxes",
+            "name": "geometry boxes",
+            "categoryId": "cat-books",
+            "categoryName": "books"
+          },
+          {
+            "id": "sub-pages",
+            "name": "pages",
+            "categoryId": "cat-books",
+            "categoryName": "books"
+          },
+          {
+            "id": "sub-files",
+            "name": "files",
+            "categoryId": "cat-books",
+            "categoryName": "books"
+          },
+          {
+            "id": "sub-dairy",
+            "name": "dairy",
+            "categoryId": "cat-books",
+            "categoryName": "books"
+          },
+          {
+            "id": "sub-beauty",
+            "name": "beauty",
+            "categoryId": "cat-books",
+            "categoryName": "books"
+          }
+        ],
+        "sectionId": "section-grocery",
+        "sectionName": "Grocery & Kitchen",
+        "type": "kart"
       }
     ]
   },
@@ -107,13 +218,20 @@
         "subcategories": [
           {
             "id": "sub-biscuits",
-            "name": "Biscuits"
+            "name": "Biscuits",
+            "categoryId": "cat-biscuits",
+            "categoryName": "Biscuits & Cookies"
           },
           {
             "id": "sub-cookies",
-            "name": "Cookies"
+            "name": "Cookies",
+            "categoryId": "cat-biscuits",
+            "categoryName": "Biscuits & Cookies"
           }
-        ]
+        ],
+        "sectionId": "section-snacks",
+        "sectionName": "Snacks & Drinks",
+        "type": "kart"
       },
       {
         "id": "cat-beverages",
@@ -122,13 +240,20 @@
         "subcategories": [
           {
             "id": "sub-juices",
-            "name": "Juices"
+            "name": "Juices",
+            "categoryId": "cat-beverages",
+            "categoryName": "Beverages"
           },
           {
             "id": "sub-soft-drinks",
-            "name": "Soft Drinks"
+            "name": "Soft Drinks",
+            "categoryId": "cat-beverages",
+            "categoryName": "Beverages"
           }
-        ]
+        ],
+        "sectionId": "section-snacks",
+        "sectionName": "Snacks & Drinks",
+        "type": "kart"
       }
     ]
   },
@@ -145,13 +270,20 @@
         "subcategories": [
           {
             "id": "sub-original",
-            "name": "Original"
+            "name": "Original",
+            "categoryId": "cat-classic-waffles",
+            "categoryName": "Classic Waffles"
           },
           {
             "id": "sub-savory",
-            "name": "Savory"
+            "name": "Savory",
+            "categoryId": "cat-classic-waffles",
+            "categoryName": "Classic Waffles"
           }
-        ]
+        ],
+        "sectionId": "section-waffle",
+        "sectionName": "The Waffle Guy",
+        "type": "app"
       },
       {
         "id": "cat-chocolate-waffles",
@@ -160,13 +292,20 @@
         "subcategories": [
           {
             "id": "sub-choc-lovers",
-            "name": "Chocolate Lovers"
+            "name": "Chocolate Lovers",
+            "categoryId": "cat-chocolate-waffles",
+            "categoryName": "Chocolate Waffles"
           },
           {
             "id": "sub-signature",
-            "name": "Signature"
+            "name": "Signature",
+            "categoryId": "cat-chocolate-waffles",
+            "categoryName": "Chocolate Waffles"
           }
-        ]
+        ],
+        "sectionId": "section-waffle",
+        "sectionName": "The Waffle Guy",
+        "type": "app"
       },
       {
         "id": "cat-special-waffles",
@@ -175,13 +314,20 @@
         "subcategories": [
           {
             "id": "sub-premium",
-            "name": "Premium"
+            "name": "Premium",
+            "categoryId": "cat-special-waffles",
+            "categoryName": "Special Waffles"
           },
           {
             "id": "sub-seasonal",
-            "name": "Seasonal"
+            "name": "Seasonal",
+            "categoryId": "cat-special-waffles",
+            "categoryName": "Special Waffles"
           }
-        ]
+        ],
+        "sectionId": "section-waffle",
+        "sectionName": "The Waffle Guy",
+        "type": "app"
       },
       {
         "id": "cat-beverages-waffle",
@@ -190,19 +336,29 @@
         "subcategories": [
           {
             "id": "sub-hot-drinks",
-            "name": "Hot Drinks"
+            "name": "Hot Drinks",
+            "categoryId": "cat-beverages-waffle",
+            "categoryName": "Beverages"
           },
           {
             "id": "sub-cold-drinks",
-            "name": "Cold Drinks"
+            "name": "Cold Drinks",
+            "categoryId": "cat-beverages-waffle",
+            "categoryName": "Beverages"
           }
-        ]
+        ],
+        "sectionId": "section-waffle",
+        "sectionName": "The Waffle Guy",
+        "type": "app"
       },
       {
         "id": "cat-mumtaz-dummy",
         "name": "Mumtaz dummy",
         "image": "",
-        "subcategories": []
+        "subcategories": [],
+        "sectionId": "section-waffle",
+        "sectionName": "The Waffle Guy",
+        "type": "app"
       }
     ]
   },
@@ -215,6 +371,30 @@
       {
         "id": "cat-apppy",
         "name": "Apppy",
+        "image": "",
+        "subcategories": [],
+        "sectionId": "section-sweety",
+        "sectionName": "Sweety",
+        "type": "app"
+      }
+    ]
+  },
+  {
+    "id": "section-books-andpen",
+    "name": "books &pen",
+    "type": "kart",
+    "image": "",
+    "categories": []
+  },
+  {
+    "id": "section-educations",
+    "name": "educations",
+    "type": "kart",
+    "image": "",
+    "categories": [
+      {
+        "id": "cat-books",
+        "name": "books",
         "image": "",
         "subcategories": []
       }

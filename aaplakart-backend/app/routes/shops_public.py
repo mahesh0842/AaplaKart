@@ -15,6 +15,14 @@ router = APIRouter(prefix="/shops", tags=["Shops (Public)"])
 @router.get("/active")
 async def get_active_shop(db: AsyncSession = Depends(get_session)):
     """Return the first active shop (for delivery app). No auth required."""
+    # Try Firestore first
+    from app.services.firestore_service import fs_get_shops
+    fs_shops = await fs_get_shops(active_only=True)
+    if fs_shops is not None and len(fs_shops) > 0:
+        shop = fs_shops[0]
+        return {"success": True, "shop": shop}
+
+    # Fallback to DB
     result = await db.execute(select(Shop).where(Shop.is_active == 1).limit(1))
     shop = result.scalar_one_or_none()
 

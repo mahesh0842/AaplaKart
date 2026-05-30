@@ -3,19 +3,28 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+const DEFAULT_MAX_QTY = 10;
+
 export const useCartStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       items: [],
-      addItem: (product) =>
+      addItem: (product, qty = 1) =>
         set((state) => {
-          const existingItem = state.items.find((item) => item.id === product.id);
+          // Use variant-specific ID: productId_weight → separate cart rows per unit.
+          // Only use product.weight (set by variant selector), NOT product.unit (display hint like "kg").
+          const weight = product.weight || '';
+          const cartId = weight ? `${product.id}_${weight}` : product.id;
+          const existingItem = state.items.find((item) => item.id === cartId);
+          const maxQty = product.maxQuantity || product.maxQuantity_ || DEFAULT_MAX_QTY;
 
           if (existingItem) {
+            const newQty = Math.min(existingItem.quantity + qty, maxQty);
+            if (newQty === existingItem.quantity) return state;
             return {
               items: state.items.map((item) =>
-                item.id === product.id
-                  ? { ...item, quantity: item.quantity + 1 }
+                item.id === cartId
+                  ? { ...item, quantity: newQty }
                   : item
               ),
             };
@@ -25,14 +34,16 @@ export const useCartStore = create(
             items: [
               ...state.items,
               {
-                id: product.id,
+                id: cartId,
+                productId: product.id,
                 name: product.name,
                 price: product.price,
-                weight: product.weight,
+                weight: weight,
                 stock: product.stock,
                 category: product.category,
                 image: product.image || product.firebaseImagePath || '',
-                quantity: 1,
+                maxQuantity: maxQty,
+                quantity: Math.min(qty, maxQty),
               },
             ],
           };
@@ -46,9 +57,11 @@ export const useCartStore = create(
           items:
             quantity <= 0
               ? state.items.filter((item) => item.id !== productId)
-              : state.items.map((item) =>
-                  item.id === productId ? { ...item, quantity } : item
-                ),
+              : state.items.map((item) => {
+                  if (item.id !== productId) return item;
+                  const max = item.maxQuantity || DEFAULT_MAX_QTY;
+                  return { ...item, quantity: Math.min(quantity, max) };
+                }),
         })),
       clearCart: () => set({ items: [] }),
     }),

@@ -22,7 +22,12 @@ const CartItemRow = ({ item, onDecrease, onIncrease, onDelete }) => (
           >
             <Ionicons name="remove" size={16} color={COLORS.primaryDark} />
           </Pressable>
-          <Text style={styles.quantity}>{item.quantity}</Text>
+          <View style={styles.qtyInfo}>
+            <Text style={styles.quantity}>{item.quantity}</Text>
+            {item.weight ? (
+              <Text style={styles.qtyUnit}>× {item.weight}</Text>
+            ) : null}
+          </View>
           <Pressable
             accessibilityLabel={`Increase ${item.name} quantity`}
             onPress={onIncrease}
@@ -106,6 +111,16 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     fontSize: 15,
     fontWeight: '700',
+  },
+  qtyInfo: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 3,
+  },
+  qtyUnit: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: COLORS.mutedText,
   },
   deleteButton: {
     width: 38,

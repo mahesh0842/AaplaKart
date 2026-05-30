@@ -1,35 +1,22 @@
-"""Category service — reads the categories.json data file."""
+"""Category service — reads categories.json with in-memory cache."""
 
 from __future__ import annotations
 
-import json
-from pathlib import Path
 from typing import Optional
-
 from loguru import logger
+from app.services.cache_service import load_json_data, save_json_data
 
-DATA_FILE = Path(__file__).resolve().parent.parent / "data" / "categories.json"
-
+DATA_NAME = "categories"
 
 def _load_sections() -> list[dict]:
-    """Load all sections with nested categories/subcategories."""
-    if not DATA_FILE.exists():
-        logger.warning("categories.json not found at {}", DATA_FILE)
-        return []
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
-
+    return load_json_data(DATA_NAME)
 
 def _save_sections(sections: list[dict]) -> None:
-    """Save the full sections list back to the JSON file."""
-    DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(sections, f, indent=2, ensure_ascii=False)
+    save_json_data(DATA_NAME, sections)
     logger.info("Categories data saved ({} sections)", len(sections))
 
 
 def get_sections(type_filter: Optional[str] = None) -> list[dict]:
-    """Return all sections, optionally filtered by type (kart/app)."""
     sections = _load_sections()
     if type_filter and type_filter != "all":
         sections = [s for s in sections if s.get("type") == type_filter]

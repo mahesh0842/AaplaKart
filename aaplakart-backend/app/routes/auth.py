@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from loguru import logger
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -38,10 +38,20 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 # ── Helpers ────────────────────────────────────────────────────────
 
 
+async def _sync_user_to_firestore(uid: str, data: dict) -> None:
+    """Sync user data to Firestore (best-effort)."""
+    try:
+        from app.services.firestore_service import fs_create_user
+        await fs_create_user(uid, data)
+    except Exception:
+        pass  # Non-critical
+
+
 async def _get_or_create_user(db: AsyncSession, uid: str, phone: str, **kwargs) -> tuple[User, bool]:
     """Return (user, is_new).
     
     First tries to find user by UID, then by phone (to avoid UNIQUE constraint).
+    Also syncs to Firestore on create/update.
     """
     # Try by UID first
     result = await db.execute(select(User).where(User.uid == uid))
@@ -57,31 +67,64 @@ async def _get_or_create_user(db: AsyncSession, uid: str, phone: str, **kwargs) 
         db.add(user)
         await db.commit()
         await db.refresh(user)
+        # Sync to Firestore
+        await _sync_user_to_firestore(uid, {
+            "uid": uid,
+            "phone_number": phone,
+            "display_name": kwargs.get("display_name", ""),
+            "email": kwargs.get("email", ""),
+            "photo_url": kwargs.get("photo_url", ""),
+            "role": kwargs.get("role", "user"),
+            "is_test_user": kwargs.get("is_test_user", 0),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
         return user, True
 
     # Update last_login / phone on every sign-in
     if phone and phone != user.phone_number:
         user.phone_number = phone
     user.updated_at = datetime.now(timezone.utc)
+
+    # ── Only update display_name if it's a REAL name (not "AaplaKart User" default) ──
+    # This preserves the user's actual name set via address/order/profile update
+    incoming_display_name = kwargs.get("display_name", "").strip()
+    is_default_name = (not incoming_display_name or incoming_display_name == "AaplaKart User")
+    
+    if not is_default_name and incoming_display_name:
+        user.display_name = incoming_display_name
+    
     for k, v in kwargs.items():
+        if k == "display_name":
+            continue  # handled above
         if v:
             setattr(user, k, v)
     await db.commit()
     await db.refresh(user)
+    # Sync to Firestore
+    await _sync_user_to_firestore(uid, {
+        "uid": uid,
+        "phone_number": user.phone_number,
+        "display_name": user.display_name or "",
+        "email": user.email or "",
+        "photo_url": user.photo_url or "",
+        "role": user.role or "user",
+        "is_test_user": user.is_test_user or 0,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    })
     return user, False
 
 async def _get_or_create_user_by_email(db: AsyncSession, email: str, name: str = "", photo_url: str = "") -> tuple[User, bool]:
-    """Find user by email, or create a new one. Returns (user, is_new)."""
+    """Find user by email, or create a new one. Returns (user, is_new).
+    Also syncs to Firestore."""
     result = await db.execute(select(User).where(User.email == email))
     user = result.scalar_one_or_none()
 
     if user is None:
-        # Create new user with a unique UID derived from email
         import hashlib
         uid = f"google-{hashlib.sha256(email.encode()).hexdigest()[:16]}"
         user = User(
             uid=uid,
-            phone_number="",  # Google users may not have a phone
+            phone_number="",
             email=email,
             display_name=name or email.split("@")[0],
             photo_url=photo_url,
@@ -89,15 +132,36 @@ async def _get_or_create_user_by_email(db: AsyncSession, email: str, name: str =
         db.add(user)
         await db.commit()
         await db.refresh(user)
+        # Sync to Firestore
+        await _sync_user_to_firestore(uid, {
+            "uid": uid,
+            "phone_number": "",
+            "email": email,
+            "display_name": name or email.split("@")[0],
+            "photo_url": photo_url,
+            "role": "user",
+            "is_test_user": 0,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
         return user, True
 
-    # Update on every sign-in
     user.updated_at = datetime.now(timezone.utc)
     if name:
         user.display_name = name
     if photo_url:
         user.photo_url = photo_url
     await db.commit()
+    # Sync to Firestore
+    await _sync_user_to_firestore(user.uid, {
+        "uid": user.uid,
+        "phone_number": user.phone_number or "",
+        "email": user.email or "",
+        "display_name": user.display_name or "",
+        "photo_url": user.photo_url or "",
+        "role": user.role or "user",
+        "is_test_user": user.is_test_user or 0,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    })
     await db.refresh(user)
     return user, False
     return user, False
@@ -232,18 +296,24 @@ async def delivery_login_endpoint(body: dict):
     phone = body.get("phone_number", "")
     otp = body.get("otp", "")
     
-    # Dev mode: any OTP works (mock OTP = 123456)
+    from app.services.delivery_partner_service import register_or_login
+    partner = register_or_login(phone)
+    
     import uuid
     delivery_token = f"delivery-dev-{uuid.uuid4().hex[:16]}"
-    logger.info(f"Delivery login success: {phone}")
+    logger.info(f"Delivery login success: {phone} (uid={partner['uid']})")
     return {
         "success": True,
-        "message": "Delivery partner logged in (dev mode).",
+        "message": "Delivery partner logged in.",
         "token": delivery_token,
         "user": {
-            "uid": "delivery-demo-001",
-            "phoneNumber": phone,
-            "displayName": "Demo Delivery Partner",
+            "uid": partner["uid"],
+            "phoneNumber": partner["phone"],
+            "displayName": partner["name"],
+            "vehicle": partner.get("vehicle", "Bike"),
+            "status": partner.get("status", "online"),
+            "totalDeliveries": partner.get("totalDeliveries", 0),
+            "totalEarnings": partner.get("totalEarnings", 0),
             "role": "delivery",
         },
     }
@@ -266,11 +336,12 @@ async def simple_login(
     db: AsyncSession = Depends(get_session),
 ):
     phone = body.get("phone_number", "")
-    display_name = body.get("display_name", "AaplaKart User")
+    display_name = body.get("display_name", "").strip()
     email = body.get("email", "")
     
     import uuid
     uid = f"user{uuid.uuid4().hex[:12]}"
+    existing_display_name = None  # track existing name
     
     # Check if user already exists with this phone or email
     if phone:
@@ -280,19 +351,34 @@ async def simple_login(
         existing = result.scalar_one_or_none()
         if existing:
             uid = existing.uid
+            existing_display_name = existing.display_name  # save existing name
     elif email:
         result = await db.execute(select(User).where(User.email == email))
         existing = result.scalar_one_or_none()
         if existing:
             uid = existing.uid
+            existing_display_name = existing.display_name
     
-    # Create or update user in DB
-    user, _ = await _get_or_create_user(db, uid, phone, display_name=display_name, email=email or None)
+    # ── Smart name resolution ──
+    # Priority: existing saved name > incoming non-default name > default
+    is_incoming_real = display_name and display_name != "AaplaKart User"
+    final_display_name = (
+        existing_display_name or  # keep existing name if available
+        (display_name if is_incoming_real else None) or
+        "AaplaKart User"
+    )
+    
+    # Create or update user in DB (only pass real name, not default)
+    user, _ = await _get_or_create_user(
+        db, uid, phone,
+        display_name=final_display_name,
+        email=email or None
+    )
     
     # Encode uid in token (uid should not contain hyphens for easy parsing)
     mock_token = f"mock-dev-{user.uid}-{uuid.uuid4().hex[:8]}"
     
-    logger.info(f"Simple login: phone={phone}, uid={user.uid}")
+    logger.info(f"Simple login: phone={phone}, uid={user.uid}, name={user.display_name}")
     
     return {
         "success": True,
@@ -300,9 +386,31 @@ async def simple_login(
         "uid": user.uid,
         "phone_number": user.phone_number or "",
         "id_token": mock_token,
-        "display_name": user.display_name or display_name,
+        "display_name": user.display_name or final_display_name,
         "is_new_user": False,
     }
+
+
+# ── Rate limiter for OTP (in-memory) ──────────────────────────────
+
+import time
+from collections import defaultdict
+
+_otp_rate_limit: dict[str, list[float]] = defaultdict(list)
+OTP_MAX_REQUESTS = 3       # max OTP requests per window
+OTP_WINDOW_SECONDS = 60    # sliding window in seconds
+
+
+def _check_otp_rate_limit(key: str) -> bool:
+    """Return True if request is allowed, False if rate limited."""
+    now = time.time()
+    window_start = now - OTP_WINDOW_SECONDS
+    # Remove expired timestamps
+    _otp_rate_limit[key] = [t for t in _otp_rate_limit[key] if t > window_start]
+    if len(_otp_rate_limit[key]) >= OTP_MAX_REQUESTS:
+        return False
+    _otp_rate_limit[key].append(now)
+    return True
 
 
 # ── Send OTP ───────────────────────────────────────────────────────
@@ -314,10 +422,28 @@ async def simple_login(
     description=(
         "Calls Firebase Auth REST API to send an SMS. "
         "Returns a session_info token that the client must pass "
-        "back when verifying the OTP."
+        "back when verifying the OTP. "
+        f"Rate limit: {OTP_MAX_REQUESTS} requests per {OTP_WINDOW_SECONDS}s per phone number."
     ),
 )
-async def send_otp(body: SendOTPRequest):
+async def send_otp(body: SendOTPRequest, request: Request):
+    # Rate limit by phone number
+    phone = body.phone_number
+    if not _check_otp_rate_limit(phone):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Too many OTP requests. Please wait {OTP_WINDOW_SECONDS} seconds before requesting again.",
+        )
+
+    # Also rate limit by client IP as secondary defense
+    client_ip = request.client.host if request.client else "unknown"
+    ip_key = f"ip:{client_ip}"
+    if not _check_otp_rate_limit(ip_key):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Too many OTP requests from this IP. Please wait before trying again.",
+        )
+
     try:
         result = await send_otp_via_rest(body.phone_number)
         return {

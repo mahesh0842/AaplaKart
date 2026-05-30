@@ -59,6 +59,14 @@ class UpdateUserRequest(BaseModel):
     email: Optional[str] = None
 
 
+class EmailAuthRequest(BaseModel):
+    """Sign in / sign up with email & password."""
+
+    email: str = Field(..., example="user@example.com")
+    password: str = Field(..., example="mypassword123", min_length=6)
+    display_name: Optional[str] = None
+
+
 # ── Response Schemas ───────────────────────────────────────────────
 
 

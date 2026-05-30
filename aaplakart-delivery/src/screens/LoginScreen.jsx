@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import ActionButton from '../components/ActionButton';
 import { COLORS } from '../utils/constants';
@@ -28,42 +28,46 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.logoWrap}>
-        <Image source={require('../../assets/icon.png')} style={styles.logo} resizeMode="contain" />
-      </View>
-      <Text style={styles.title}>AaplaKart</Text>
-      <Text style={styles.subtitle}>Delivery Partner</Text>
-      {step === 'phone' ? (
-        <>
-          <View style={styles.inputRow}>
-            <Text style={styles.cc}>+91</Text>
-            <TextInput style={styles.phoneInput} placeholder="Phone Number" placeholderTextColor={COLORS.mutedText}
-              value={phone} onChangeText={setPhone} keyboardType="phone-pad" maxLength={10} />
-          </View>
-          <ActionButton label="Send OTP" onPress={handleSendOtp} loading={isLoading} />
-        </>
-      ) : (
-        <>
-          <Text style={styles.otpSent}>OTP sent to +91 {phone}</Text>
-          <View style={styles.demoHint}>
-            <Text style={styles.demoHintText}>Demo mode — use code </Text>
-            <Text style={styles.demoHintCode}>123456</Text>
-          </View>
-          <TextInput style={styles.input} placeholder="Enter OTP" placeholderTextColor={COLORS.mutedText}
-            value={otp} onChangeText={setOtp} keyboardType="number-pad" maxLength={6} />
-          <ActionButton label="Verify & Login" onPress={handleVerify} loading={isLoading} />
-          <Pressable onPress={() => setStep('phone')} style={{ marginTop: 16 }}>
-            <Text style={styles.backText}>Change phone number</Text>
-          </Pressable>
-        </>
-      )}
-    </View>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <View style={styles.logoWrap}>
+          <Image source={require('../../assets/icon.png')} style={styles.logo} resizeMode="contain" />
+        </View>
+        <Text style={styles.title}>AaplaKart</Text>
+        <Text style={styles.subtitle}>Delivery Partner</Text>
+
+        {step === 'phone' ? (
+          <>
+            <View style={styles.inputRow}>
+              <Text style={styles.cc}>+91</Text>
+              <TextInput style={styles.phoneInput} placeholder="Phone Number" placeholderTextColor={COLORS.mutedText}
+                value={phone} onChangeText={setPhone} keyboardType="phone-pad" maxLength={10} />
+            </View>
+            <ActionButton label="Send OTP" onPress={handleSendOtp} loading={isLoading} />
+          </>
+        ) : (
+          <>
+            <Text style={styles.otpSent}>OTP sent to +91 {phone}</Text>
+            <View style={styles.demoHint}>
+              <Text style={styles.demoHintText}>Demo mode — use code </Text>
+              <Text style={styles.demoHintCode}>123456</Text>
+            </View>
+            <TextInput style={styles.input} placeholder="Enter OTP" placeholderTextColor={COLORS.mutedText}
+              value={otp} onChangeText={setOtp} keyboardType="number-pad" maxLength={6} />
+            <ActionButton label="Verify & Login" onPress={handleVerify} loading={isLoading} />
+            <Pressable onPress={() => setStep('phone')} style={{ marginTop: 16 }}>
+              <Text style={styles.backText}>Change phone number</Text>
+            </Pressable>
+          </>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background, justifyContent: 'center', paddingHorizontal: 30 },
+  container: { flex: 1, backgroundColor: COLORS.background },
+  scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 30 },
   logoWrap: { alignItems: 'center', marginBottom: 16 },
   logo: { width: 80, height: 80 },
   title: { fontSize: 28, fontWeight: '900', color: COLORS.text, textAlign: 'center' },

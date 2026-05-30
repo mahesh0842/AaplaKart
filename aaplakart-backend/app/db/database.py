@@ -9,6 +9,7 @@ from __future__ import annotations
 import os
 
 from loguru import logger
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -33,11 +34,33 @@ class Base(DeclarativeBase):
 
 
 async def init_db() -> None:
-    """Create all tables (safe to call on every startup)."""
+    """Create all tables and migrate missing columns (safe to call on every startup)."""
     from app.db import models  # noqa: F401 – ensure models are loaded
 
     async with _engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+        # ── SQLite column migration: add synced_to_firestore if missing ──
+        if "sqlite" in _DATABASE_URL:
+            try:
+                # Check if column exists
+                result = await conn.execute(
+                    text("PRAGMA table_info(orders)")
+                )
+                columns = [row[1] for row in result.fetchall()]
+                if "synced_to_firestore" not in columns:
+                    await conn.execute(
+                        text("ALTER TABLE orders ADD COLUMN synced_to_firestore INTEGER DEFAULT 0")
+                    )
+                    logger.info("Migrated: added synced_to_firestore column to orders")
+                if "synced_at" not in columns:
+                    await conn.execute(
+                        text("ALTER TABLE orders ADD COLUMN synced_at TIMESTAMP")
+                    )
+                    logger.info("Migrated: added synced_at column to orders")
+            except Exception as e:
+                logger.warning(f"Column migration skipped: {e}")
+
     logger.info("Database tables ready (engine={})", _DATABASE_URL)
 
 

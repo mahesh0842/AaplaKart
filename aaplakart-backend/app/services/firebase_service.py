@@ -292,3 +292,61 @@ async def verify_google_id_token(id_token: str) -> dict | None:
     except Exception as exc:
         logger.error("Google token verification error: {}", exc)
         return None
+
+
+# ── Email / Password Auth (REST API) ───────────────────────────────
+
+
+async def sign_up_with_email(email: str, password: str, display_name: str = "") -> dict:
+    """Create a new account with email & password via Firebase REST API.
+
+    Returns:
+        dict with keys: localId, idToken, refreshToken, email, displayName
+    """
+    try:
+        result = await _rest_post(
+            "/accounts:signUp",
+            {
+                "email": email,
+                "password": password,
+                "displayName": display_name or email.split("@")[0],
+                "returnSecureToken": True,
+            },
+        )
+        logger.info("Email sign-up success: email={}, uid={}", email, result.get("localId"))
+        return result
+    except RuntimeError as exc:
+        err_msg = str(exc).lower()
+        if "email_exists" in err_msg or "EMAIL_EXISTS" in str(exc).upper():
+            raise RuntimeError("EMAIL_EXISTS: An account with this email already exists.")
+        if "weak_password" in err_msg or "WEAK_PASSWORD" in str(exc).upper():
+            raise RuntimeError("WEAK_PASSWORD: Password should be at least 6 characters.")
+        raise
+
+
+async def sign_in_with_email(email: str, password: str) -> dict:
+    """Sign in with email & password via Firebase REST API.
+
+    Returns:
+        dict with keys: localId, idToken, refreshToken, email, displayName, registered
+    """
+    try:
+        result = await _rest_post(
+            "/accounts:signInWithPassword",
+            {
+                "email": email,
+                "password": password,
+                "returnSecureToken": True,
+            },
+        )
+        logger.info("Email sign-in success: email={}, uid={}", email, result.get("localId"))
+        return result
+    except RuntimeError as exc:
+        err_msg = str(exc).lower()
+        if "invalid_password" in err_msg or "INVALID_PASSWORD" in str(exc).upper():
+            raise RuntimeError("INVALID_PASSWORD: Invalid email or password.")
+        if "email_not_found" in err_msg or "EMAIL_NOT_FOUND" in str(exc).upper():
+            raise RuntimeError("EMAIL_NOT_FOUND: No account found with this email.")
+        if "too_many_attempts" in err_msg or "TOO_MANY_ATTEMPTS" in str(exc).upper():
+            raise RuntimeError("TOO_MANY_ATTEMPTS: Too many login attempts. Try again later.")
+        raise

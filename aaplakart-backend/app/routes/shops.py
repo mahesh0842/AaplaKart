@@ -60,6 +60,13 @@ async def list_shops(
     user: dict = Depends(require_admin),
     db: AsyncSession = Depends(get_session),
 ):
+    # Try Firestore first
+    from app.services.firestore_service import fs_get_shops
+    fs_shops = await fs_get_shops()
+    if fs_shops is not None:
+        return {"success": True, "shops": fs_shops}
+
+    # Fallback to DB
     result = await db.execute(select(Shop).order_by(Shop.name))
     shops = result.scalars().all()
     return {
@@ -90,31 +97,31 @@ async def create_shop(
     user: dict = Depends(require_admin),
     db: AsyncSession = Depends(get_session),
 ):
-    shop = Shop(
-        name=body.name,
-        address=body.address,
-        latitude=body.latitude,
-        longitude=body.longitude,
-        delivery_radius_km=body.delivery_radius_km,
-        phone=body.phone,
-    )
+    import uuid
+    shop_id = uuid.uuid4().hex[:12]
+
+    # Write to Firestore
+    from app.services.firestore_service import fs_create_shop
+    fs_data = {
+        "id": shop_id,
+        "name": body.name,
+        "address": body.address,
+        "latitude": body.latitude,
+        "longitude": body.longitude,
+        "delivery_radius_km": body.delivery_radius_km,
+        "phone": body.phone,
+        "is_active": True,
+    }
+    await fs_create_shop(shop_id, dict(fs_data))
+
+    # Also write to SQLite
+    shop = Shop(id=shop_id, **body.model_dump())
     db.add(shop)
     await db.commit()
     await db.refresh(shop)
     logger.info(f"Shop created: {shop.name} ({shop.id})")
-    return {
-        "success": True,
-        "shop": {
-            "id": shop.id,
-            "name": shop.name,
-            "address": shop.address,
-            "latitude": shop.latitude,
-            "longitude": shop.longitude,
-            "delivery_radius_km": shop.delivery_radius_km,
-            "phone": shop.phone,
-            "is_active": bool(shop.is_active),
-        },
-    }
+    fs_data["id"] = shop.id
+    return {"success": True, "shop": fs_data}
 
 
 # ── Update shop ────────────────────────────────────────────────────
@@ -127,6 +134,12 @@ async def update_shop(
     user: dict = Depends(require_admin),
     db: AsyncSession = Depends(get_session),
 ):
+    # Write to Firestore
+    from app.services.firestore_service import fs_update_shop
+    update_data = {k: v for k, v in body.model_dump().items() if v is not None}
+    await fs_update_shop(shop_id, update_data)
+
+    # Also update SQLite
     result = await db.execute(select(Shop).where(Shop.id == shop_id))
     shop = result.scalar_one_or_none()
     if not shop:
@@ -151,19 +164,7 @@ async def update_shop(
     await db.commit()
     await db.refresh(shop)
     logger.info(f"Shop updated: {shop.name}")
-    return {
-        "success": True,
-        "shop": {
-            "id": shop.id,
-            "name": shop.name,
-            "address": shop.address,
-            "latitude": shop.latitude,
-            "longitude": shop.longitude,
-            "delivery_radius_km": shop.delivery_radius_km,
-            "phone": shop.phone,
-            "is_active": bool(shop.is_active),
-        },
-    }
+    return {"success": True, "shop": update_data}
 
 
 # ── Delete shop ────────────────────────────────────────────────────
@@ -175,11 +176,15 @@ async def delete_shop(
     user: dict = Depends(require_admin),
     db: AsyncSession = Depends(get_session),
 ):
+    # Delete from Firestore
+    from app.services.firestore_service import fs_delete_shop
+    await fs_delete_shop(shop_id)
+
+    # Delete from SQLite
     result = await db.execute(select(Shop).where(Shop.id == shop_id))
     shop = result.scalar_one_or_none()
     if not shop:
         raise HTTPException(status_code=404, detail="Shop not found")
-
     await db.delete(shop)
     await db.commit()
     logger.info(f"Shop deleted: {shop_id}")
@@ -197,6 +202,24 @@ async def find_nearest_shop(
     db: AsyncSession = Depends(get_session),
 ):
     """Find the nearest active shop to given coordinates within its radius."""
+    # Try Firestore first
+    from app.services.firestore_service import fs_get_shops
+    fs_shops = await fs_get_shops(active_only=True)
+    if fs_shops is not None:
+        nearest = None
+        nearest_dist = float("inf")
+        for s in fs_shops:
+            s_lat = s.get("latitude")
+            s_lon = s.get("longitude")
+            if s_lat and s_lon:
+                dist = _haversine_km(lat, lon, float(s_lat), float(s_lon))
+                radius = float(s.get("delivery_radius_km", 6))
+                if dist <= radius and dist < nearest_dist:
+                    nearest = s
+                    nearest_dist = dist
+        return {"success": True, "shop": nearest} if nearest else {"success": False, "shop": None}
+
+    # Fallback to DB
     result = await db.execute(select(Shop).where(Shop.is_active == 1))
     shops = result.scalars().all()
 

@@ -227,6 +227,50 @@ export async function googleSignIn(googleIdToken, displayName = '', photoUrl = '
 }
 
 /**
+ * Sign in with email & password.
+ * Backend uses Firebase REST API to authenticate and returns an id_token.
+ *
+ * @param {string} email
+ * @param {string} password
+ * @returns {object} { success, uid, email, display_name, id_token, ... }
+ */
+export async function emailSignIn(email, password) {
+  const result = await request('POST', '/auth/email-signin', {
+    email,
+    password,
+  });
+
+  if (result.success && result.id_token) {
+    setAuthToken(result.id_token);
+  }
+
+  return result;
+}
+
+/**
+ * Sign up with email, password & display name.
+ * Backend creates the account via Firebase REST API and returns an id_token.
+ *
+ * @param {string} email
+ * @param {string} password
+ * @param {string} displayName
+ * @returns {object} { success, uid, email, display_name, id_token, is_new_user, ... }
+ */
+export async function emailSignUp(email, password, displayName = '') {
+  const result = await request('POST', '/auth/email-signup', {
+    email,
+    password,
+    display_name: displayName,
+  });
+
+  if (result.success && result.id_token) {
+    setAuthToken(result.id_token);
+  }
+
+  return result;
+}
+
+/**
  * Get the currently authenticated user's profile.
  */
 export async function getMyProfile() {
@@ -253,7 +297,7 @@ export async function createOrder(orderData) {
  * List all orders for the current user.
  */
 export async function listMyOrders() {
-  return request('GET', '/orders');
+  return request('GET', '/orders/');
 }
 
 /**
@@ -269,7 +313,7 @@ export async function getOrder(orderId) {
  * List saved addresses for the current user.
  */
 export async function listAddresses() {
-  return request('GET', '/addresses');
+  return request('GET', '/addresses/');
 }
 
 /**

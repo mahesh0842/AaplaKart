@@ -94,6 +94,10 @@ class Order(Base):
     placed_at = Column(DateTime, default=_utcnow, index=True)  # index for fast ORDER BY
     updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
 
+    # ── Firestore batch-archive tracking ──
+    synced_to_firestore = Column(Integer, default=0, index=True)  # 0=pending, 1=synced
+    synced_at = Column(DateTime, nullable=True)  # when batch-synced to Firestore
+
     user = relationship("User", back_populates="orders")
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
 

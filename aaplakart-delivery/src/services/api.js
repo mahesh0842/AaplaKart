@@ -58,3 +58,13 @@ export async function fetchAllOrders() {
 export async function fetchActiveShop() {
   return request('GET', '/shops/active');
 }
+
+/** Accept an order — notify backend that delivery partner has claimed it */
+export async function acceptOrderApi(orderId) {
+  return request('POST', `/delivery/orders/${orderId}/accept`);
+}
+
+/** Reject an order — notify backend that delivery partner doesn't want it */
+export async function rejectOrderApi(orderId) {
+  return request('POST', `/delivery/orders/${orderId}/reject`);
+}

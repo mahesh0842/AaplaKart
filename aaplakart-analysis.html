@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AaplaKart — Comprehensive Codebase Analysis Report</title>
+<style>
+  :root {
+    --primary: #f97316;
+    --primary-dark: #ea580c;
+    --accent: #16a34a;
+    --bg: #f8fafc;
+    --card: #fff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --critical: #dc2626;
+    --high: #f97316;
+    --medium: #eab308;
+    --low: #3b82f6;
+    --sidebar-w: 260px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; font-size: 15px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh;
+    background: #1e293b; color: #e2e8f0; overflow-y: auto; z-index: 100;
+    padding: 20px 0;
+  }
+  .sidebar h2 {
+    font-size: 1.25rem; padding: 0 20px 16px; color: #fff;
+    border-bottom: 1px solid #334155; margin-bottom: 8px;
+  }
+  .sidebar h2 span { color: var(--primary); }
+  .sidebar nav a {
+    display: block; padding: 10px 20px; color: #94a3b8; text-decoration: none;
+    font-size: 0.9rem; border-left: 3px solid transparent; transition: all 0.15s;
+  }
+  .sidebar nav a:hover, .sidebar nav a.active { color: #fff; background: #1e3a5f; border-left-color: var(--primary); }
+  .sidebar nav a.section-head {
+    font-weight: 700; color: #cbd5e1; margin-top: 12px; font-size: 0.8rem;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  /* ── Main Content ── */
+  .main { margin-left: var(--sidebar-w); padding: 32px 40px; max-width: 1100px; }
+  h1 { font-size: 2rem; color: var(--text); margin-bottom: 4px; }
+  h1 span { color: var(--primary); }
+  .subtitle { color: var(--muted); margin-bottom: 32px; font-size: 0.95rem; }
+
+  section { margin-bottom: 40px; }
+  section h2 {
+    font-size: 1.5rem; color: var(--text); border-bottom: 2px solid var(--primary);
+    padding-bottom: 8px; margin-bottom: 20px;
+  }
+  section h3 { font-size: 1.15rem; margin: 20px 0 12px; color: var(--primary-dark); }
+  section h4 { font-size: 1rem; margin: 16px 0 8px; }
+
+  /* ── Cards ── */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--card); border-radius: 12px; padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid var(--border);
+  }
+  .card h4 { margin-top: 0; color: var(--primary-dark); }
+  .card p { font-size: 0.9rem; color: var(--muted); }
+
+  /* ── Tables ── */
+  .table-wrap { overflow-x: auto; margin: 16px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; background: var(--card); border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: #f1f5f9; font-weight: 600; color: var(--text); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8fafc; }
+
+  /* ── Badges ── */
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+  .badge-critical { background: #fee2e2; color: var(--critical); }
+  .badge-high { background: #fff7ed; color: var(--high); }
+  .badge-medium { background: #fefce8; color: #a16207; }
+  .badge-low { background: #eff6ff; color: var(--low); }
+  .badge-done { background: #dcfce7; color: #15803d; }
+  .badge-warn { background: #fef3c7; color: #92400e; }
+  .badge-fail { background: #fee2e2; color: #991b1b; }
+
+  /* ── Lists ── */
+  ul, ol { padding-left: 20px; margin: 8px 0; }
+  li { margin-bottom: 6px; font-size: 0.92rem; }
+  li strong { color: var(--text); }
+
+  /* ── Info Boxes ── */
+  .info-box {
+    border-left: 4px solid #3b82f6; background: #eff6ff; padding: 14px 18px;
+    border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 0.9rem;
+  }
+  .warn-box {
+    border-left: 4px solid var(--high); background: #fff7ed; padding: 14px 18px;
+    border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 0.9rem;
+  }
+  .danger-box {
+    border-left: 4px solid var(--critical); background: #fef2f2; padding: 14px 18px;
+    border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 0.9rem;
+  }
+
+  /* ── Progress Bar ── */
+  .progress-bar { height: 10px; background: #e5e7eb; border-radius: 5px; overflow: hidden; margin: 4px 0 8px; }
+  .progress-fill { height: 100%; border-radius: 5px; }
+  .prog-green { background: var(--accent); }
+  .prog-orange { background: var(--primary); }
+  .prog-red { background: var(--critical); }
+
+  /* ── App Badge ── */
+  .app-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-right: 4px; text-transform: uppercase; }
+  .tag-main { background: #dbeafe; color: #1d4ed8; }
+  .tag-backend { background: #fce7f3; color: #be185d; }
+  .tag-admin { background: #fef3c7; color: #a16207; }
+  .tag-delivery { background: #dcfce7; color: #15803d; }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .sidebar { width: 100%; height: auto; position: relative; padding: 12px 16px; }
+    .sidebar h2 { border-bottom: none; padding-bottom: 4px; }
+    .sidebar nav { display: flex; flex-wrap: wrap; gap: 4px; }
+    .sidebar nav a { padding: 6px 12px; border-left: none; border-radius: 6px; }
+    .sidebar nav a.section-head { display: none; }
+    .main { margin-left: 0; padding: 20px 16px; }
+    .card-grid { grid-template-columns: 1fr; }
+  }
+  @media print {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 0; }
+    section { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<aside class="sidebar">
+  <h2>Aapla<span>Kart</span> Analysis</h2>
+  <nav>
+    <a href="#completed" style="color:#4ade80;">✅ Completed Work</a>
+    <a href="#overview">Project Overview</a>
+    <a href="#architecture">Architecture Diagram</a>
+    <a href="#functionalities" class="section-head">Functionalities</a>
+    <a href="#func-main">Main Customer App</a>
+    <a href="#func-backend">Backend API</a>
+    <a href="#func-admin">Admin Panel</a>
+    <a href="#func-delivery">Delivery App</a>
+    <a href="#bugs" class="section-head">Bugs &amp; Issues</a>
+    <a href="#bugs-critical">Critical Bugs (1–7)</a>
+    <a href="#bugs-high">High Priority (8–15)</a>
+    <a href="#bugs-medium">Medium Priority (16–24)</a>
+    <a href="#bugs-low">Low Priority (25–30)</a>
+    <a href="#ui-issues" class="section-head">UI/UX Issues</a>
+    <a href="#ui-admin">Admin Panel UI</a>
+    <a href="#ui-main">Main App UI</a>
+    <a href="#ui-delivery">Delivery App UI</a>
+    <a href="#responsiveness" class="section-head">Responsiveness</a>
+    <a href="#independence" class="section-head">Independence</a>
+    <a href="#ws-vs-api" class="section-head">WebSocket vs API</a>
+    <a href="#security" class="section-head">Security Issues</a>
+    <a href="#missing" class="section-head">Missing Features</a>
+    <a href="#changes" class="section-head">Changes Needed</a>
+    <a href="#summary">Final Summary</a>
+  </nav>
+</aside>
+
+<!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+<main class="main">
+
+<!-- ── HERO ── -->
+<h1><span>AaplaKart</span> — Comprehensive Codebase Analysis</h1>
+<p class="subtitle">Deep dive into all 4 apps — Main, Backend, Admin Panel, and Delivery Partner. <strong>91+ API endpoints</strong> | <strong>30 bugs</strong> | <strong>10 security issues</strong> | <strong>23 missing features</strong><br>Generated: May 28, 2026 &nbsp;|&nbsp; <strong>Updated: May 30, 2026 (Batch Archive + User Names + WebSocket Analysis)</strong></p>
+
+<!-- ═══════════════ COMPLETED WORK ═══════════════ -->
+<section id="completed" style="background:#f0fdf4;border:2px solid #22c55e;border-radius:12px;padding:20px 24px;margin-bottom:32px;">
+<h2 style="color:#15803d;border-bottom-color:#22c55e;">✅ Recently Completed Work (May 25–30, 2026)</h2>
+<div class="table-wrap">
+<table>
+  <tr><th>#</th><th>Fix</th><th>App</th><th>Details</th></tr>
+  <tr>
+    <td><span class="badge badge-done">✅</span></td>
+    <td><strong>Batch Archive System (Firestore)</strong></td>
+    <td><span class="app-tag tag-backend">Backend</span> <span class="app-tag tag-admin">Admin</span></td>
+    <td>New auto-archive: 20+ delivered orders → batch sync to Firestore (1 call). Added synced_to_firestore DB flag, circuit breaker, <code>verify-and-clean</code> + <code>pending-sync-count</code> + <code>archive-status</code> endpoints. Admin UI with live sync status bar, manual sync/clean buttons. Orders stay in SQLite until batch-delivered → single Firestore batch.write() → admin verify → SQLite delete.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-done">✅</span></td>
+    <td><strong>User Name Persistence (First-Time Capture)</strong></td>
+    <td><span class="app-tag tag-main">Main</span> <span class="app-tag tag-backend">Backend</span></td>
+    <td>Fixed bug: backend overwrote display_name with "AaplaKart User" on every login. Added smart name resolution in simple_login (preserve existing name). Created userNameStore (Zustand) for instant profile updates. AddressFormSheet now saves name to backend + session + store on FIRST address save only (never overwrites existing real name). Logout→relogin restores name from DB.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-done">✅</span></td>
+    <td><strong>Unit Conversion UI/UX Fix</strong></td>
+    <td><span class="app-tag tag-main">Main</span></td>
+    <td>ProductCard: removed chevron dropdown indicator, unified badge colors (rgba(0,0,0,0.55) + white text), shows cheapest variant weight only, repositioned badge left-down (bottom:4, left:4). Added cheapestVariantWeight computation.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-done">✅</span></td>
+    <td><strong>307 Redirect + 401 Auth Fix</strong></td>
+    <td><span class="app-tag tag-main">Main</span></td>
+    <td>Fixed trailing slash mismatch in api.js: <code>/orders</code> → <code>/orders/</code> and <code>/addresses</code> → <code>/addresses/</code>. Eliminates 307 Temporary Redirect → 401 Unauthorized chain caused by auth header loss on redirect.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-done">✅</span></td>
+    <td><strong>Zustand Infinite Loop Fix</strong></td>
+    <td><span class="app-tag tag-main">Main</span></td>
+    <td>Upgraded zustand 5.0.12→5.0.13; memoized BrandContext value with useCallback/useMemo to prevent React 19 useSyncExternalStore infinite re-renders</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-done">✅</span></td>
+    <td><strong>Delivery Backend Token Support</strong></td>
+    <td><span class="app-tag tag-backend">Backend</span></td>
+    <td>Added delivery-dev-* token handling in auth_middleware.py; added /auth/delivery-login endpoint returning valid delivery tokens</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-done">✅</span></td>
+    <td><strong>Delivery Store Backend-First</strong></td>
+    <td><span class="app-tag tag-delivery">Delivery</span></td>
+    <td>deliveryStore.js now always tries backend first (even in demo mode), falls back to DEMO_ORDERS only on failure. Added _usingFallback flag</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-done">✅</span></td>
+    <td><strong>DB Auto-Migration for New Columns</strong></td>
+    <td><span class="app-tag tag-backend">Backend</span></td>
+    <td>database.py init_db() now auto-detects missing columns (synced_to_firestore, synced_at) via PRAGMA table_info and ALTER TABLE ADD COLUMN for existing SQLite databases.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-done">✅</span></td>
+    <td><strong>MapMyIndia → Google Maps Migration</strong></td>
+    <td><span class="app-tag tag-delivery">Delivery</span></td>
+    <td>Removed all MapMyIndia/Mappls code. Replaced with Google Maps tile URL + Directions API. Deleted NavigationOverlay.jsx.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-done">✅</span></td>
+    <td><strong>XSS Sanitization (Partial)</strong></td>
+    <td><span class="app-tag tag-admin">Admin</span></td>
+    <td>Added escapeHtml() function to admin.js. Applied to product rendering and error messages.</td>
+  </tr>
+</table>
+</div>
+</section>
+
+<!-- ═══════════════ 1. OVERVIEW ═══════════════ -->
+<section id="overview">
+<h2>1. Project Overview</h2>
+
+<div class="card-grid">
+  <div class="card">
+    <h4><span class="app-tag tag-main">Main</span> aaplakart-app</h4>
+    <p>Customer-facing mobile app built with React Native + Expo 54. Features OTP login, dual-brand mode (AaplaKart &amp; The Waffle Guy), product browsing, cart, checkout with Razorpay, order history, and real-time updates.</p>
+    <p style="margin-top:8px"><strong>Tech:</strong> React Native 0.81.5, Zustand, Firebase Auth, React Navigation</p>
+  </div>
+  <div class="card">
+    <h4><span class="app-tag tag-backend">Backend</span> aaplakart-backend</h4>
+    <p>FastAPI Python server with 67+ REST endpoints + WebSocket server. Uses Firestore (primary) + SQLite (fallback) + JSON files for data. Firebase Admin SDK for auth. Redis caching with graceful degradation.</p>
+    <p style="margin-top:8px"><strong>Tech:</strong> FastAPI, SQLAlchemy, Firebase Admin, Razorpay, Redis</p>
+  </div>
+  <div class="card">
+    <h4><span class="app-tag tag-admin">Admin</span> aaplakart-admin</h4>
+    <p>Single-page web admin panel (vanilla HTML/JS). 9 tabs: Dashboard, Products, Orders, Categories, Promos, Shops, Health, API Perf, Config. Real-time updates via WebSocket + polling.</p>
+    <p style="margin-top:8px"><strong>Tech:</strong> Vanilla JS, Firestore Web SDK, WebSocket</p>
+  </div>
+  <div class="card">
+    <h4><span class="app-tag tag-delivery">Delivery</span> aaplakart-delivery</h4>
+    <p>Delivery partner mobile app built with React Native + Expo 54. Order acceptance, real-time tracking with Google Maps, earnings dashboard, and delivery proof capture.</p>
+    <p style="margin-top:8px"><strong>Tech:</strong> React Native 0.81.5, Zustand, Google Maps, WebSocket</p>
+  </div>
+</div>
+
+<div class="info-box">
+  <strong>Services Running:</strong> Backend (Port 8000) | Admin Panel (Port 3000) | Main App (Port 8082) | Delivery App (Port 8081)
+</div>
+</section>
+
+<!-- ═══════════════ 2. ARCHITECTURE ═══════════════ -->
+<section id="architecture">
+<h2>2. Architecture &amp; Data Flow</h2>
+
+<div class="card" style="padding:30px; text-align:center;">
+<pre style="font-size:0.78rem; line-height:1.8; white-space:pre; text-align:left; display:inline-block;">
+┌──────────────────────────────────────────────────────────────────┐
+│                        <strong>CLIENT LAYER</strong>                           │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐   │
+│  │ Main App     │  │ Admin Panel  │  │ Delivery App         │   │
+│  │ (ReactNative)│  │ (Vanilla JS) │  │ (React Native/Expo)  │   │
+│  │ Expo :8082   │  │ HTTP :3000   │  │ Expo :8081           │   │
+│  └──────┬───────┘  └──────┬───────┘  └──────────┬───────────┘   │
+│         │                 │                      │               │
+│         └────────────┬────┴──────────────────────┘               │
+│                      │  HTTP REST + WebSocket                     │
+│                      ▼                                            │
+├──────────────────────────────────────────────────────────────────┤
+│                      <strong>API LAYER</strong>                              │
+│  ┌───────────────────────────────────────────────────────────┐   │
+│  │  FastAPI Backend (Python) :8000                          │   │
+│  │  • 12 Auth endpoints (OTP, Google, Email, Mock)         │   │
+│  │  • 7 Product endpoints (CRUD + filtering)               │   │
+│  │  • 4 Order endpoints (create, list, detail, status)    │   │
+│  │  • 3 Address endpoints (list, create, delete)          │   │
+│  │  • 2 Payment endpoints (Razorpay create/verify)        │   │
+│  │  • 4+ Admin endpoints (health, stats, catalog, config) │   │
+│  │  • 5 Shop endpoints (CRUD, nearest)                    │   │
+│  │  • 2 Delivery endpoints (orders, status)               │   │
+│  │  • WebSocket /ws/orders (real-time broadcast)          │   │
+│  └──────────┬──────────────────────┬──────────────────────┘    │
+│             │                      │                            │
+├─────────────┼──────────────────────┼────────────────────────────┤
+│             ▼                      ▼                            │
+│       <strong>DATA LAYER</strong>                                               │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │ Firestore    │  │ SQLite       │  │ Redis Cache  │          │
+│  │ (Primary DB) │  │ (Fallback)   │  │ (Optional)   │          │
+│  │ • orders     │  │ • users      │  │ • API cache  │          │
+│  │ • products   │  │ • orders     │  │ • Session    │          │
+│  │ • categories │  │ • addresses  │  └──────────────┘          │
+│  │ • shops      │  │ • orderitems │                            │
+│  │ • promos     │  └──────────────┘                            │
+│  │ • config     │                                               │
+│  │ • addresses  │    ┌──────────────┐                          │
+│  └──────────────┘    │ JSON Files   │                          │
+│                      │ (Last Resort)│                          │
+│                      │ • products   │                          │
+│                      │ • categories │                          │
+│                      │ • promos     │                          │
+│                      └──────────────┘                          │
+├──────────────────────────────────────────────────────────────────┤
+│                     <strong>EXTERNAL SERVICES</strong>                        │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────┐   │
+│  │ Firebase │  │ Razorpay │  │ Google   │  │ Nominatim    │   │
+│  │ Auth +   │  │ Payments │  │ Maps     │  │ Geocoding    │   │
+│  │ Firestore│  │ (Test)   │  │ API      │  │ (Fallback)   │   │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────────┘   │
+└──────────────────────────────────────────────────────────────────┘
+</pre>
+</div>
+
+<h3>Order Status Flow</h3>
+<div class="card" style="text-align:center; padding:24px;">
+  <code style="font-size:1.1rem; letter-spacing:0.03em;">
+    pending → confirmed → preparing → out-for-delivery → delivered<br>
+    <span style="margin-left:120px">↳ cancelled</span>
+  </code>
+</div>
+
+<h3>Database Strategy</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>Priority</th><th>Store</th><th>Used For</th><th>Sync Direction</th></tr>
+  <tr><td>1 (Primary)</td><td>Firestore</td><td>Orders, Products, Categories, Shops, Promos, Config, Addresses</td><td>Read/Write</td></tr>
+  <tr><td>2 (Fallback)</td><td>SQLite</td><td>Users, Orders, Addresses, OrderItems</td><td>Dual-write during migration</td></tr>
+  <tr><td>3 (Last Resort)</td><td>JSON files</td><td>Products, Categories, Promos</td><td>Read-only fallback</td></tr>
+</table>
+</div>
+</section>
+
+<!-- ═══════════════ 3. ALL FUNCTIONALITIES ═══════════════ -->
+<section id="functionalities">
+<h2>3. All Functionalities — Complete Feature Inventory</h2>
+
+<!-- ── MAIN APP ── -->
+<h3 id="func-main"><span class="app-tag tag-main">Main</span> Customer App (aaplakart-app)</h3>
+
+<h4>Authentication (11 flows)</h4>
+<div class="table-wrap">
+<table>
+  <tr><th>Feature</th><th>Method</th><th>Implementation</th><th>Status</th></tr>
+  <tr><td>Phone OTP Login</td><td>3-tier fallback</td><td>Mock OTP → Backend REST API → Firebase SDK</td><td><span class="badge badge-done">Working</span></td></tr>
+  <tr><td>Google Sign-In</td><td>OAuth 2.0</td><td>expo-auth-session + Google ID token</td><td><span class="badge badge-done">Working</span></td></tr>
+  <tr><td>Email/Password Auth</td><td>REST API</td><td>Backend email-auth endpoint</td><td><span class="badge badge-warn">Partial</span></td></tr>
+  <tr><td>Mock Login (Dev)</td><td>REST API</td><td>simple-login — any phone, no OTP</td><td><span class="badge badge-done">Working</span></td></tr>
+  <tr><td>Session Persistence</td><td>AsyncStorage</td><td>Auto-restore on app boot</td><td><span class="badge badge-done">Working</span></td></tr>
+  <tr><td>Logout</td><td>Clear state</td><td>AsyncStorage wipe + state reset</td><td><span class="badge badge-done">Working</span></td></tr>
+  <tr><td>reCAPTCHA Verifier</td><td>Firebase SDK</td><td>Invisible captcha for phone auth</td><td><span class="badge badge-done">Working</span></td></tr>
+  <tr><td>OTP Resend Timer</td><td>30s cooldown</td><td>Disabled button with countdown</td><td><span class="badge badge-done">Working</span></td></tr>
+  <tr><td>Country Code Picker</td><td>Dropdown</td><td>+91 (India) default, expandable</td><td><span class="badge badge-done">Working</span></td></tr>
+  <tr><td>Auto OTP Detect</td><td>4-digit input</td><td>Auto-submit on 4 digits filled</td><td><span class="badge badge-done">Working</span></td></tr>
+  <tr><td>Backend Registration</td><td>POST /auth/register</td><td>Sync user profile to backend on login</td><td><span class="badge badge-done">Working</span></td></tr>
+</table>
+</div>
+
+<h4>Navigation &amp; Layout (5 Screens + Sub-screens)</h4>
+<div class="table-wrap">
+<table>
+  <tr><th>Screen</th><th>Type</th><th>Features</th></tr>
+  <tr><td><strong>HomeScreen</strong></td><td>Tab</td><td>Header with location + delivery badge, SearchBar, CategoryBrowser (horizontal scroll), ProductGrid, PromoSlider, ActiveOrderTracker, pull-to-refresh</td></tr>
+  <tr><td><strong>BrandCategoryScreen</strong></td><td>Tab</td><td>Dual-brand: AaplaKart (Categories tab) &amp; The Waffle Guy (Waffle tab). CategoryBrowser → ProductListingPage flow</td></tr>
+  <tr><td><strong>CartScreen</strong></td><td>Tab</td><td>FlatList of CartItemRow, quantity +/-, CartSummary with subtotal/delivery/total, checkout button, EmptyCart state</td></tr>
+  <tr><td><strong>ProfileScreen</strong></td><td>Tab</td><td>User info, MenuItem list (Orders, Addresses, Share, Info, Logout). Auto-shows login if unauthenticated</td></tr>
+  <tr><td><strong>LoginScreen</strong></td><td>Modal</td><td>Brand header, PhoneLogin form, Terms &amp; Privacy footer, close button</td></tr>
+  <tr><td><strong>CheckoutScreen</strong></td><td>Modal</td><td>5-step flow: Address → Delivery Slot → Payment → Razorpay WebView → Confirmation</td></tr>
+  <tr><td><strong>OrdersScreen</strong></td><td>Sub-screen</td><td>FlatList of OrderCards with status badges, delivery slot info, auto-sync every 30s</td></tr>
+  <tr><td><strong>AddressBookScreen</strong></td><td>Sub-screen</td><td>List saved addresses, add/edit/delete, select for checkout</td></tr>
+  <tr><td><strong>InfoScreen</strong></td><td>Sub-screen</td><td>App info, terms, privacy, version</td></tr>
+</table>
+</div>
+
+<h4>Shopping &amp; Cart Features</h4>
+<ul>
+  <li><strong>Product Grid</strong> — Responsive grid (2 cols phone, 3 cols tablet), ProductCard with image/name/price/weight/quantity control</li>
+  <li><strong>Cart Persistence</strong> — Zustand + AsyncStorage (survives app restarts)</li>
+  <li><strong>Max Quantity Cap</strong> — Per-product max (default 10), enforced in addItem</li>
+  <li><strong>Login Gate</strong> — Cart requires authentication; prompts login modal</li>
+  <li><strong>Floating Cart Bar</strong> — Animated bubble above tab bar when items in cart</li>
+  <li><strong>Cart Summary</strong> — Subtotal, delivery fee (₹30, free above ₹199), total</li>
+</ul>
+
+<h4>Checkout Flow (5 Steps)</h4>
+<ol>
+  <li><strong>Address</strong> — Select saved address or enter new (with geolocation coordinates)</li>
+  <li><strong>Delivery Slot</strong> — ASAP / Morning (7AM) / Afternoon (12PM) / Evening (5PM)</li>
+  <li><strong>Payment Method</strong> — COD or Online (Razorpay UPI/Card/NetBanking)</li>
+  <li><strong>Razorpay WebView</strong> — In-app payment via react-native-webview</li>
+  <li><strong>Confirmation</strong> — Order placed screen with order ID, estimated delivery time</li>
+</ol>
+
+<h4>Real-Time Features</h4>
+<ul>
+  <li><strong>WebSocket</strong> — ws://backend/ws/orders for instant order status updates</li>
+  <li><strong>HTTP Polling</strong> — 30s fallback if WebSocket unavailable</li>
+  <li><strong>Local Push Notifications</strong> — expo-notifications for order status changes (foreground + background)</li>
+  <li><strong>ActiveOrderTracker</strong> — Shows live status of most recent active order on HomeScreen</li>
+</ul>
+
+<h4>Other Features</h4>
+<ul>
+  <li><strong>Dual Brand Mode</strong> — Animated toggle between AaplaKart &amp; The Waffle Guy with cross-fade + slide animation</li>
+  <li><strong>Promo Slider</strong> — Banner carousel for promotional offers</li>
+  <li><strong>Search</strong> — 300ms debounced text search across products (backend filtered)</li>
+  <li><strong>Location Detection</strong> — GPS coordinates → reverse geocoding → display name</li>
+  <li><strong>Rating Prompt</strong> — Post-delivery rating modal</li>
+  <li><strong>Share</strong> — Native share sheet with app download link</li>
+  <li><strong>Image Caching</strong> — Manual cache management for product images</li>
+  <li><strong>Toast Notifications</strong> — react-native-toast-message for success/error/info</li>
+</ul>
+
+<!-- ── BACKEND ── -->
+<h3 id="func-backend" style="margin-top:36px;"><span class="app-tag tag-backend">Backend</span> API Server (aaplakart-backend)</h3>
+
+<h4>Authentication Module (12 endpoints)</h4>
+<div class="table-wrap">
+<table>
+  <tr><th>Endpoint</th><th>Method</th><th>Auth</th><th>Purpose</th></tr>
+  <tr><td>/api/auth/send-otp</td><td>POST</td><td>❌</td><td>Send SMS OTP via Firebase REST API</td></tr>
+  <tr><td>/api/auth/verify-otp</td><td>POST</td><td>❌</td><td>Verify OTP code and return Firebase ID token</td></tr>
+  <tr><td>/api/auth/verify-token</td><td>POST</td><td>❌</td><td>Verify Firebase ID token validity</td></tr>
+  <tr><td>/api/auth/google-auth</td><td>POST</td><td>❌</td><td>Sign in with Google ID token</td></tr>
+  <tr><td>/api/auth/email-auth</td><td>POST</td><td>❌</td><td>Email &amp; password authentication</td></tr>
+  <tr><td>/api/auth/test-login</td><td>POST</td><td>❌</td><td>Dev: Login with pre-configured test token</td></tr>
+  <tr><td>/api/auth/mock-login</td><td>POST</td><td>❌</td><td>Dev: Generate fresh mock account</td></tr>
+  <tr><td>/api/auth/admin-login</td><td>POST</td><td>❌</td><td>Dev: Admin login (admin/admin@123)</td></tr>
+  <tr><td>/api/auth/delivery-login</td><td>POST</td><td>❌</td><td>Dev: Delivery partner phone login</td></tr>
+  <tr><td>/api/auth/simple-login</td><td>POST</td><td>❌</td><td>Dev: Any phone/email, no OTP needed</td></tr>
+  <tr><td>/api/auth/me</td><td>GET</td><td>✅</td><td>Get current user profile</td></tr>
+  <tr><td>/api/auth/update</td><td>PATCH</td><td>✅</td><td>Update display name &amp; email</td></tr>
+</table>
+</div>
+
+<h4>Product &amp; Category APIs</h4>
+<div class="table-wrap">
+<table>
+  <tr><th>Endpoint</th><th>Method</th><th>Auth</th><th>Features</th></tr>
+  <tr><td>/api/products</td><td>GET</td><td>❌</td><td>List with filtering (type, brand, category, subcategory, search) + pagination</td></tr>
+  <tr><td>/api/products/{id}</td><td>GET</td><td>❌</td><td>Single product detail</td></tr>
+  <tr><td>/api/products</td><td>POST</td><td>✅ Admin</td><td>Create new product</td></tr>
+  <tr><td>/api/products/{id}</td><td>PUT</td><td>✅ Admin</td><td>Update product</td></tr>
+  <tr><td>/api/products/{id}</td><td>PATCH</td><td>✅ Admin</td><td>Toggle stock/active status</td></tr>
+  <tr><td>/api/products/{id}</td><td>DELETE</td><td>✅ Admin</td><td>Delete product</td></tr>
+  <tr><td>/api/products/categories/list</td><td>GET</td><td>❌</td><td>Get category names only</td></tr>
+  <tr><td>/api/categories/sections</td><td>GET</td><td>❌</td><td>List sections (Grocery, Fruits, etc.)</td></tr>
+  <tr><td>/api/categories</td><td>GET</td><td>❌</td><td>Categories with nested subcategories</td></tr>
+  <tr><td>/api/categories/subcategories</td><td>GET</td><td>❌</td><td>Flat subcategory list</td></tr>
+</table>
+</div>
+
+<h4>Order &amp; Delivery APIs</h4>
+<div class="table-wrap">
+<table>
+  <tr><th>Endpoint</th><th>Method</th><th>Auth</th><th>Purpose</th></tr>
+  <tr><td>/api/orders</td><td>POST</td><td>✅</td><td>Place new order (dual-write: SQLite + Firestore)</td></tr>
+  <tr><td>/api/orders</td><td>GET</td><td>✅</td><td>List user's order history</td></tr>
+  <tr><td>/api/orders/{id}</td><td>GET</td><td>✅</td><td>Single order detail with items</td></tr>
+  <tr><td>/api/orders/{id}/status</td><td>PATCH</td><td>✅</td><td>Update order status (user or delivery partner)</td></tr>
+  <tr><td>/api/delivery/orders</td><td>GET</td><td>✅</td><td>Active orders near delivery partner</td></tr>
+  <tr><td>/api/delivery/orders/{id}/status</td><td>PATCH</td><td>✅</td><td>Delivery partner status update</td></tr>
+</table>
+</div>
+
+<h4>Additional APIs</h4>
+<div class="table-wrap">
+<table>
+  <tr><th>Module</th><th>Endpoints</th><th>Count</th></tr>
+  <tr><td><strong>Addresses</strong></td><td>GET /api/addresses | POST /api/addresses | DELETE /api/addresses/{id}</td><td>3</td></tr>
+  <tr><td><strong>Payments</strong></td><td>POST /api/payments/create-order | POST /api/payments/verify-payment</td><td>2</td></tr>
+  <tr><td><strong>Admin Dashboard</strong></td><td>GET /api/admin/health | GET /api/admin/stats | POST /api/admin/products/bulk-status | GET /api/admin/orders/archive-status | GET /api/admin/orders/pending-sync-count | POST /api/admin/orders/batch-sync | POST /api/admin/orders/verify-and-clean</td><td>7</td></tr>
+  <tr><td><strong>Admin Catalog</strong></td><td>Full CRUD for sections, categories, subcategories, products</td><td>9+</td></tr>
+  <tr><td><strong>Shops</strong></td><td>CRUD + GET /api/admin/shops/nearest | GET /api/shops/active (public)</td><td>5</td></tr>
+  <tr><td><strong>WebSocket</strong></td><td>ws://backend/ws/orders — broadcasts new_order, order_update</td><td>1</td></tr>
+</table>
+</div>
+
+<h4>Infrastructure Features</h4>
+<ul>
+  <li><strong>Dual DB Strategy</strong> — Firestore (primary) → SQLite (fallback) → JSON (last resort)</li>
+  <li><strong>Redis Caching</strong> — Optional, graceful degradation if unavailable</li>
+  <li><strong>Geocoding</strong> — Nominatim → Google Maps fallback for address coordinates</li>
+  <li><strong>WebSocket Broadcast</strong> — All connected clients get instant order updates</li>
+  <li><strong>Address Geocoding</strong> — Auto-resolves lat/lng on order creation</li>
+  <li><strong>Haversine Formula</strong> — Distance calculation for nearest shop / delivery radius</li>
+  <li><strong>CSV Export</strong> — Download filtered orders as CSV</li>
+  <li><strong>Firestore Sync</strong> — Archive delivered orders from SQLite to Firestore</li>
+  <li><strong>API Timeout</strong> — 10s default timeout on all fetch calls</li>
+  <li><strong>CORS Support</strong> — Configured for all origins</li>
+</ul>
+
+<!-- ── ADMIN PANEL ── -->
+<h3 id="func-admin" style="margin-top:36px;"><span class="app-tag tag-admin">Admin</span> Web Panel (aaplakart-admin)</h3>
+
+<h4>9 Main Tabs</h4>
+<div class="table-wrap">
+<table>
+  <tr><th>Tab</th><th>Features</th><th>Real-Time?</th></tr>
+  <tr><td><strong>Dashboard</strong></td><td>Total products, orders, users, revenue; out-of-stock count; active orders count; system health indicators</td><td>✅ 30s auto-refresh</td></tr>
+  <tr><td><strong>Products</strong></td><td>Search, filter by type (Kart/Waffle), CRUD, stock toggle (0↔10), image with fallback</td><td>❌ Manual</td></tr>
+  <tr><td><strong>Orders</strong></td><td>Status filter (6 states), live polling (5s), alert sound + vibration, smart DOM update, status buttons, detail modal</td><td>✅ 5s polling</td></tr>
+  <tr><td><strong>Categories</strong></td><td>Sections → Categories → Subcategories 3-level hierarchy, inline edit, badge counts</td><td>❌ Manual</td></tr>
+  <tr><td><strong>Promos</strong></td><td>Title, subtitle, code, brand, position, image, colors, active toggle — full CRUD</td><td>❌ Manual</td></tr>
+  <tr><td><strong>Shops</strong></td><td>Name, address, lat/lng, delivery radius, phone — full CRUD</td><td>❌ Manual</td></tr>
+  <tr><td><strong>System Health</strong></td><td>Database, Firebase, Redis, product catalog status — 10s auto-check with animated ring</td><td>✅ 10s</td></tr>
+  <tr><td><strong>API Performance</strong></td><td>Tests 11 endpoints with response times, success rate, color-coded ratings (🟢&lt;50ms 🟡&lt;200ms 🟠&lt;500ms)</td><td>❌ Manual</td></tr>
+  <tr><td><strong>Config</strong></td><td>Delivery fee, free threshold, promo code, app version, maintenance mode</td><td>❌ Manual</td></tr>
+</table>
+</div>
+
+<h4>Special Features</h4>
+<ul>
+  <li><strong>Alert Sound</strong> — HTML5 Audio → Web Audio API → Tab title flash (3-tier fallback), repeats every 10s for 2 min on new orders</li>
+  <li><strong>CSV Export</strong> — Download filtered orders as CSV file</li>
+  <li><strong>Firestore Sync</strong> — Archive delivered orders from SQLite to Firestore, then delete from SQLite</li>
+  <li><strong>WebSocket</strong> — Listens for new_order and order_update events</li>
+  <li><strong>Smart DOM Update</strong> — Only updates changed table cells (not full re-render) on polling</li>
+  <li><strong>API Auto-Detect</strong> — Local vs Railway (production) URL based on hostname</li>
+  <li><strong>Toast Notifications</strong> — Success/error/info toasts (3s auto-hide)</li>
+</ul>
+
+<!-- ── DELIVERY APP ── -->
+<h3 id="func-delivery" style="margin-top:36px;"><span class="app-tag tag-delivery">Delivery</span> Partner App (aaplakart-delivery)</h3>
+
+<h4>6 Screens</h4>
+<div class="table-wrap">
+<table>
+  <tr><th>Screen</th><th>Purpose</th><th>API Calls</th></tr>
+  <tr><td><strong>SplashScreen</strong></td><td>Branding intro with fade+spring animation (800ms), logo, version</td><td>None</td></tr>
+  <tr><td><strong>LoginScreen</strong></td><td>OTP-based delivery partner login (phone → OTP → verify)</td><td>POST /auth/delivery-login</td></tr>
+  <tr><td><strong>HomeScreen</strong></td><td>Dashboard: greeting, order counts, online toggle, earnings (today/week), my deliveries, available orders</td><td>GET /delivery/orders, WebSocket</td></tr>
+  <tr><td><strong>OrdersScreen</strong></td><td>Filtered order list: Active / My Orders / Delivered. FlatList + pull-to-refresh</td><td>GET /delivery/orders</td></tr>
+  <tr><td><strong>OrderDetailScreen</strong></td><td>Full order: customer card, delivery address map, route polyline, items, payment summary, status flow buttons</td><td>GET /orders/{id}, PATCH /delivery/orders/{id}/status</td></tr>
+  <tr><td><strong>ProfileScreen</strong></td><td>Avatar, stats (delivered, active, earnings), info, logout</td><td>None (local state)</td></tr>
+</table>
+</div>
+
+<h4>6 Components</h4>
+<ul>
+  <li><strong>ActionButton</strong> — Reusable button (primary/secondary/danger variants + loading state)</li>
+  <li><strong>DeliveryMap</strong> — Google Maps with route polyline, distance display, ETA, call button</li>
+  <li><strong>DeliveryProofModal</strong> — Photo proof capture (⚠️ <span class="badge badge-critical">INCOMPLETE</span>)</li>
+  <li><strong>EarningsCard</strong> — Today/week earnings, delivery count, KM display</li>
+  <li><strong>OrderCard</strong> — Order preview with accept/reject/release buttons</li>
+  <li><strong>StatusBadge</strong> — Color-coded status indicator (sm/md sizes)</li>
+</ul>
+
+<h4>Real-Time &amp; Alerts</h4>
+<ul>
+  <li><strong>WebSocket</strong> — ws://backend/ws/orders for new_order and order_update events</li>
+  <li><strong>HTTP Polling</strong> — 10s interval (runs even alongside WebSocket — redundant)</li>
+  <li><strong>Sound Alert</strong> — expo-av audio from CDN + vibration pattern (0ms-200ms-100ms-200ms)</li>
+  <li><strong>Keep-Alive</strong> — 30s ping messages to maintain WebSocket connection</li>
+  <li><strong>Auto-Reconnect</strong> — 5s on disconnect, 10s on error</li>
+</ul>
+</section>
+
+<!-- ═══════════════ 4. BUGS ═══════════════ -->
+<section id="bugs">
+<h2>4. Bugs &amp; Code Issues (30 Total)</h2>
+
+<h3 id="bugs-critical">🔴 Critical Bugs — Fix Immediately</h3>
+
+<div class="danger-box"><strong>#1 Accept/Reject Orders Local-Only</strong><br>
+  <strong>App:</strong> <span class="app-tag tag-delivery">Delivery</span> &nbsp; <strong>File:</strong> src/store/deliveryStore.js (lines 59–67)<br>
+  Accept/Reject operations only update Zustand local state — NO API call to backend. If the app restarts, all accepted/rejected orders revert. Backend has zero record of partner decisions.
+</div>
+
+<div class="danger-box"><strong>#2 DeliveryProofModal Placeholder</strong><br>
+  <strong>App:</strong> <span class="app-tag tag-delivery">Delivery</span> &nbsp; <strong>File:</strong> src/components/DeliveryProofModal.jsx (lines 21–28)<br>
+  Camera UI is a placeholder. shows <code>photo: 'captured'</code> as mock value. The expo-camera Camera component is never actually rendered. Delivery proof capture is completely non-functional.
+</div>
+
+<div class="danger-box"><strong>#3 XSS via innerHTML</strong> <span class="badge badge-warn">PARTIALLY FIXED</span><br>
+  <strong>App:</strong> <span class="app-tag tag-admin">Admin</span> &nbsp; <strong>File:</strong> admin.js<br>
+  User input (order names, product names, address text) injected directly into <code>innerHTML</code> without sanitization. An attacker with product creation access could inject malicious scripts visible to all admin users.<br>
+  <strong>Fix applied (May 29):</strong> Added <code>escapeHtml()</code> function. Product rendering and error messages now sanitized. Full coverage audit still needed.</div>
+
+<div class="danger-box"><strong>#4 Firestore Sync Data Loss Risk</strong> <span class="badge badge-done">FIXED</span><br>
+  <strong>App:</strong> <span class="app-tag tag-admin">Admin</span> &nbsp; <strong>File:</strong> admin.py (auto_archive_delivered_orders)<br>
+  <strong>Fixed May 30:</strong> Replaced individual set() calls with Firestore batch writes (single network call). Added synced_to_firestore DB flag + verify-and-clean endpoint with Firestore verification before SQLite delete. Auto-triggered at 20+ unsynced delivered orders. Circuit breaker prevents 429 spam. Admin UI shows live sync status.</div>
+
+<div class="danger-box"><strong>#5 No Inventory / Stock Validation</strong><br>
+  <strong>App:</strong> <span class="app-tag tag-backend">Backend</span> &nbsp; <strong>File:</strong> app/routes/orders.py<br>
+  Order placement never checks product stock. Users can order 1000 units of an out-of-stock item. No inventory reservation, no stock decrement on successful order.
+</div>
+
+<div class="danger-box"><strong>#6 Mock Token Spoofing</strong><br>
+  <strong>App:</strong> <span class="app-tag tag-backend">Backend</span> &nbsp; <strong>File:</strong> app/routes/auth.py<br>
+  Mock token format <code>mock-dev-{uid}-{random}</code> uses simple string parsing — anyone who knows the pattern can forge tokens. No cryptographic signature verification.
+</div>
+
+<div class="danger-box"><strong>#7 Payment Endpoints Unauthenticated</strong><br>
+  <strong>App:</strong> <span class="app-tag tag-backend">Backend</span> &nbsp; <strong>File:</strong> app/routes/payments.py<br>
+  Both /api/payments/create-order and /api/payments/verify-payment have NO authentication. Any unauthenticated user can create Razorpay orders or submit fake payment verifications. Amount is checked against Redis but Redis failure = no amount verification.
+</div>
+
+<h3 id="bugs-high">🟠 High Priority — Fix This Week</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th>#</th><th>Bug</th><th>App</th><th>File / Location</th></tr>
+  <tr><td>8</td><td><strong>Razorpay key in plaintext</strong> — Stored in frontend config, visible in network requests</td><td><span class="app-tag tag-admin">Admin</span></td><td>config tab, fetchAdminConfig()</td></tr>
+  <tr><td>9</td><td><strong>No CSRF protection</strong> — State-changing requests (POST/PATCH/DELETE) have no CSRF tokens</td><td><span class="app-tag tag-admin">Admin</span></td><td>api.js</td></tr>
+  <tr><td>10</td><td><strong>Auth token race condition</strong> — setAuthToken() called but API call may not include token yet</td><td><span class="app-tag tag-delivery">Delivery</span></td><td>authStore.js line 29</td></tr>
+  <tr><td>11</td><td><strong>Silent error handling</strong> — All catch blocks empty in notificationService and websocketService</td><td><span class="app-tag tag-delivery">Delivery</span></td><td>notificationService.js, websocketService.js</td></tr>
+  <tr><td>12</td><td><strong>Week earnings hardcoded</strong> — <code>todayEarnings * 5</code> instead of actual backend calculation</td><td><span class="app-tag tag-delivery">Delivery</span></td><td>HomeScreen.jsx line 47</td></tr>
+  <tr><td>13</td><td><strong>No rate limiting on OTP</strong> — /api/auth/send-otp can be spammed infinitely</td><td><span class="app-tag tag-backend">Backend</span></td><td>app/routes/auth.py</td></tr>
+  <tr><td>14</td><td><strong>Geocoding failures ignored</strong> — Order placed without coordinates if all geocoders fail</td><td><span class="app-tag tag-backend">Backend</span></td><td>app/routes/orders.py</td></tr>
+  <tr><td>15</td><td><strong>No validation on admin forms</strong> — Empty strings, invalid values all accepted</td><td><span class="app-tag tag-admin">Admin</span></td><td>All CRUD forms in admin.js</td></tr>
+</table>
+</div>
+
+<h3 id="bugs-medium">🟡 Medium Priority — Fix This Sprint</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th>#</th><th>Bug</th><th>App</th></tr>
+  <tr><td>16</td><td><strong>Delivery radius disabled</strong> — DELIVERY_RADIUS_KM = 9999 (shows ALL orders, no filter)</td><td><span class="app-tag tag-delivery">Delivery</span></td></tr>
+  <tr><td>17</td><td><strong>Google Maps API key exposed</strong> — In client-side constants.js, should be proxied via backend</td><td><span class="app-tag tag-delivery">Delivery</span></td></tr>
+  <tr><td>18</td><td><strong>Polling + WebSocket simultaneously</strong> — Both run at same time, duplicate updates, wasted bandwidth</td><td><span class="app-tag tag-delivery tag-main">Both Apps</span></td></tr>
+  <tr><td>19</td><td><strong>No pagination on orders</strong> — All orders loaded at once, truncated to 15 silently</td><td><span class="app-tag tag-admin">Admin</span></td></tr>
+  <tr><td>20</td><td><strong>In-memory filtering O(n)</strong> — All products loaded into memory, then filtered per request</td><td><span class="app-tag tag-backend">Backend</span></td></tr>
+  <tr><td>21</td><td><strong>Dual-write inconsistency</strong> — If Firestore succeeds but SQLite fails, data diverges</td><td><span class="app-tag tag-backend">Backend</span></td></tr>
+  <tr><td>22</td><td><strong>Search case-sensitive</strong> — No fuzzy/partial matching, exact match only</td><td><span class="app-tag tag-backend">Backend</span></td></tr>
+  <tr><td>23</td><td><strong>No debouncing on admin search</strong> — Fires on every keystroke, could spam API</td><td><span class="app-tag tag-admin">Admin</span></td></tr>
+  <tr><td>24</td><td><strong>Online toggle cosmetic only</strong> — Doesn't pause order acceptance or notify backend</td><td><span class="app-tag tag-delivery">Delivery</span></td></tr>
+</table>
+</div>
+
+<h3 id="bugs-low">🔵 Low Priority — Backlog</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th>#</th><th>Bug</th><th>App</th></tr>
+  <tr><td>25</td><td><strong>Profile rating hardcoded</strong> — "4.8⭐" not fetched from backend</td><td><span class="app-tag tag-delivery">Delivery</span></td></tr>
+  <tr><td>26</td><td><strong>Unused API functions</strong> — fetchAssignedOrders(), fetchAllOrders() never called</td><td><span class="app-tag tag-delivery">Delivery</span></td></tr>
+  <tr><td>27</td><td><strong>Health check cached 30s</strong> — Stale data shown to admin</td><td><span class="app-tag tag-backend">Backend</span></td></tr>
+  <tr><td>28</td><td><strong>Revenue includes incomplete orders</strong> — 'preparing' and 'out-for-delivery' counted as revenue</td><td><span class="app-tag tag-backend">Backend</span></td></tr>
+  <tr><td>29</td><td><strong>Haversine duplicated</strong> — Same distance calculation in shops.py and delivery.py</td><td><span class="app-tag tag-backend">Backend</span></td></tr>
+  <tr><td>30</td><td><strong>No retry logic</strong> — Failed API calls fail immediately, no exponential backoff anywhere</td><td><span class="app-tag tag-main tag-delivery">All Apps</span></td></tr>
+</table>
+</div>
+</section>
+
+<!-- ═══════════════ 5. UI/UX ISSUES ═══════════════ -->
+<section id="ui-issues">
+<h2>5. UI/UX Issues</h2>
+
+<h3 id="ui-admin"><span class="app-tag tag-admin">Admin</span> Admin Panel — Most Problems</h3>
+<div class="warn-box">
+  <ul>
+    <li><strong>🔴 Not Responsive:</strong> Fixed 240px sidebar doesn't collapse on tablets/phones. Tables overflow horizontally with no mobile scroll indicators.</li>
+    <li><strong>🔴 Table Design:</strong> 2px solid black borders on all cells — harsh, industrial look. No alternating row colors.</li>
+    <li><strong>🔴 No Dark Mode:</strong> Zero dark mode support despite being an admin tool used at all hours.</li>
+    <li><strong>🔴 Zero Accessibility:</strong> No ARIA labels, no keyboard navigation, no screen reader support, color-only status indicators.</li>
+    <li><strong>🟠 Alert Sound Too Aggressive:</strong> Repeats every 10 seconds for 2 minutes (12 total alerts). No volume control or disable option.</li>
+    <li><strong>🟠 No Loading Indicators:</strong> Only a global "Loading..." text — no per-operation feedback, no skeleton screens.</li>
+    <li><strong>🟠 Modal Issues:</strong> No focus management, no confirmation before closing with unsaved changes, max-width too large for mobile.</li>
+    <li><strong>🟡 Shadows Too Subtle:</strong> Cards don't visually pop off the page.</li>
+    <li><strong>🟡 No Empty State Messages:</strong> When search yields no results, no feedback to user.</li>
+    <li><strong>🟡 Date Display:</strong> Timestamps sometimes show "N/A" if missing; no timezone handling.</li>
+  </ul>
+</div>
+
+<h3 id="ui-main"><span class="app-tag tag-main">Main</span> Customer App — Minor Issues</h3>
+<div class="warn-box">
+  <ul>
+    <li><strong>🟠 Padding Misalignment:</strong> Header padding (14px) vs screen padding (20px) — visual inconsistency.</li>
+    <li><strong>🟠 CategoryBrowser vs ProductGrid Mismatch:</strong> hPadding=16px vs paddingHorizontal=20px — 4px gap difference.</li>
+    <li><strong>🟡 No Loading Skeletons:</strong> Full-screen spinner blocks UI during data fetch.</li>
+    <li><strong>🟡 Empty States Lack Guidance:</strong> Users don't know what to do when cart is empty or no orders exist.</li>
+    <li><strong>🟡 ProductCard "compact" variant redundant:</strong> Only differs by borderRadius (10 vs 12).</li>
+  </ul>
+</div>
+
+<h3 id="ui-delivery"><span class="app-tag tag-delivery">Delivery</span> Partner App — Minor Issues</h3>
+<div class="warn-box">
+  <ul>
+    <li><strong>🟠 Online/Offline Toggle Cosmetic:</strong> Visual indicator doesn't affect app behavior at all — confusing.</li>
+    <li><strong>🟡 Color Contrast:</strong> Muted text on light background is hard to read in sunlight.</li>
+    <li><strong>🟡 No Offline Mode:</strong> App crashes if API is unreachable — no graceful degradation.</li>
+    <li><strong>🟡 Empty States Lack Context:</strong> No guidance on what to do when no orders are available.</li>
+    <li><strong>🟡 No Timezone Handling:</strong> Date parsing assumes UTC — could show wrong "today's" earnings.</li>
+  </ul>
+</div>
+</section>
+
+<!-- ═══════════════ 6. RESPONSIVENESS ═══════════════ -->
+<section id="responsiveness">
+<h2>6. Responsiveness Assessment</h2>
+
+<div class="table-wrap">
+<table>
+  <tr><th>App</th><th>Responsive?</th><th>Method</th><th>Tablet Support?</th><th>Notes</th></tr>
+  <tr>
+    <td><span class="app-tag tag-main">Main</span></td>
+    <td><span class="badge badge-done">YES</span></td>
+    <td>scaleW(), scaleH(), moderateScale(), responsiveFont(), isTablet(), getCardWidth()</td>
+    <td>✅ Yes — 3-col grid on tablet vs 2-col on phone</td>
+    <td>Good responsive system. Uses iPhone 11 (375x812) as base, caps scaling at 1.5x to prevent oversizing on tablets.</td>
+  </tr>
+  <tr>
+    <td><span class="app-tag tag-delivery">Delivery</span></td>
+    <td><span class="badge badge-done">YES</span></td>
+    <td>Similar responsive approach (shared patterns with main app)</td>
+    <td>✅ Yes</td>
+    <td>Follows main app's responsive patterns.</td>
+  </tr>
+  <tr>
+    <td><span class="app-tag tag-admin">Admin</span></td>
+    <td><span class="badge badge-critical">NO</span></td>
+    <td>Fixed 240px sidebar + content; no breakpoints, no media queries for layout</td>
+    <td>❌ No</td>
+    <td><strong>Critical issue:</strong> The admin panel is completely unusable on mobile. Sidebar takes full width, tables overflow, modals are too large.</td>
+  </tr>
+  <tr>
+    <td><span class="app-tag tag-backend">Backend</span></td>
+    <td><span class="badge badge-done">N/A</span></td>
+    <td>API only — no UI</td>
+    <td>N/A</td>
+    <td>Stateless REST API, responsive by nature.</td>
+  </tr>
+</table>
+</div>
+
+<h3>Admin Panel Responsiveness — Detailed Breakdown</h3>
+<div class="card-grid">
+  <div class="card">
+    <h4>Sidebar</h4>
+    <p>Fixed 240px width, no collapse toggle, no hamburger menu. On mobile, it remains full width above content.</p>
+    <div class="progress-bar"><div class="progress-fill prog-red" style="width:10%"></div></div>
+    <small>Responsiveness: 1/10</small>
+  </div>
+  <div class="card">
+    <h4>Tables</h4>
+    <p>Fixed column widths, horizontal scroll without mobile-friendly overflow indicators. No card-view fallback for small screens.</p>
+    <div class="progress-bar"><div class="progress-fill prog-red" style="width:15%"></div></div>
+    <small>Responsiveness: 1.5/10</small>
+  </div>
+  <div class="card">
+    <h4>Modals</h4>
+    <p>Max-width not constrained for mobile. On small screens, modals overflow viewport with no internal scroll.</p>
+    <div class="progress-bar"><div class="progress-fill prog-orange" style="width:30%"></div></div>
+    <small>Responsiveness: 3/10</small>
+  </div>
+  <div class="card">
+    <h4>Forms</h4>
+    <p>Input widths are fixed. On mobile, labels and inputs don't stack vertically. Submit buttons may be off-screen.</p>
+    <div class="progress-bar"><div class="progress-fill prog-orange" style="width:25%"></div></div>
+    <small>Responsiveness: 2.5/10</small>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════ 7. INDEPENDENCE ═══════════════ -->
+<section id="independence">
+<h2>7. Independence Assessment — Is the App Self-Contained?</h2>
+
+<div class="danger-box">
+  <strong>NO — The app is NOT fully independent.</strong> It depends on multiple external services with varying fallback quality.
+</div>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Dependency</th><th>Purpose</th><th>Fallback?</th><th>Criticality</th></tr>
+  <tr>
+    <td><strong>Firebase Auth</strong></td>
+    <td>User authentication, OTP verification</td>
+    <td>⚠️ Partial — Mock OTP mode for dev, but no real auth without Firebase</td>
+    <td><span class="badge badge-critical">Critical</span></td>
+  </tr>
+  <tr>
+    <td><strong>Firestore</strong></td>
+    <td>Primary database</td>
+    <td>⚠️ Partial — SQLite fallback, but not all collections synced</td>
+    <td><span class="badge badge-high">High</span></td>
+  </tr>
+  <tr>
+    <td><strong>Razorpay</strong></td>
+    <td>Payment processing</td>
+    <td>❌ None — Only COD works without Razorpay</td>
+    <td><span class="badge badge-high">High</span></td>
+  </tr>
+  <tr>
+    <td><strong>Google Maps</strong></td>
+    <td>Location, routing, geocoding</td>
+    <td>⚠️ Partial — Nominatim for geocoding, but no routing fallback</td>
+    <td><span class="badge badge-medium">Medium</span></td>
+  </tr>
+  <tr>
+    <td><strong>Backend API</strong></td>
+    <td>All data operations</td>
+    <td>❌ None — App is thin client, no offline data</td>
+    <td><span class="badge badge-critical">Critical</span></td>
+  </tr>
+  <tr>
+    <td><strong>Internet Connectivity</strong></td>
+    <td>Everything</td>
+    <td>❌ None — No offline queue, no local cache</td>
+    <td><span class="badge badge-critical">Critical</span></td>
+  </tr>
+</table>
+</div>
+
+<div class="danger-box">
+  <strong>Delivery Flow Status (Updated May 29):</strong> The delivery app infrastructure is now functional. Backend token handling, delivery-login endpoint, and API connectivity have been fixed. The core issue of accept/reject not syncing to backend (Bug #1) and delivery proof camera (Bug #2) remain. Delivery partners can now log in, see real orders from backend, and update statuses.
+</div>
+
+<h3>What's Missing for Independence</h3>
+<ul>
+  <li><strong>Offline Order Queue</strong> — Queue orders locally when offline, sync when online</li>
+  <li><strong>Local Product Cache</strong> — Cache product catalog for offline browsing</li>
+  <li><strong>Graceful Degradation</strong> — Show cached data when API is unreachable instead of crashing</li>
+  <li><strong>Alternative Payment</strong> — COD works, but online payment has no fallback</li>
+  <li><strong>Offline Auth</strong> — Session should persist and work offline for basic browsing</li>
+  <li><strong>Service Worker</strong> — Not applicable for React Native, but needed for Admin Panel PWA</li>
+</ul>
+</section>
+
+<!-- ═══════════════ 8. WEBSOCKET VS API ═══════════════ -->
+<section id="ws-vs-api">
+<h2>8. WebSocket vs REST API — Decision Matrix</h2>
+
+<div class="info-box">
+  <strong>Key Finding:</strong> Polling (REST) is the PRIMARY real-time mechanism across ALL apps. WebSocket is secondary/optional. For this use case (food delivery), REST polling at 5-10s intervals is MORE reliable and simpler than WebSocket.
+</div>
+
+<h3>Where WebSocket IS Used</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>App</th><th>WS Endpoint</th><th>Purpose</th><th>Reliability</th><th>Recommendation</th></tr>
+  <tr>
+    <td><span class="app-tag tag-admin">Admin</span></td>
+    <td>ws://backend/ws/orders</td>
+    <td>Real-time order notifications (new_order, order_update)</td>
+    <td><span class="badge badge-medium">Medium</span></td>
+    <td>✅ Keep — Admin needs instant order alerts. WS + polling fallback works well.</td>
+  </tr>
+  <tr>
+    <td><span class="app-tag tag-main">Main App</span></td>
+    <td>ws://backend/ws/orders</td>
+    <td>Order status updates (polling is primary, WS is bonus)</td>
+    <td><span class="badge badge-low">Low</span></td>
+    <td>⚠️ Optional — 5s REST polling already handles this. WS adds complexity without benefit.</td>
+  </tr>
+  <tr>
+    <td><span class="app-tag tag-delivery">Delivery</span></td>
+    <td>ws://backend/ws/orders</td>
+    <td>New order alerts for delivery partners</td>
+    <td><span class="badge badge-medium">Medium</span></td>
+    <td>⚠️ Replace with polling — Delivery partners already poll every 5s. WS is redundant.</td>
+  </tr>
+</table>
+</div>
+
+<h3>Where REST API Is Sufficient (No WS Needed)</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>Feature</th><th>Current Method</th><th>Why REST Is Enough</th><th>Verdict</th></tr>
+  <tr><td>Product browsing / search</td><td>REST GET /products</td><td>Static data, no real-time need</td><td><span class="badge badge-done">REST ✅</span></td></tr>
+  <tr><td>Category listing</td><td>REST GET /categories</td><td>Changes rarely, cache-friendly</td><td><span class="badge badge-done">REST ✅</span></td></tr>
+  <tr><td>Cart operations</td><td>Local Zustand store</td><td>Client-side only, no server sync needed</td><td><span class="badge badge-done">LOCAL ✅</span></td></tr>
+  <tr><td>Order placement</td><td>REST POST /orders</td><td>One-time transaction, needs confirmation</td><td><span class="badge badge-done">REST ✅</span></td></tr>
+  <tr><td>Payment processing</td><td>REST POST /payments/*</td><td>Requires request-response for security</td><td><span class="badge badge-done">REST ✅</span></td></tr>
+  <tr><td>Address CRUD</td><td>REST /addresses</td><td>Infrequent operations</td><td><span class="badge badge-done">REST ✅</span></td></tr>
+  <tr><td>Order history</td><td>REST GET /orders</td><td>User-initiated, not real-time</td><td><span class="badge badge-done">REST ✅</span></td></tr>
+  <tr><td>User profile</td><td>REST GET/PATCH /auth/me</td><td>Infrequent updates</td><td><span class="badge badge-done">REST ✅</span></td></tr>
+  <tr><td>Promo banners</td><td>REST GET /config/promos</td><td>Cache-friendly, changes rarely</td><td><span class="badge badge-done">REST ✅</span></td></tr>
+  <tr><td>Delivery slot config</td><td>REST GET /config/delivery-slots</td><td>Static config</td><td><span class="badge badge-done">REST ✅</span></td></tr>
+  <tr><td>Admin dashboard stats</td><td>REST GET /admin/stats</td><td>Dashboard refreshes, not real-time stream</td><td><span class="badge badge-done">REST ✅</span></td></tr>
+  <tr><td>System health check</td><td>REST GET /admin/health</td><td>On-demand diagnostic</td><td><span class="badge badge-done">REST ✅</span></td></tr>
+</table>
+</div>
+
+<h3>WebSocket Events Map</h3>
+<div class="card" style="padding:20px;">
+<table>
+  <tr><th>Event Type</th><th>Trigger</th><th>Recipients</th><th>Critical?</th></tr>
+  <tr><td><code>new_order</code></td><td>Customer places order via POST /orders</td><td>Admin panel, Delivery app</td><td><span class="badge badge-high">HIGH</span></td></tr>
+  <tr><td><code>order_update</code></td><td>Admin/Delivery updates status via PATCH</td><td>Admin panel, Customer app, Delivery app</td><td><span class="badge badge-high">HIGH</span></td></tr>
+  <tr><td><code>ping</code></td><td>Client keep-alive every 30s</td><td>Server only</td><td><span class="badge badge-low">LOW</span></td></tr>
+  <tr><td><code>archive_sync_complete</code></td><td>Batch archive finishes</td><td>Admin panel</td><td><span class="badge badge-medium">MEDIUM</span></td></tr>
+</table>
+</div>
+
+<h3>Recommendation: Simplify to Polling-Only</h3>
+<div class="warn-box">
+  <strong>For this use case (food delivery with 5-30 min delivery windows):</strong><br><br>
+  <strong>✅ KEEP WebSocket for:</strong> Admin panel (needs instant order alerts for operations)<br>
+  <strong>❌ REMOVE WebSocket from:</strong> Main customer app and Delivery app (5s REST polling already provides sub-5s latency, which is more than adequate for food delivery)<br><br>
+  <strong>Benefits of removing WS from mobile apps:</strong>
+  <ul>
+    <li>Reduced battery drain (no persistent WS connection)</li>
+    <li>Simpler code (no reconnection logic, ping/pong, state sync)</li>
+    <li>Less server load (no WS connection per mobile user)</li>
+    <li>Better reliability (REST with retry > WS with reconnect)</li>
+    <li>Easier debugging (standard HTTP tooling)</li>
+  </ul>
+</div>
+</section>
+
+<!-- ═══════════════ 9. SECURITY ═══════════════ -->
+<section id="security">
+<h2>9. Security Issues Summary</h2>
+
+<div class="table-wrap">
+<table>
+  <tr><th>#</th><th>Issue</th><th>Severity</th><th>App</th><th>Impact</th></tr>
+  <tr>
+    <td>1</td><td><strong>XSS via innerHTML</strong></td><td><span class="badge badge-critical">CRITICAL</span></td><td><span class="app-tag tag-admin">Admin</span></td><td>Malicious script execution for all admin users</td>
+  </tr>
+  <tr>
+    <td>2</td><td><strong>Mock token spoofable</strong></td><td><span class="badge badge-critical">CRITICAL</span></td><td><span class="app-tag tag-backend">Backend</span></td><td>Anyone can forge mock tokens to impersonate users</td>
+  </tr>
+  <tr>
+    <td>3</td><td><strong>Payment APIs unauthenticated</strong></td><td><span class="badge badge-critical">CRITICAL</span></td><td><span class="app-tag tag-backend">Backend</span></td><td>Unauthorized payment creation and verification</td>
+  </tr>
+  <tr>
+    <td>4</td><td><strong>Razorpay key in plaintext</strong></td><td><span class="badge badge-high">HIGH</span></td><td><span class="app-tag tag-admin">Admin</span></td><td>Key visible in browser network tab and source</td>
+  </tr>
+  <tr>
+    <td>5</td><td><strong>No CSRF protection</strong></td><td><span class="badge badge-high">HIGH</span></td><td><span class="app-tag tag-admin">Admin</span></td><td>Cross-site request forgery on state changes</td>
+  </tr>
+  <tr>
+    <td>6</td><td><strong>Google Maps key exposed</strong></td><td><span class="badge badge-high">HIGH</span></td><td><span class="app-tag tag-delivery">Delivery</span></td><td>API key visible in client source code</td>
+  </tr>
+  <tr>
+    <td>7</td><td><strong>No rate limiting</strong></td><td><span class="badge badge-medium">MEDIUM</span></td><td><span class="app-tag tag-backend">Backend</span></td><td>OTP brute-force, API abuse</td>
+  </tr>
+  <tr>
+    <td>8</td><td><strong>Admin token in localStorage</strong></td><td><span class="badge badge-medium">MEDIUM</span></td><td><span class="app-tag tag-admin">Admin</span></td><td>Vulnerable to XSS token theft</td>
+  </tr>
+  <tr>
+    <td>9</td><td><strong>WebSocket no auth</strong></td><td><span class="badge badge-medium">MEDIUM</span></td><td><span class="app-tag tag-backend">Backend</span></td><td>Anyone can connect to WS and receive all order broadcasts</td>
+  </tr>
+  <tr>
+    <td>10</td><td><strong>Hardcoded test credentials</strong></td><td><span class="badge badge-medium">MEDIUM</span></td><td><span class="app-tag tag-backend">Backend</span></td><td>admin/admin@123 in source code</td>
+  </tr>
+</table>
+</div>
+</section>
+
+<!-- ═══════════════ 9. MISSING FEATURES ═══════════════ -->
+<section id="missing">
+<h2>10. Missing Features — What's Needed</h2>
+
+<h3>Priority 0 — Must Have Now</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>#</th><th>Feature</th><th>Why Needed</th><th>App</th></tr>
+  <tr><td>1</td><td><strong>Real payment processing (live Razorpay)</strong></td><td>Currently test mode only — can't accept real money</td><td><span class="app-tag tag-backend tag-main">Backend + Main</span></td></tr>
+  <tr><td>2</td><td><strong>Backend sync for delivery accept/reject</strong></td><td>Delivery flow fundamentally broken — accept/reject not sent to backend</td><td><span class="app-tag tag-delivery tag-backend">Delivery + Backend</span></td></tr>
+  <tr><td>3</td><td><strong>Camera-based delivery proof</strong></td><td>Required for delivery confirmation — currently placeholder</td><td><span class="app-tag tag-delivery">Delivery</span></td></tr>
+</table>
+</div>
+
+<h3>Priority 1 — Needed This Month</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>#</th><th>Feature</th><th>Why Needed</th></tr>
+  <tr><td>4</td><td><strong>FCM Push Notifications</strong></td><td>Replace local-only notifications with real push for background delivery</td></tr>
+  <tr><td>5</td><td><strong>Inventory / Stock Management</strong></td><td>Prevent overselling — decrement stock on order, restore on cancellation</td></tr>
+  <tr><td>6</td><td><strong>Customer Order Cancellation</strong></td><td>Basic e-commerce need — let customers cancel pending orders</td></tr>
+  <tr><td>7</td><td><strong>Admin Analytics Dashboard</strong></td><td>Sales trends, popular products, peak hours, revenue charts</td></tr>
+  <tr><td>8</td><td><strong>Input Validation (all forms)</strong></td><td>Currently zero validation on any form across all apps</td></tr>
+  <tr><td>9</td><td><strong>XSS Sanitization</strong></td><td>Sanitize all user input before innerHTML injection in admin panel</td></tr>
+</table>
+</div>
+
+<h3>Priority 2 — Needed This Quarter</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>#</th><th>Feature</th><th>Why Needed</th></tr>
+  <tr><td>10</td><td><strong>Multi-language Support (Marathi, Hindi)</strong></td><td>Local audience — Maharashtra primarily Marathi/Hindi speaking</td></tr>
+  <tr><td>11</td><td><strong>Referral / Loyalty Program</strong></td><td>Growth feature — incentivize word-of-mouth</td></tr>
+  <tr><td>12</td><td><strong>Proper Pagination</strong></td><td>Performance — orders, products, categories lists</td></tr>
+  <tr><td>13</td><td><strong>Offline Queue</strong></td><td>Resilience — queue orders when offline, sync on reconnect</td></tr>
+  <tr><td>14</td><td><strong>Order Tracking Map (Customer)</strong></td><td>Customers can see live delivery partner location</td></tr>
+  <tr><td>15</td><td><strong>Delivery Partner Earnings Reports</strong></td><td>Weekly/monthly earnings summary for delivery partners</td></tr>
+</table>
+</div>
+
+<h3>Priority 3 — Backlog</h3>
+<div class="table-wrap">
+<table>
+  <tr><th>#</th><th>Feature</th></tr>
+  <tr><td>16</td><td><strong>Unit Tests (0% coverage currently)</strong> — Jest for JS, pytest for Python</td></tr>
+  <tr><td>17</td><td><strong>Dark Mode</strong> — Both main app and admin panel</td></tr>
+  <tr><td>18</td><td><strong>Accessibility</strong> — ARIA labels, keyboard navigation, screen reader support</td></tr>
+  <tr><td>19</td><td><strong>Admin Panel PWA</strong> — Install as standalone app with offline support</td></tr>
+  <tr><td>20</td><td><strong>Product Reviews &amp; Ratings</strong> — Customer reviews on products</td></tr>
+  <tr><td>21</td><td><strong>Bulk Product Import/Export</strong> — CSV import/export for products</td></tr>
+  <tr><td>22</td><td><strong>SMS/Email Order Confirmations</strong> — Transactional notifications</td></tr>
+  <tr><td>23</td><td><strong>Admin Activity Log</strong> — Audit trail for all admin actions</td></tr>
+</table>
+</div>
+</section>
+
+<!-- ═══════════════ 10. CHANGES NEEDED ═══════════════ -->
+<section id="changes">
+<h2>11. Recommended Changes — Priority Roadmap</h2>
+
+<div class="card">
+<h3 style="margin-top:0;">🚨 Immediate (P0) — This Week</h3>
+<ol>
+  <li><strong>Fix delivery accept/reject sync</strong> — Add API calls in deliveryStore.js to POST to backend</li>
+  <li><strong>Fix XSS in admin panel</strong> — Sanitize all user input with DOMPurify or textContent instead of innerHTML</li>
+  <li><strong>Add auth to payment endpoints</strong> — Require valid user token for /api/payments/*</li>
+  <li><strong>Implement camera capture</strong> — Replace placeholder with actual expo-camera component in DeliveryProofModal</li>
+  <li><strong>Add rate limiting</strong> — Apply rate limiter middleware to /api/auth/send-otp</li>
+</ol>
+</div>
+
+<div class="card" style="margin-top:16px;">
+<h3 style="margin-top:0;">⚡ High Priority (P1) — Next 2 Weeks</h3>
+<ol start="6">
+  <li><strong>Make admin panel responsive</strong> — Collapsible sidebar, card-view fallback for tables on mobile</li>
+  <li><strong>Add inventory validation</strong> — Check stock before order placement, decrement on success</li>
+  <li><strong>Move Razorpay key to backend</strong> — Never expose payment keys in frontend</li>
+  <li><strong>Add CSRF tokens</strong> — Implement for all state-changing admin requests</li>
+  <li><strong>Fix mock token security</strong> — Use proper JWT signing instead of string patterns</li>
+  <li><strong>Add input validation</strong> — All forms across admin panel and checkout</li>
+  <li><strong>Fix dual-write consistency</strong> — Wrap Firestore+SQLite writes in transaction or add compensation logic</li>
+</ol>
+</div>
+
+<div class="card" style="margin-top:16px;">
+<h3 style="margin-top:0;">📋 Medium Priority (P2) — This Sprint</h3>
+<ol start="13">
+  <li><strong>Implement Firebase Cloud Messaging</strong> — Replace local-only expo-notifications with FCM</li>
+  <li><strong>Add pagination</strong> — All list endpoints: products, orders, categories</li>
+  <li><strong>Fix product filtering performance</strong> — Move from in-memory O(n) to database query filtering</li>
+  <li><strong>Add offline support</strong> — Local product cache, order queue, graceful degradation</li>
+  <li><strong>Enable delivery radius filtering</strong> — Set realistic DELIVERY_RADIUS_KM (e.g., 15km)</li>
+  <li><strong>Fix WebSocket + polling redundancy</strong> — Use WebSocket as primary, polling as fallback only</li>
+  <li><strong>Add error tracking/logging</strong> — Replace empty catch blocks with proper error logging</li>
+  <li><strong>Add search debouncing to admin</strong> — 300ms debounce on search inputs</li>
+</ol>
+</div>
+
+<div class="card" style="margin-top:16px;">
+<h3 style="margin-top:0;">🔮 Nice to Have (P3) — Backlog</h3>
+<ol start="21">
+  <li>Implement dark mode (both apps)</li>
+  <li>Add ARIA labels and keyboard navigation to admin</li>
+  <li>Write unit tests (Jest for JS, pytest for Python)</li>
+  <li>Multi-language support (Marathi, Hindi)</li>
+  <li>Referral/loyalty program</li>
+  <li>Customer order tracking map</li>
+  <li>Admin activity audit log</li>
+  <li>Bulk product import/export</li>
+  <li>Product reviews and ratings</li>
+  <li>Transactional SMS/email notifications</li>
+</ol>
+</div>
+</section>
+
+<!-- ═══════════════ 11. SUMMARY ═══════════════ -->
+<section id="summary">
+<h2>12. Final Summary</h2>
+
+<div class="card-grid">
+  <div class="card" style="text-align:center;">
+    <h4>Total Features</h4>
+    <p style="font-size:2rem; font-weight:700; color:var(--primary);">75+</p>
+    <p style="color:var(--muted);">Across all 4 apps</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <h4>Total Bugs</h4>
+    <p style="font-size:2rem; font-weight:700; color:var(--critical);">30</p>
+    <p style="color:var(--muted);">7 Critical, 8 High, 9 Medium, 6 Low</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <h4>API Endpoints</h4>
+    <p style="font-size:2rem; font-weight:700; color:#2563eb;">71+</p>
+    <p style="color:var(--muted);">REST + 1 WebSocket</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <h4>Missing Features</h4>
+    <p style="font-size:2rem; font-weight:700; color:#eab308;">23</p>
+    <p style="color:var(--muted);">3 P0, 6 P1, 6 P2, 8 P3</p>
+  </div>
+</div>
+
+<div class="warn-box" style="margin-top:24px;">
+  <strong>Bottom Line:</strong> The AaplaKart codebase is a <strong>functional MVP</strong> with solid architecture but significant gaps in security, reliability, and production readiness. The core shopping flow works end-to-end, but the delivery partner app has critical bugs, the admin panel is not responsive, and payment processing is in test mode only. <strong>Recommended focus:</strong> Fix the 7 critical bugs first, make admin responsive, then move to production features (live payments, FCM, inventory).
+</div>
+
+<div class="info-box">
+  <strong>Generated:</strong> May 28, 2026 &nbsp;|&nbsp; <strong>Analyzed:</strong> 4 apps, 150+ files, 91+ API endpoints, 1 WebSocket &nbsp;|&nbsp; <strong>Total Issues Found:</strong> 53 (30 bugs + 15 UI issues + 8 security issues) &nbsp;|&nbsp; <strong>Fixes Applied:</strong> 10 major (May 25–30)<br>
+  <strong>Tech Stack:</strong> React Native 0.81.5 (Expo 54) | FastAPI Python | Vanilla JS Admin | Firestore + SQLite + Redis | Firebase Auth | Razorpay Payments | Google Maps
+</div>
+</section>
+
+</main>
+</body>
+</html>

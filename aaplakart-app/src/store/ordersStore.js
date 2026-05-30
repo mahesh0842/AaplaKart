@@ -38,6 +38,7 @@ export const useOrdersStore = create(
           deliverySlotLabel: orderData.deliverySlotLabel || 'ASAP',
           status: ORDER_STATUS.PENDING,
           placedAt: now.toISOString(),
+          updatedAt: now.toISOString(),
           estimatedDelivery: new Date(
             now.getTime() + addMinutes * 60 * 1000
           ).toISOString(),
@@ -53,7 +54,7 @@ export const useOrdersStore = create(
       updateOrderStatus: (orderId, status) =>
         set((state) => ({
           orders: state.orders.map((order) =>
-            order.id === orderId ? { ...order, status } : order
+            order.id === orderId ? { ...order, status, updatedAt: new Date().toISOString() } : order
           ),
         })),
 

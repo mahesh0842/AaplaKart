@@ -38,7 +38,7 @@ export const COLORS = {
 export const PROMO_CODE = 'FREEDEL';
 export const FREE_DELIVERY_THRESHOLD = 199;
 export const DELIVERY_FEE = 30;
-export const MOCK_OTP_CODE = '123456';
+export const MOCK_OTP_CODE = '1234';
 export const MOCK_AUTH_STORAGE_KEY = '@aaplakart/mock-session';
 
 export const CATEGORY_OPTIONS = [
@@ -66,25 +66,18 @@ export const CATEGORY_ICONS = {
 
 export const PAYMENT_METHODS = [
   {
-    id: 'cod',
-    label: 'Cash on Delivery',
-    description: 'Pay when your order arrives',
-    iconFamily: 'Ionicons',
-    iconName: 'cash-outline',
-  },
-  {
-    id: 'online',
-    label: 'Online Payment',
-    description: 'Pay securely via Razorpay — Cards, UPI, NetBanking',
-    iconFamily: 'MaterialCommunityIcons',
-    iconName: 'shield-check-outline',
-  },
-  {
     id: 'upi',
     label: 'UPI',
     description: 'Google Pay, PhonePe, Paytm & more',
     iconFamily: 'MaterialCommunityIcons',
     iconName: 'qrcode-scan',
+  },
+  {
+    id: 'cod',
+    label: 'Cash on Delivery',
+    description: 'Pay when your order arrives',
+    iconFamily: 'Ionicons',
+    iconName: 'cash-outline',
   },
 ];
 

@@ -1,13 +1,12 @@
 // GUI category: App shell. Boots Firebase, auth persistence, navigation, modals, and safe layout affordances.
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { LogBox, Modal, StyleSheet, View } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer, DefaultTheme, useNavigationContainerRef } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import * as SplashScreen from 'expo-splash-screen';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { initializeRecaptchaConfig, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
@@ -23,12 +22,18 @@ import { clearImageCache } from './src/services/imageService';
 import { BrandProvider } from './src/brand-mode/BrandContext';
 import BrandTabToggle from './src/components/common/BrandTabToggle';
 import FloatingCartBar from './src/components/cart/FloatingCartBar';
-import { COLORS, MOCK_AUTH_STORAGE_KEY } from './src/utils/constants';
+import RatingPrompt from './src/components/common/RatingPrompt';
+import { COLORS } from './src/utils/constants';
 import { getCartCount } from './src/utils/helpers';
 import { useCartStore } from './src/store/cartStore';
-import { testLogin, mockLogin, verifyFirebaseToken, setAuthToken, clearAuthToken, simpleLogin } from './src/services/api';
-
-SplashScreen.preventAutoHideAsync().catch(() => {});
+import { useUserNameStore } from './src/store/userNameStore';
+import {
+  restoreSession,
+  persistSession,
+  clearSession,
+  registerWithBackend,
+} from './src/services/authService';
+import { startRealtime, disconnectWebSocket } from './src/services/websocketService';
 
 // Disable dev warnings and layout measurement overlay in UI
 LogBox.ignoreAllLogs(true);
@@ -171,6 +176,19 @@ function AppContent() {
   const [currentRoute, setCurrentRoute] = useState('Home');
   const [checkoutActive, setCheckoutActive] = useState(false);
   const [loginModalVisible, setLoginModalVisible] = useState(false);
+  const [loginDismissed, setLoginDismissed] = useState(false);
+
+  // Prevent splash auto-hide — we control when to hide it
+  useEffect(() => {
+    SplashScreen.preventAutoHideAsync();
+  }, []);
+
+  // Hide splash when app finishes booting
+  useEffect(() => {
+    if (authReady && storageReady) {
+      SplashScreen.hideAsync();
+    }
+  }, [authReady, storageReady]);
 
   const tabBarHeight = 64 + Math.max(insets.bottom, 12);
   const floatingCartOffset = tabBarHeight + 18;
@@ -178,14 +196,45 @@ function AppContent() {
   const isAuthenticated = Boolean(firebaseUser || mockSession);
   const phoneNumber = firebaseUser?.phoneNumber || mockSession?.phoneNumber || '';
   const provider = firebaseUser ? 'firebase' : mockSession?.provider || 'mock';
+
+  // ── User name: store value > session value > default ──
+  const storeDisplayName = useUserNameStore((state) => state.displayName);
   const resolvedUserName = useMemo(
     () =>
+      storeDisplayName?.trim() ||
       firebaseUser?.displayName?.trim() ||
       mockSession?.displayName?.trim() ||
       (phoneNumber ? 'AaplaKart User' : ''),
-    [firebaseUser?.displayName, mockSession?.displayName, phoneNumber]
+    [storeDisplayName, firebaseUser?.displayName, mockSession?.displayName, phoneNumber]
   );
 
+  // ── Sync store with session on login ──
+  useEffect(() => {
+    const sessionName = mockSession?.displayName?.trim();
+    if (sessionName && sessionName !== 'AaplaKart User') {
+      useUserNameStore.getState().setDisplayName(sessionName);
+    }
+  }, [mockSession?.displayName]);
+
+  // ── Auto-show login for first-time (unauthenticated) users (only once) ──
+  useEffect(() => {
+    if (authReady && storageReady && !isAuthenticated && !loginDismissed) {
+      setLoginModalVisible(true);
+    }
+  }, [authReady, storageReady, isAuthenticated, loginDismissed]);
+
+  // ── WebSocket real-time order updates (same global WS as admin + delivery) ──
+  useEffect(() => {
+    if (authReady && storageReady && isAuthenticated) {
+      const cleanup = startRealtime();
+      return () => {
+        cleanup();
+        disconnectWebSocket();
+      };
+    }
+  }, [authReady, storageReady, isAuthenticated]);
+
+  // ── Firebase auth bootstrap ─────────────────────────────────
   useEffect(() => {
     let mounted = true;
     let unsubscribe = () => {};
@@ -194,13 +243,13 @@ function AppContent() {
       try {
         clearImageCache();
 
-        const savedMockSession = await AsyncStorage.getItem(MOCK_AUTH_STORAGE_KEY);
+        const savedSession = await restoreSession();
 
-        if (mounted && savedMockSession) {
-          setMockSession(JSON.parse(savedMockSession));
+        if (mounted && savedSession) {
+          setMockSession(savedSession);
         }
       } catch (error) {
-        console.log('Unable to restore mock session:', error?.message);
+        console.log('Unable to restore session:', error?.message);
       } finally {
         if (mounted) {
           setStorageReady(true);
@@ -220,7 +269,7 @@ function AppContent() {
 
           if (user) {
             setMockSession(null);
-            await AsyncStorage.removeItem(MOCK_AUTH_STORAGE_KEY);
+            await clearSession();
           }
         });
       }
@@ -240,49 +289,22 @@ function AppContent() {
       displayName: session?.displayName?.trim() || 'AaplaKart User',
     };
 
-    // ── Register with the backend (non-blocking) ──────────────────
-    const isMockProvider = session.provider === 'mock' || session.provider === 'mock-google' || session.provider === 'google-fallback';
-    const shouldPersist = isMockProvider || session.provider === 'google';
+    // Register with backend (non-blocking)
+    const enrichedSession = await registerWithBackend(normalizedSession);
 
-    try {
-      if (session.idToken && !isMockProvider) {
-        // Real Firebase / Google auth – verify token with backend
-        await verifyFirebaseToken(session.idToken, session.phoneNumber);
-        console.log('[api] Backend: token verified for', session.phoneNumber);
-      } else if (isMockProvider) {
-        // Mock/Simple auth — register ANY phone number with backend
-        try {
-          const result = await simpleLogin(
-            session.phoneNumber || '',
-            session.displayName || '',
-            session.email || ''
-          );
-          if (result.id_token) {
-            setAuthToken(result.id_token);
-            normalizedSession.uid = result.uid;
-          }
-          console.log('[api] Backend: simple-login success for', session.phoneNumber);
-        } catch {
-          console.log('[api] Backend: simple-login skipped (backend unavailable)');
-        }
-      }
-    } catch (err) {
-      console.log('[api] Backend registration skipped:', err?.message);
-    }
+    // Persist session for non-Firebase providers (email, google, mock)
+    const shouldPersist = !firebaseUser || enrichedSession.provider !== 'firebase';
 
-    // ── Persist session ───────────────────────────────────────────
     if (shouldPersist) {
-      setMockSession(normalizedSession);
-      await AsyncStorage.setItem(
-        MOCK_AUTH_STORAGE_KEY,
-        JSON.stringify(normalizedSession)
-      );
+      setMockSession(enrichedSession);
+      await persistSession(enrichedSession);
     } else {
       setMockSession(null);
-      await AsyncStorage.removeItem(MOCK_AUTH_STORAGE_KEY);
+      await clearSession();
     }
 
     setLoginModalVisible(false);
+    setLoginDismissed(false); // reset on successful login
   };
 
   const handleLogout = async () => {
@@ -294,8 +316,11 @@ function AppContent() {
     setMockSession(null);
     setCheckoutActive(false);
     setLoginModalVisible(false);
-    clearAuthToken();
-    await AsyncStorage.removeItem(MOCK_AUTH_STORAGE_KEY);
+    await clearSession();
+
+    // Auto-show login after sign-out — reset dismissed flag
+    setLoginDismissed(false);
+    setLoginModalVisible(true);
 
     Toast.show({
       type: 'success',
@@ -303,6 +328,35 @@ function AppContent() {
       text2: 'Your session has been cleared from this device.',
     });
   };
+
+  // ── Update user name (called from CheckoutScreen after order with real name) ──
+  const handleUpdateUserName = useCallback(async (newName) => {
+    if (!newName || newName === 'AplaKart User') return;
+
+    // Only update if current name is still default (first-time capture)
+    const currentName = useUserNameStore.getState().displayName
+      || mockSession?.displayName?.trim()
+      || '';
+    if (currentName && currentName !== 'AaplaKart User') return;
+
+    // Update global store -> Profile tab reflects immediately
+    useUserNameStore.getState().setDisplayName(newName);
+
+    // Update mockSession + persist
+    if (mockSession) {
+      const updatedSession = { ...mockSession, displayName: newName };
+      setMockSession(updatedSession);
+      await persistSession(updatedSession);
+    }
+
+    // Update backend (non-blocking)
+    try {
+      const { updateMyProfile } = require('./src/services/api');
+      await updateMyProfile({ display_name: newName });
+    } catch {
+      // non-blocking
+    }
+  }, [mockSession]);
 
   const handleNavigationState = () => {
     const routeName = navigationRef.getCurrentRoute()?.name;
@@ -317,12 +371,6 @@ function AppContent() {
     checkoutActive || loginModalVisible
       ? Math.max(insets.bottom + 24, 40)
       : floatingCartOffset + 54;
-
-  useEffect(() => {
-    if (!showBootLoader) {
-      SplashScreen.hideAsync().catch(() => {});
-    }
-  }, [showBootLoader]);
 
   return (
     <GestureHandlerRootView style={styles.flex}>
@@ -341,7 +389,10 @@ function AppContent() {
                 isAuthenticated={isAuthenticated}
                 onCheckout={() => setCheckoutActive(true)}
                 onLogout={handleLogout}
-                onShowLogin={() => setLoginModalVisible(true)}
+                onShowLogin={() => {
+                  setLoginDismissed(false);
+                  setLoginModalVisible(true);
+                }}
                 phoneNumber={phoneNumber}
                 provider={provider}
                 tabBarHeight={tabBarHeight}
@@ -358,15 +409,20 @@ function AppContent() {
               <CheckoutScreen
                 phoneNumber={phoneNumber}
                 isAuthenticated={isAuthenticated}
-                onClose={() => setCheckoutActive(false)}
+                onClose={() => {
+                  setCheckoutActive(false);
+                  navigationRef.navigate('Home');
+                }}
                 onShowLogin={() => {
                   setCheckoutActive(false);
+                  setLoginDismissed(false);
                   setLoginModalVisible(true);
                 }}
                 onBack={() => {
                   setCheckoutActive(false);
                   navigationRef.navigate('Cart');
                 }}
+                onUpdateUserName={handleUpdateUserName}
               />
             </Modal>
 
@@ -378,18 +434,22 @@ function AppContent() {
             >
               <LoginScreen
                 onAuthenticated={handleAuthenticated}
-                onClose={() => setLoginModalVisible(false)}
+                onClose={() => {
+                  setLoginModalVisible(false);
+                  setLoginDismissed(true); // user chose to skip
+                }}
               />
             </Modal>
           </>
         )}
 
-        {/* Floating checkout bubble — appears above tab bar when cart has items */}
-        {!checkoutActive && !loginModalVisible && (
-          <FloatingCartBar
-            onCheckout={() => setCheckoutActive(true)}
-          />
+        {/* Floating cart bubble — tap opens Checkout directly */}
+        {!checkoutActive && !loginModalVisible && !['Cart', 'Profile'].includes(currentRoute) && (
+          <FloatingCartBar onNavigateCart={() => setCheckoutActive(true)} />
         )}
+
+        {/* Rating prompt — shown after 3rd delivery */}
+        <RatingPrompt />
 
         <Toast
           config={toastConfig}

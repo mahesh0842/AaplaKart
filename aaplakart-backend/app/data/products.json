@@ -1,956 +1,1982 @@
 [
   {
-    "id": "kart-potato",
-    "name": "Fresh Potato",
-    "price": 20,
-    "category": "Vegetables",
-    "subcategory": "Root Veggies",
-    "image": "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400",
-    "rating": 4.0,
-    "deliveryTime": "20 min",
-    "stock": 10,
-    "categoryId": "cat-vegetables",
     "type": "kart",
-    "subcategoryId": "sub-root-veggies",
-    "weight": ""
+    "price": 36.0,
+    "id": "kart-apple",
+    "subcategory": "Premium Fruits",
+    "image": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400",
+    "deliveryTime": "20 min",
+    "subcategoryId": "sub-premium-fruits",
+    "category": "Fruits",
+    "categoryId": "cat-fruits",
+    "stock": 10,
+    "rating": 4.6,
+    "weight": "",
+    "name": "Red Apple",
+    "unit": "kg",
+    "options": [
+      {
+        "weight": "250g",
+        "price": 36.0,
+        "stock": 30,
+        "mrp": 41.0
+      },
+      {
+        "weight": "500g",
+        "price": 66.0,
+        "stock": 25,
+        "mrp": 76.0
+      },
+      {
+        "weight": "1kg",
+        "price": 120.0,
+        "stock": 20,
+        "mrp": 138.0
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-29T17:47:52.237041+00:00",
+    "description": ""
   },
   {
-    "id": "kart-spinach",
-    "name": "Green Spinach",
-    "price": 15,
-    "category": "Vegetables",
-    "subcategory": "Leafy Greens",
-    "image": "https://images.unsplash.com/photo-1576045057995-9d3b7e75be9a?w=400",
+    "type": "kart",
+    "price": 12,
+    "id": "kart-banana",
+    "subcategory": "Daily Fruits",
+    "image": "https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=400",
+    "weight": "",
+    "subcategoryId": "sub-daily-fruits",
+    "category": "Fruits",
+    "categoryId": "cat-fruits",
+    "stock": 30,
     "rating": 4.2,
     "deliveryTime": "15 min",
-    "stock": 10,
-    "categoryId": "cat-vegetables",
-    "type": "kart",
-    "subcategoryId": "sub-leafy-greens",
-    "weight": ""
+    "name": "Yellow Banana",
+    "unit": "kg",
+    "options": [
+      {
+        "weight": "250g",
+        "price": 12,
+        "stock": 30,
+        "mrp": 14
+      },
+      {
+        "weight": "500g",
+        "price": 22,
+        "stock": 25,
+        "mrp": 25
+      },
+      {
+        "weight": "1kg",
+        "price": 40,
+        "stock": 20,
+        "mrp": 46
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
   },
   {
-    "id": "kart-coriander",
-    "name": "Fresh Coriander",
-    "price": 35,
-    "category": "Vegetables",
-    "subcategory": "Leafy Greens",
-    "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400",
-    "rating": 4.5,
-    "deliveryTime": "15 min",
-    "stock": 10,
-    "categoryId": "cat-vegetables",
     "type": "kart",
-    "subcategoryId": "sub-leafy-greens",
-    "weight": ""
-  },
-  {
-    "id": "kart-cauliflower",
-    "name": "Cauliflower",
-    "price": 32,
-    "category": "Vegetables",
-    "subcategory": "Premium Veggies",
-    "image": "https://images.unsplash.com/photo-1566842600175-97dca489844f?w=400",
-    "rating": 4.1,
-    "deliveryTime": "25 min",
-    "stock": 9,
-    "categoryId": "cat-vegetables",
-    "type": "kart",
-    "subcategoryId": "sub-premium-veggies",
-    "weight": ""
-  },
-  {
-    "id": "kart-ghee",
-    "name": "Pure Ghee",
-    "price": 280,
-    "category": "Dairy",
+    "price": 22,
+    "id": "kart-butter",
     "subcategory": "Butter & Ghee",
-    "image": "https://images.unsplash.com/photo-1631374818650-37e9b6c09b1f?w=400",
-    "rating": 4.8,
+    "subcategoryId": "sub-butter-ghee",
+    "weight": "",
+    "deliveryTime": "20 min",
+    "category": "Dairy",
+    "categoryId": "cat-dairy",
+    "stock": 20,
+    "rating": 4.6,
+    "image": "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=400",
+    "name": "Amul Butter",
+    "unit": "g",
+    "options": [
+      {
+        "weight": "200g",
+        "price": 22,
+        "stock": 25,
+        "mrp": 25
+      },
+      {
+        "weight": "500g",
+        "price": 47,
+        "stock": 20,
+        "mrp": 54
+      },
+      {
+        "weight": "1kg",
+        "price": 82,
+        "stock": 15,
+        "mrp": 94
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "kart",
+    "price": 10,
+    "id": "kart-cauliflower",
+    "subcategory": "Premium Veggies",
+    "subcategoryId": "sub-premium-veggies",
+    "weight": "",
     "deliveryTime": "25 min",
+    "category": "Vegetables",
+    "categoryId": "cat-vegetables",
+    "stock": 9,
+    "rating": 4.1,
+    "image": "https://images.unsplash.com/photo-1566842600175-97dca489844f?w=400",
+    "name": "Cauliflower",
+    "unit": "kg",
+    "options": [
+      {
+        "weight": "250g",
+        "price": 10,
+        "stock": 30,
+        "mrp": 12
+      },
+      {
+        "weight": "500g",
+        "price": 18,
+        "stock": 25,
+        "mrp": 21
+      },
+      {
+        "weight": "1kg",
+        "price": 32,
+        "stock": 20,
+        "mrp": 37
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "",
+    "price": 65,
+    "id": "kart-chai-masala",
+    "subcategory": "Masala Blends",
+    "type": "kart",
+    "weight": "",
+    "deliveryTime": "20 min",
+    "category": "Spices",
+    "categoryId": "cat-spices",
+    "stock": 18,
+    "rating": 4.6,
+    "image": "https://images.unsplash.com/photo-1577968897966-4f64c18360b4?w=400",
+    "name": "Chai Masala",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 65,
+        "stock": 20,
+        "mrp": 75
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-leafy-greens",
+    "price": 10,
+    "id": "kart-coriander",
+    "subcategory": "Leafy Greens",
+    "deliveryTime": "15 min",
+    "type": "kart",
+    "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400",
+    "category": "Vegetables",
+    "categoryId": "cat-vegetables",
+    "stock": 10,
+    "rating": 4.5,
+    "weight": "",
+    "name": "Fresh Coriander",
+    "unit": "kg",
+    "options": [
+      {
+        "weight": "250g",
+        "price": 10,
+        "stock": 30,
+        "mrp": 12
+      },
+      {
+        "weight": "500g",
+        "price": 19,
+        "stock": 25,
+        "mrp": 22
+      },
+      {
+        "weight": "1kg",
+        "price": 35,
+        "stock": 20,
+        "mrp": 40
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-whole-spices",
+    "price": 60,
+    "id": "kart-cumin",
+    "subcategory": "Whole Spices",
+    "type": "kart",
+    "deliveryTime": "20 min",
+    "weight": "",
+    "category": "Spices",
+    "categoryId": "cat-spices",
+    "stock": 25,
+    "rating": 4.3,
+    "image": "https://images.unsplash.com/photo-1599909818482-de811b172f29?w=400",
+    "name": "Jeera (Cumin Seeds)",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 60,
+        "stock": 20,
+        "mrp": 69
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-paneer-curd",
+    "price": 18,
+    "id": "kart-curd",
+    "subcategory": "Paneer & Curd",
+    "weight": "",
+    "deliveryTime": "15 min",
+    "type": "kart",
+    "category": "Dairy",
+    "categoryId": "cat-dairy",
+    "stock": 18,
+    "rating": 4.4,
+    "image": "https://images.unsplash.com/photo-1571212513979-5b4ef3e68c29?w=400",
+    "name": "Fresh Curd",
+    "unit": "g",
+    "options": [
+      {
+        "weight": "200g",
+        "price": 18,
+        "stock": 25,
+        "mrp": 21
+      },
+      {
+        "weight": "500g",
+        "price": 38,
+        "stock": 20,
+        "mrp": 44
+      },
+      {
+        "weight": "1kg",
+        "price": 68,
+        "stock": 15,
+        "mrp": 78
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-milk",
+    "price": 11,
+    "id": "kart-full-cream-milk",
+    "subcategory": "Milk",
+    "deliveryTime": "15 min",
+    "image": "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400",
+    "type": "kart",
+    "category": "Dairy",
+    "categoryId": "cat-dairy",
+    "stock": 24,
+    "rating": 4.5,
+    "weight": "",
+    "name": "Full Cream Milk",
+    "unit": "g",
+    "options": [
+      {
+        "weight": "200g",
+        "price": 11,
+        "stock": 25,
+        "mrp": 13
+      },
+      {
+        "weight": "500g",
+        "price": 24,
+        "stock": 20,
+        "mrp": 28
+      },
+      {
+        "weight": "1kg",
+        "price": 42,
+        "stock": 15,
+        "mrp": 48
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "kart",
+    "price": 75,
+    "id": "kart-garam-masala",
+    "subcategory": "Masala Blends",
+    "subcategoryId": "",
+    "weight": "",
+    "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400",
+    "category": "Spices",
+    "categoryId": "cat-spices",
+    "stock": 20,
+    "rating": 4.7,
+    "deliveryTime": "20 min",
+    "name": "Garam Masala",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 75,
+        "stock": 20,
+        "mrp": 86
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-butter-ghee",
+    "price": 150,
+    "id": "kart-ghee",
+    "subcategory": "Butter & Ghee",
+    "weight": "",
+    "deliveryTime": "25 min",
+    "type": "kart",
+    "category": "Dairy",
+    "categoryId": "cat-dairy",
     "stock": 0,
     "options": [
       {
-        "label": "250ml",
-        "price": 150
+        "price": 150,
+        "label": "250ml"
       },
       {
-        "label": "500ml",
-        "price": 280
+        "price": 280,
+        "label": "500ml"
       },
       {
-        "label": "1L",
-        "price": 520
+        "price": 520,
+        "label": "1L"
       }
     ],
-    "categoryId": "cat-dairy",
-    "type": "kart",
-    "subcategoryId": "sub-butter-ghee",
-    "weight": ""
+    "rating": 4.8,
+    "image": "https://images.unsplash.com/photo-1631374818650-37e9b6c09b1f?w=400",
+    "name": "Pure Ghee",
+    "unit": "g",
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
   },
   {
-    "id": "kart-butter",
-    "name": "Amul Butter",
-    "price": 55,
-    "category": "Dairy",
-    "subcategory": "Butter & Ghee",
-    "image": "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=400",
-    "rating": 4.6,
-    "deliveryTime": "20 min",
-    "stock": 20,
-    "categoryId": "cat-dairy",
+    "subcategoryId": "sub-premium-fruits",
+    "price": 27,
+    "id": "kart-grapes",
+    "subcategory": "Premium Fruits",
+    "weight": "",
+    "image": "https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=400",
     "type": "kart",
-    "subcategoryId": "sub-butter-ghee",
-    "weight": ""
-  },
-  {
-    "id": "kart-full-cream-milk",
-    "name": "Full Cream Milk",
-    "price": 28,
-    "category": "Dairy",
-    "subcategory": "Milk",
-    "image": "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400",
+    "category": "Fruits",
+    "categoryId": "cat-fruits",
+    "stock": 12,
     "rating": 4.5,
-    "deliveryTime": "15 min",
-    "stock": 24,
-    "categoryId": "cat-dairy",
-    "type": "kart",
-    "subcategoryId": "sub-milk",
-    "weight": ""
+    "deliveryTime": "20 min",
+    "name": "Green Grapes",
+    "unit": "kg",
+    "options": [
+      {
+        "weight": "250g",
+        "price": 27,
+        "stock": 30,
+        "mrp": 31
+      },
+      {
+        "weight": "500g",
+        "price": 50,
+        "stock": 25,
+        "mrp": 57
+      },
+      {
+        "weight": "1kg",
+        "price": 90,
+        "stock": 20,
+        "mrp": 103
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
   },
   {
-    "id": "kart-toned-milk",
-    "name": "Toned Milk",
-    "price": 24,
-    "category": "Dairy",
-    "subcategory": "Milk",
-    "image": "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400",
+    "subcategoryId": "sub-premium-fruits",
+    "price": 54,
+    "id": "kart-mango",
+    "subcategory": "Premium Fruits",
+    "weight": "",
+    "deliveryTime": "25 min",
+    "type": "kart",
+    "category": "Fruits",
+    "categoryId": "cat-fruits",
+    "stock": 10,
+    "rating": 4.9,
+    "image": "https://images.unsplash.com/photo-1553279768-865429fa0078?w=400",
+    "name": "Alphonso Mango",
+    "unit": "kg",
+    "options": [
+      {
+        "weight": "250g",
+        "price": 54,
+        "stock": 30,
+        "mrp": 62
+      },
+      {
+        "weight": "500g",
+        "price": 99,
+        "stock": 25,
+        "mrp": 114
+      },
+      {
+        "weight": "1kg",
+        "price": 180,
+        "stock": 20,
+        "mrp": 207
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-pulses",
+    "price": 120,
+    "id": "kart-moong-dal",
+    "subcategory": "Pulses",
+    "type": "kart",
+    "weight": "",
+    "deliveryTime": "25 min",
+    "category": "Grains",
+    "categoryId": "cat-grains",
+    "stock": 18,
+    "rating": 4.0,
+    "image": "https://images.unsplash.com/photo-1585991519035-39eb7a0b8774?w=400",
+    "name": "Moong Dal",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 120,
+        "stock": 20,
+        "mrp": 138
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "kart",
+    "price": 21,
+    "id": "kart-orange",
+    "subcategory": "Daily Fruits",
+    "deliveryTime": "20 min",
+    "weight": "",
+    "subcategoryId": "sub-daily-fruits",
+    "category": "Fruits",
+    "categoryId": "cat-fruits",
+    "stock": 15,
     "rating": 4.3,
-    "deliveryTime": "15 min",
-    "stock": 26,
-    "categoryId": "cat-dairy",
-    "type": "kart",
-    "subcategoryId": "sub-milk",
-    "weight": ""
+    "image": "https://images.unsplash.com/photo-1547514701-42782101795e?w=400",
+    "name": "Nagpur Orange",
+    "unit": "kg",
+    "options": [
+      {
+        "weight": "250g",
+        "price": 21,
+        "stock": 30,
+        "mrp": 24
+      },
+      {
+        "weight": "500g",
+        "price": 38,
+        "stock": 25,
+        "mrp": 44
+      },
+      {
+        "weight": "1kg",
+        "price": 70,
+        "stock": 20,
+        "mrp": 80
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
   },
   {
-    "id": "kart-paneer",
-    "name": "Fresh Paneer",
+    "subcategoryId": "sub-paneer-curd",
     "price": 80,
-    "category": "Dairy",
+    "id": "kart-paneer",
     "subcategory": "Paneer & Curd",
     "image": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400",
-    "rating": 4.7,
     "deliveryTime": "20 min",
+    "type": "kart",
+    "category": "Dairy",
+    "categoryId": "cat-dairy",
     "stock": 11,
     "options": [
       {
-        "label": "200g",
-        "price": 80
+        "price": 80,
+        "label": "200g"
       },
       {
-        "label": "500g",
-        "price": 180
+        "price": 180,
+        "label": "500g"
       },
       {
-        "label": "1kg",
-        "price": 340
+        "price": 340,
+        "label": "1kg"
       }
     ],
-    "categoryId": "cat-dairy",
-    "type": "kart",
-    "subcategoryId": "sub-paneer-curd",
-    "weight": ""
+    "rating": 4.7,
+    "weight": "",
+    "name": "Fresh Paneer",
+    "unit": "g",
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
   },
   {
-    "id": "kart-curd",
-    "name": "Fresh Curd",
-    "price": 45,
-    "category": "Dairy",
-    "subcategory": "Paneer & Curd",
-    "image": "https://images.unsplash.com/photo-1571212513979-5b4ef3e68c29?w=400",
-    "rating": 4.4,
-    "deliveryTime": "15 min",
-    "stock": 18,
-    "categoryId": "cat-dairy",
     "type": "kart",
-    "subcategoryId": "sub-paneer-curd",
-    "weight": ""
-  },
-  {
-    "id": "kart-apple",
-    "name": "Red Apple",
-    "price": 120,
-    "category": "Fruits",
-    "subcategory": "Premium Fruits",
-    "image": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400",
-    "rating": 4.6,
-    "deliveryTime": "20 min",
-    "stock": 20,
-    "categoryId": "cat-fruits",
-    "type": "kart",
-    "subcategoryId": "sub-premium-fruits",
-    "weight": ""
-  },
-  {
-    "id": "kart-banana",
-    "name": "Yellow Banana",
-    "price": 40,
-    "category": "Fruits",
-    "subcategory": "Daily Fruits",
-    "image": "https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=400",
-    "rating": 4.2,
-    "deliveryTime": "15 min",
-    "stock": 30,
-    "categoryId": "cat-fruits",
-    "type": "kart",
-    "subcategoryId": "sub-daily-fruits",
-    "weight": ""
-  },
-  {
-    "id": "kart-grapes",
-    "name": "Green Grapes",
-    "price": 90,
-    "category": "Fruits",
-    "subcategory": "Premium Fruits",
-    "image": "https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=400",
-    "rating": 4.5,
-    "deliveryTime": "20 min",
-    "stock": 12,
-    "categoryId": "cat-fruits",
-    "type": "kart",
-    "subcategoryId": "sub-premium-fruits",
-    "weight": ""
-  },
-  {
-    "id": "kart-mango",
-    "name": "Alphonso Mango",
-    "price": 180,
-    "category": "Fruits",
-    "subcategory": "Premium Fruits",
-    "image": "https://images.unsplash.com/photo-1553279768-865429fa0078?w=400",
-    "rating": 4.9,
-    "deliveryTime": "25 min",
-    "stock": 10,
-    "categoryId": "cat-fruits",
-    "type": "kart",
-    "subcategoryId": "sub-premium-fruits",
-    "weight": ""
-  },
-  {
-    "id": "kart-orange",
-    "name": "Nagpur Orange",
-    "price": 70,
-    "category": "Fruits",
-    "subcategory": "Daily Fruits",
-    "image": "https://images.unsplash.com/photo-1547514701-42782101795e?w=400",
-    "rating": 4.3,
-    "deliveryTime": "20 min",
-    "stock": 15,
-    "categoryId": "cat-fruits",
-    "type": "kart",
-    "subcategoryId": "sub-daily-fruits",
-    "weight": ""
-  },
-  {
+    "price": 39,
     "id": "kart-pomegranate",
-    "name": "Pomegranate",
-    "price": 130,
-    "category": "Fruits",
     "subcategory": "Premium Fruits",
     "image": "https://images.unsplash.com/photo-1615485925626-d123e6f7b610?w=400",
-    "rating": 4.4,
-    "deliveryTime": "25 min",
-    "stock": 8,
-    "categoryId": "cat-fruits",
-    "type": "kart",
     "subcategoryId": "sub-premium-fruits",
-    "weight": ""
+    "deliveryTime": "25 min",
+    "category": "Fruits",
+    "categoryId": "cat-fruits",
+    "stock": 8,
+    "rating": 4.4,
+    "weight": "",
+    "name": "Pomegranate",
+    "unit": "kg",
+    "options": [
+      {
+        "weight": "250g",
+        "price": 39,
+        "stock": 30,
+        "mrp": 45
+      },
+      {
+        "weight": "500g",
+        "price": 72,
+        "stock": 25,
+        "mrp": 83
+      },
+      {
+        "weight": "1kg",
+        "price": 130,
+        "stock": 20,
+        "mrp": 150
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
   },
   {
-    "id": "kart-rice",
-    "name": "Basmati Rice",
-    "price": 95,
-    "category": "Grains",
-    "subcategory": "Rice",
-    "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400",
+    "type": "kart",
+    "price": 6,
+    "id": "kart-potato",
+    "subcategory": "Root Veggies",
+    "image": "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400",
+    "deliveryTime": "20 min",
+    "subcategoryId": "sub-root-veggies",
+    "category": "Vegetables",
+    "categoryId": "cat-vegetables",
+    "stock": 10,
+    "rating": 4.0,
+    "weight": "1",
+    "name": "Fresh Potato",
+    "unit": "kg",
+    "options": [
+      {
+        "weight": "250g",
+        "price": 6,
+        "stock": 30,
+        "mrp": 7
+      },
+      {
+        "weight": "500g",
+        "price": 11,
+        "stock": 25,
+        "mrp": 13
+      },
+      {
+        "weight": "1kg",
+        "price": 20,
+        "stock": 20,
+        "mrp": 23
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "kart",
+    "price": 55,
+    "id": "kart-red-chilli",
+    "subcategory": "Whole Spices",
+    "weight": "",
+    "image": "https://images.unsplash.com/photo-1588252303782-cb80119c02df?w=400",
+    "subcategoryId": "sub-whole-spices",
+    "category": "Spices",
+    "categoryId": "cat-spices",
+    "stock": 22,
     "rating": 4.5,
-    "deliveryTime": "25 min",
+    "deliveryTime": "20 min",
+    "name": "Kashmiri Red Chilli",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 55,
+        "stock": 20,
+        "mrp": 63
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "kart",
+    "price": 95,
+    "id": "kart-rice",
+    "subcategory": "Rice",
+    "subcategoryId": "sub-rice",
+    "weight": "",
+    "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400",
+    "category": "Grains",
+    "categoryId": "cat-grains",
     "stock": 25,
     "options": [
       {
-        "label": "1kg",
-        "price": 95
+        "price": 95,
+        "label": "1kg"
       },
       {
-        "label": "5kg",
-        "price": 420
+        "price": 420,
+        "label": "5kg"
       },
       {
-        "label": "10kg",
-        "price": 780
+        "price": 780,
+        "label": "10kg"
       }
     ],
-    "categoryId": "cat-grains",
-    "type": "kart",
-    "subcategoryId": "sub-rice",
-    "weight": ""
+    "rating": 4.5,
+    "deliveryTime": "25 min",
+    "name": "Basmati Rice",
+    "unit": "pcs",
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
   },
   {
-    "id": "kart-wheat-flour",
-    "name": "Wheat Flour (Atta)",
-    "price": 55,
-    "category": "Grains",
-    "subcategory": "Flour",
-    "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400",
-    "rating": 4.3,
-    "deliveryTime": "25 min",
-    "stock": 20,
+    "subcategoryId": "sub-leafy-greens",
+    "price": 4,
+    "id": "kart-spinach",
+    "subcategory": "Leafy Greens",
+    "image": "https://images.unsplash.com/photo-1576045057995-9d3b7e75be9a?w=400",
+    "type": "kart",
+    "deliveryTime": "15 min",
+    "category": "Vegetables",
+    "categoryId": "cat-vegetables",
+    "stock": 10,
+    "rating": 4.2,
+    "weight": "",
+    "name": "Green Spinach",
+    "unit": "kg",
     "options": [
       {
-        "label": "1kg",
-        "price": 55
+        "weight": "250g",
+        "price": 4,
+        "stock": 30,
+        "mrp": 5
       },
       {
-        "label": "5kg",
-        "price": 240
+        "weight": "500g",
+        "price": 8,
+        "stock": 25,
+        "mrp": 9
       },
       {
-        "label": "10kg",
-        "price": 440
+        "weight": "1kg",
+        "price": 15,
+        "stock": 20,
+        "mrp": 17
       }
     ],
-    "categoryId": "cat-grains",
-    "type": "kart",
-    "subcategoryId": "sub-flour",
-    "weight": ""
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
   },
   {
-    "id": "kart-toor-dal",
-    "name": "Toor Dal",
+    "type": "kart",
+    "price": 10,
+    "id": "kart-toned-milk",
+    "subcategory": "Milk",
+    "subcategoryId": "sub-milk",
+    "weight": "",
+    "deliveryTime": "15 min",
+    "category": "Dairy",
+    "categoryId": "cat-dairy",
+    "stock": 26,
+    "rating": 4.3,
+    "image": "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400",
+    "name": "Toned Milk",
+    "unit": "g",
+    "options": [
+      {
+        "weight": "200g",
+        "price": 10,
+        "stock": 25,
+        "mrp": 12
+      },
+      {
+        "weight": "500g",
+        "price": 20,
+        "stock": 20,
+        "mrp": 23
+      },
+      {
+        "weight": "1kg",
+        "price": 36,
+        "stock": 15,
+        "mrp": 41
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-pulses",
     "price": 140,
-    "category": "Grains",
+    "id": "kart-toor-dal",
     "subcategory": "Pulses",
-    "image": "https://images.unsplash.com/photo-1599749011927-1a74b1ac2f51?w=400",
-    "rating": 4.2,
     "deliveryTime": "25 min",
+    "weight": "",
+    "type": "kart",
+    "category": "Grains",
+    "categoryId": "cat-grains",
     "stock": 15,
-    "categoryId": "cat-grains",
-    "type": "kart",
-    "subcategoryId": "sub-pulses",
-    "weight": ""
+    "rating": 4.2,
+    "image": "https://images.unsplash.com/photo-1599749011927-1a74b1ac2f51?w=400",
+    "name": "Toor Dal",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 140,
+        "stock": 20,
+        "mrp": 161
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
   },
   {
-    "id": "kart-moong-dal",
-    "name": "Moong Dal",
-    "price": 120,
-    "category": "Grains",
-    "subcategory": "Pulses",
-    "image": "https://images.unsplash.com/photo-1585991519035-39eb7a0b8774?w=400",
-    "rating": 4.0,
-    "deliveryTime": "25 min",
-    "stock": 18,
-    "categoryId": "cat-grains",
     "type": "kart",
-    "subcategoryId": "sub-pulses",
-    "weight": ""
-  },
-  {
-    "id": "kart-turmeric",
-    "name": "Turmeric Powder",
     "price": 45,
-    "category": "Spices",
+    "id": "kart-turmeric",
     "subcategory": "Whole Spices",
+    "subcategoryId": "sub-whole-spices",
+    "weight": "",
     "image": "https://images.unsplash.com/photo-1615486550082-41d2474037b1?w=400",
+    "category": "Spices",
+    "categoryId": "cat-spices",
+    "stock": 30,
     "rating": 4.4,
     "deliveryTime": "20 min",
-    "stock": 30,
-    "categoryId": "cat-spices",
-    "type": "kart",
-    "subcategoryId": "sub-whole-spices",
-    "weight": ""
-  },
-  {
-    "id": "kart-red-chilli",
-    "name": "Kashmiri Red Chilli",
-    "price": 55,
-    "category": "Spices",
-    "subcategory": "Whole Spices",
-    "image": "https://images.unsplash.com/photo-1588252303782-cb80119c02df?w=400",
-    "rating": 4.5,
-    "deliveryTime": "20 min",
-    "stock": 22,
-    "categoryId": "cat-spices",
-    "type": "kart",
-    "subcategoryId": "sub-whole-spices",
-    "weight": ""
-  },
-  {
-    "id": "kart-cumin",
-    "name": "Jeera (Cumin Seeds)",
-    "price": 60,
-    "category": "Spices",
-    "subcategory": "Whole Spices",
-    "image": "https://images.unsplash.com/photo-1599909818482-de811b172f29?w=400",
-    "rating": 4.3,
-    "deliveryTime": "20 min",
-    "stock": 25,
-    "categoryId": "cat-spices",
-    "type": "kart",
-    "subcategoryId": "sub-whole-spices",
-    "weight": ""
-  },
-  {
-    "id": "kart-garam-masala",
-    "name": "Garam Masala",
-    "price": 75,
-    "category": "Spices",
-    "subcategory": "Masala Blends",
-    "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400",
-    "rating": 4.7,
-    "deliveryTime": "20 min",
-    "stock": 20,
-    "categoryId": "cat-spices",
-    "type": "kart",
-    "subcategoryId": "",
-    "weight": ""
-  },
-  {
-    "id": "kart-chai-masala",
-    "name": "Chai Masala",
-    "price": 65,
-    "category": "Spices",
-    "subcategory": "Masala Blends",
-    "image": "https://images.unsplash.com/photo-1577968897966-4f64c18360b4?w=400",
-    "rating": 4.6,
-    "deliveryTime": "20 min",
-    "stock": 18,
-    "categoryId": "cat-spices",
-    "type": "kart",
-    "subcategoryId": "",
-    "weight": ""
-  },
-  {
-    "id": "waffle-classic-butter",
-    "name": "Classic Butter Waffle",
-    "price": 149,
-    "category": "Classic Waffles",
-    "subcategory": "Original",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1558584724-0e4a32be0d1b?w=400",
-    "rating": 4.7,
-    "deliveryTime": "25 min",
-    "stock": 20,
-    "categoryId": "cat-classic-waffles",
-    "type": "app",
-    "subcategoryId": "sub-original",
-    "weight": ""
-  },
-  {
-    "id": "waffle-classic-maple",
-    "name": "Maple Syrup Waffle",
-    "price": 179,
-    "category": "Classic Waffles",
-    "subcategory": "Original",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400",
-    "rating": 4.6,
-    "deliveryTime": "25 min",
-    "stock": 0,
-    "categoryId": "cat-classic-waffles",
-    "type": "app",
-    "subcategoryId": "sub-original",
-    "weight": ""
-  },
-  {
-    "id": "waffle-classic-honey",
-    "name": "Honey Glaze Waffle",
-    "price": 169,
-    "category": "Classic Waffles",
-    "subcategory": "Original",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1519676867240-f03562a2e405?w=400",
-    "rating": 4.5,
-    "deliveryTime": "25 min",
-    "stock": 0,
-    "categoryId": "cat-classic-waffles",
-    "type": "app",
-    "subcategoryId": "sub-original",
-    "weight": ""
-  },
-  {
-    "id": "waffle-classic-strawberry",
-    "name": "Strawberry Cream Waffle",
-    "price": 189,
-    "category": "Classic Waffles",
-    "subcategory": "Fruity",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1505253719856-0c99522e3add?w=400",
-    "rating": 4.8,
-    "deliveryTime": "25 min",
-    "stock": 0,
-    "categoryId": "cat-classic-waffles",
-    "type": "app",
-    "subcategoryId": "",
-    "weight": ""
-  },
-  {
-    "id": "waffle-classic-blueberry",
-    "name": "Blueberry Bliss Waffle",
-    "price": 199,
-    "category": "Classic Waffles",
-    "subcategory": "Fruity",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1509042239865-f550ceafcef4?w=400",
-    "rating": 4.6,
-    "deliveryTime": "25 min",
-    "stock": 0,
-    "categoryId": "cat-classic-waffles",
-    "type": "app",
-    "subcategoryId": "",
-    "weight": ""
-  },
-  {
-    "id": "waffle-choc-chip",
-    "name": "Chocolate Chip Waffle",
-    "price": 199,
-    "category": "Chocolate Waffles",
-    "subcategory": "Chocolate Lovers",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1579954115545-a9553f28a0e7?w=400",
-    "rating": 4.8,
-    "deliveryTime": "30 min",
-    "stock": 0,
-    "categoryId": "cat-chocolate-waffles",
-    "type": "app",
-    "subcategoryId": "sub-choc-lovers",
-    "weight": ""
-  },
-  {
-    "id": "waffle-double-choc",
-    "name": "Double Chocolate Waffle",
-    "price": 229,
-    "category": "Chocolate Waffles",
-    "subcategory": "Chocolate Lovers",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400",
-    "rating": 4.9,
-    "deliveryTime": "30 min",
-    "stock": 14,
-    "categoryId": "cat-chocolate-waffles",
-    "type": "app",
-    "subcategoryId": "sub-choc-lovers",
-    "weight": ""
-  },
-  {
-    "id": "waffle-nutella",
-    "name": "Nutella Stuffed Waffle",
-    "price": 259,
-    "category": "Chocolate Waffles",
-    "subcategory": "Signature",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1511381939415-e44015466834?w=400",
-    "rating": 4.9,
-    "deliveryTime": "30 min",
-    "stock": 12,
+    "name": "Turmeric Powder",
+    "unit": "pcs",
     "options": [
       {
-        "label": "Single",
-        "price": 259
-      },
-      {
-        "label": "Double",
-        "price": 459
+        "weight": "1pc",
+        "price": 45,
+        "stock": 20,
+        "mrp": 52
       }
     ],
-    "categoryId": "cat-chocolate-waffles",
-    "type": "app",
-    "subcategoryId": "sub-signature",
-    "weight": ""
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
   },
   {
-    "id": "waffle-brownie-crumble",
-    "name": "Brownie Crumble Waffle",
-    "price": 239,
-    "category": "Chocolate Waffles",
-    "subcategory": "Chocolate Lovers",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?w=400",
-    "rating": 4.7,
-    "deliveryTime": "30 min",
-    "stock": 16,
-    "categoryId": "cat-chocolate-waffles",
-    "type": "app",
-    "subcategoryId": "sub-choc-lovers",
-    "weight": ""
+    "type": "kart",
+    "price": 55,
+    "id": "kart-wheat-flour",
+    "subcategory": "Flour",
+    "subcategoryId": "sub-flour",
+    "weight": "1 pc",
+    "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400",
+    "category": "Grains",
+    "options": [
+      {
+        "price": 55,
+        "label": "1kg"
+      },
+      {
+        "price": 240,
+        "label": "5kg"
+      },
+      {
+        "price": 440,
+        "label": "10kg"
+      }
+    ],
+    "stock": 20,
+    "categoryId": "cat-grains",
+    "rating": 4.3,
+    "deliveryTime": "25 min",
+    "name": "Wheat Flour (Atta)",
+    "unit": "pcs",
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
   },
   {
-    "id": "waffle-white-choc",
-    "name": "White Chocolate Waffle",
+    "subcategoryId": "",
+    "type": "app",
+    "id": "otatao-1",
+    "subcategory": "Premium veggie",
+    "image": "file:///data/user/0/host.exp.exponent/cache/ImagePicker/99.jpeg",
+    "category": "Vegetables",
+    "categoryId": "",
+    "options": [
+      {
+        "weight": "250g",
+        "price": 601526,
+        "stock": 30,
+        "mrp": 691755
+      },
+      {
+        "weight": "500g",
+        "price": 1102798,
+        "stock": 25,
+        "mrp": 1268218
+      },
+      {
+        "weight": "1kg",
+        "price": 2005088,
+        "stock": 20,
+        "mrp": 2305851
+      }
+    ],
+    "brand": "kart",
+    "weight": "",
+    "price": 601526,
+    "stock": 10,
+    "rating": 0,
+    "deliveryTime": "20 min",
+    "name": "Otatao",
+    "unit": "kg",
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "kart",
+    "subcategoryId": "",
+    "id": "otatatai-1",
+    "subcategory": "Premium veggies",
+    "deliveryTime": "20 min",
+    "category": "Vegetables",
+    "options": [
+      {
+        "weight": "250g",
+        "price": 16666,
+        "stock": 30,
+        "mrp": 19166
+      },
+      {
+        "weight": "500g",
+        "price": 30555,
+        "stock": 25,
+        "mrp": 35138
+      },
+      {
+        "weight": "1kg",
+        "price": 55555,
+        "stock": 20,
+        "mrp": 63888
+      }
+    ],
+    "categoryId": "",
+    "weight": "",
+    "brand": "kart",
+    "price": 16666,
+    "stock": 10,
+    "rating": 0,
+    "image": "file:///data/user/0/host.exp.exponent/cache/ImagePicker/869e1bb5-590c-4d65-9740-a6c5f3d8fd3c.jpeg",
+    "name": "Otatatai",
+    "unit": "kg",
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "",
+    "image": "698c352c-1a8a-4213-a107-9032778267c9.jpeg",
+    "id": "tamatar-1",
+    "subcategory": "Milk",
+    "type": "kart",
+    "category": "Dairy",
+    "categoryId": "",
+    "options": [
+      {
+        "weight": "200g",
+        "price": 20,
+        "stock": 25,
+        "mrp": 23
+      },
+      {
+        "weight": "500g",
+        "price": 42,
+        "stock": 20,
+        "mrp": 48
+      },
+      {
+        "weight": "1kg",
+        "price": 75,
+        "stock": 15,
+        "mrp": 86
+      }
+    ],
+    "weight": "",
+    "brand": "kart",
+    "price": 20,
+    "stock": 10,
+    "rating": 0,
+    "deliveryTime": "20 min",
+    "name": "Tamatar",
+    "unit": "g",
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "app",
     "price": 249,
+    "id": "waffle-berry-blast",
+    "subcategory": "Seasonal",
+    "brand": "waffle",
+    "subcategoryId": "sub-seasonal",
+    "deliveryTime": "35 min",
+    "category": "Special Waffles",
+    "weight": "",
+    "categoryId": "cat-special-waffles",
+    "stock": 11,
+    "rating": 4.6,
+    "image": "https://images.unsplash.com/photo-1464305795204-6f83e4bbec86?w=400",
+    "name": "Berry Blast Waffle",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 249,
+        "stock": 15,
+        "mrp": 286
+      },
+      {
+        "weight": "2pcs",
+        "price": 448,
+        "stock": 12,
+        "mrp": 515
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "app",
+    "price": 239,
+    "id": "waffle-brownie-crumble",
+    "subcategory": "Chocolate Lovers",
+    "deliveryTime": "30 min",
+    "weight": "",
+    "subcategoryId": "sub-choc-lovers",
     "category": "Chocolate Waffles",
+    "image": "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?w=400",
+    "categoryId": "cat-chocolate-waffles",
+    "stock": 16,
+    "rating": 4.7,
+    "brand": "waffle",
+    "name": "Brownie Crumble Waffle",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 239,
+        "stock": 15,
+        "mrp": 275
+      },
+      {
+        "weight": "2pcs",
+        "price": 430,
+        "stock": 12,
+        "mrp": 494
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "kart",
+    "price": 199,
+    "id": "waffle-brownie-sundae",
+    "subcategory": "Ice Cream",
+    "weight": "",
+    "brand": "waffle",
+    "subcategoryId": "",
+    "category": "Desserts",
+    "deliveryTime": "20 min",
+    "categoryId": "",
+    "stock": 14,
+    "rating": 4.8,
+    "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400",
+    "name": "Brownie Sundae",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 199,
+        "stock": 20,
+        "mrp": 229
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "kart",
+    "price": 159,
+    "id": "waffle-bruschetta",
+    "subcategory": "Savory",
+    "weight": "",
+    "image": "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=400",
+    "subcategoryId": "sub-savory",
+    "category": "Quick Bites",
+    "brand": "waffle",
+    "categoryId": "",
+    "stock": 10,
+    "rating": 4.3,
+    "deliveryTime": "20 min",
+    "name": "Tomato Bruschetta",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 159,
+        "stock": 20,
+        "mrp": 183
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "app",
+    "price": 199,
+    "id": "waffle-choc-chip",
+    "subcategory": "Chocolate Lovers",
+    "deliveryTime": "30 min",
+    "image": "https://images.unsplash.com/photo-1579954115545-a9553f28a0e7?w=400",
+    "weight": "",
+    "category": "Chocolate Waffles",
+    "subcategoryId": "sub-choc-lovers",
+    "categoryId": "cat-chocolate-waffles",
+    "stock": 0,
+    "rating": 4.8,
+    "brand": "waffle",
+    "name": "Chocolate Chip Waffle",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 199,
+        "stock": 15,
+        "mrp": 229
+      },
+      {
+        "weight": "2pcs",
+        "price": 358,
+        "stock": 12,
+        "mrp": 412
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-cold-drinks",
+    "price": 159,
+    "id": "waffle-chocolate-shake",
+    "subcategory": "Cold Drinks",
+    "deliveryTime": "15 min",
+    "image": "https://images.unsplash.com/photo-1572490122747-3968b75cc600?w=400",
+    "type": "app",
+    "category": "Beverages",
+    "brand": "waffle",
+    "categoryId": "cat-beverages-waffle",
+    "stock": 20,
+    "rating": 4.7,
+    "weight": "",
+    "name": "Chocolate Milkshake",
+    "unit": "ml",
+    "options": [
+      {
+        "weight": "200ml",
+        "price": 159,
+        "stock": 25,
+        "mrp": 183
+      },
+      {
+        "weight": "500ml",
+        "price": 318,
+        "stock": 20,
+        "mrp": 366
+      },
+      {
+        "weight": "1L",
+        "price": 556,
+        "stock": 15,
+        "mrp": 639
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "",
+    "price": 199,
+    "id": "waffle-classic-blueberry",
+    "subcategory": "Fruity",
+    "deliveryTime": "25 min",
+    "image": "https://images.unsplash.com/photo-1509042239865-f550ceafcef4?w=400",
+    "brand": "waffle",
+    "category": "Classic Waffles",
+    "type": "app",
+    "categoryId": "cat-classic-waffles",
+    "stock": 0,
+    "rating": 4.6,
+    "weight": "",
+    "name": "Blueberry Bliss Waffle",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 199,
+        "stock": 15,
+        "mrp": 229
+      },
+      {
+        "weight": "2pcs",
+        "price": 358,
+        "stock": 12,
+        "mrp": 412
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-original",
+    "price": 149,
+    "id": "waffle-classic-butter",
+    "subcategory": "Original",
+    "image": "https://images.unsplash.com/photo-1558584724-0e4a32be0d1b?w=400",
+    "type": "app",
+    "weight": "",
+    "category": "Classic Waffles",
+    "brand": "waffle",
+    "categoryId": "cat-classic-waffles",
+    "stock": 20,
+    "rating": 4.7,
+    "deliveryTime": "25 min",
+    "name": "Classic Butter Waffle",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 149,
+        "stock": 15,
+        "mrp": 171
+      },
+      {
+        "weight": "2pcs",
+        "price": 268,
+        "stock": 12,
+        "mrp": 308
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-original",
+    "price": 169,
+    "id": "waffle-classic-honey",
+    "subcategory": "Original",
+    "weight": "",
+    "type": "app",
+    "deliveryTime": "25 min",
+    "category": "Classic Waffles",
+    "image": "https://images.unsplash.com/photo-1519676867240-f03562a2e405?w=400",
+    "categoryId": "cat-classic-waffles",
+    "stock": 0,
+    "rating": 4.5,
+    "brand": "waffle",
+    "name": "Honey Glaze Waffle",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 169,
+        "stock": 15,
+        "mrp": 194
+      },
+      {
+        "weight": "2pcs",
+        "price": 304,
+        "stock": 12,
+        "mrp": 350
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "app",
+    "price": 179,
+    "id": "waffle-classic-maple",
+    "subcategory": "Original",
+    "deliveryTime": "25 min",
+    "image": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400",
+    "subcategoryId": "sub-original",
+    "category": "Classic Waffles",
+    "brand": "waffle",
+    "categoryId": "cat-classic-waffles",
+    "stock": 0,
+    "rating": 4.6,
+    "weight": "",
+    "name": "Maple Syrup Waffle",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 179,
+        "stock": 15,
+        "mrp": 206
+      },
+      {
+        "weight": "2pcs",
+        "price": 322,
+        "stock": 12,
+        "mrp": 370
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "",
+    "price": 189,
+    "id": "waffle-classic-strawberry",
+    "subcategory": "Fruity",
+    "image": "https://images.unsplash.com/photo-1505253719856-0c99522e3add?w=400",
+    "type": "app",
+    "weight": "",
+    "category": "Classic Waffles",
+    "deliveryTime": "25 min",
+    "categoryId": "cat-classic-waffles",
+    "stock": 0,
+    "rating": 4.8,
+    "brand": "waffle",
+    "name": "Strawberry Cream Waffle",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 189,
+        "stock": 15,
+        "mrp": 217
+      },
+      {
+        "weight": "2pcs",
+        "price": 340,
+        "stock": 12,
+        "mrp": 391
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-cold-drinks",
+    "price": 129,
+    "id": "waffle-cold-coffee",
+    "subcategory": "Cold Drinks",
+    "brand": "waffle",
+    "deliveryTime": "15 min",
+    "image": "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400",
+    "category": "Beverages",
+    "type": "app",
+    "categoryId": "cat-beverages-waffle",
+    "stock": 25,
+    "rating": 4.4,
+    "weight": "",
+    "name": "Iced Cold Coffee",
+    "unit": "ml",
+    "options": [
+      {
+        "weight": "200ml",
+        "price": 129,
+        "stock": 25,
+        "mrp": 148
+      },
+      {
+        "weight": "500ml",
+        "price": 258,
+        "stock": 20,
+        "mrp": 297
+      },
+      {
+        "weight": "1L",
+        "price": 452,
+        "stock": 15,
+        "mrp": 520
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-premium",
+    "price": 229,
+    "id": "waffle-cookie-cream",
+    "subcategory": "Premium",
+    "deliveryTime": "35 min",
+    "type": "app",
+    "weight": "",
+    "category": "Special Waffles",
+    "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400",
+    "categoryId": "cat-special-waffles",
+    "stock": 14,
+    "rating": 4.7,
+    "brand": "waffle",
+    "name": "Cookies & Cream Waffle",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 229,
+        "stock": 15,
+        "mrp": 263
+      },
+      {
+        "weight": "2pcs",
+        "price": 412,
+        "stock": 12,
+        "mrp": 474
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-choc-lovers",
+    "price": 229,
+    "id": "waffle-double-choc",
+    "subcategory": "Chocolate Lovers",
+    "weight": "",
+    "deliveryTime": "30 min",
+    "type": "app",
+    "category": "Chocolate Waffles",
+    "brand": "waffle",
+    "categoryId": "cat-chocolate-waffles",
+    "stock": 14,
+    "rating": 4.9,
+    "image": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400",
+    "name": "Double Chocolate Waffle",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 229,
+        "stock": 15,
+        "mrp": 263
+      },
+      {
+        "weight": "2pcs",
+        "price": 412,
+        "stock": 12,
+        "mrp": 474
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-savory",
+    "price": 99,
+    "id": "waffle-french-fries",
+    "subcategory": "Savory",
+    "brand": "waffle",
+    "type": "kart",
+    "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400",
+    "category": "Quick Bites",
+    "weight": "",
+    "categoryId": "",
+    "stock": 25,
+    "rating": 4.3,
+    "deliveryTime": "20 min",
+    "name": "Peri Peri Fries",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 99,
+        "stock": 20,
+        "mrp": 114
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-savory",
+    "price": 149,
+    "id": "waffle-garlic-bread",
+    "subcategory": "Savory",
+    "image": "https://images.unsplash.com/photo-1573140401552-3ecc0b83a8c7?w=400",
+    "weight": "",
+    "deliveryTime": "20 min",
+    "category": "Quick Bites",
+    "type": "kart",
+    "categoryId": "",
+    "stock": 15,
+    "rating": 4.4,
+    "brand": "waffle",
+    "name": "Cheesy Garlic Bread",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 149,
+        "stock": 20,
+        "mrp": 171
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-hot-drinks",
+    "price": 89,
+    "id": "waffle-green-tea",
+    "subcategory": "Hot Drinks",
+    "type": "app",
+    "brand": "waffle",
+    "weight": "",
+    "category": "Beverages",
+    "image": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400",
+    "categoryId": "cat-beverages-waffle",
+    "stock": 20,
+    "rating": 4.2,
+    "deliveryTime": "10 min",
+    "name": "Premium Green Tea",
+    "unit": "ml",
+    "options": [
+      {
+        "weight": "200ml",
+        "price": 89,
+        "stock": 25,
+        "mrp": 102
+      },
+      {
+        "weight": "500ml",
+        "price": 178,
+        "stock": 20,
+        "mrp": 205
+      },
+      {
+        "weight": "1L",
+        "price": 312,
+        "stock": 15,
+        "mrp": 359
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "",
+    "type": "kart",
+    "id": "waffle-icecream-scoop",
+    "subcategory": "Ice Cream",
+    "deliveryTime": "15 min",
+    "category": "Desserts",
+    "options": [
+      {
+        "price": 89,
+        "label": "1 Scoop"
+      },
+      {
+        "price": 149,
+        "label": "2 Scoops"
+      },
+      {
+        "price": 199,
+        "label": "3 Scoops"
+      }
+    ],
+    "categoryId": "",
+    "weight": "",
+    "brand": "waffle",
+    "price": 89,
+    "stock": 20,
+    "rating": 4.4,
+    "image": "https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=400",
+    "name": "Vanilla Ice Cream",
+    "unit": "pcs",
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "app",
+    "price": 219,
+    "id": "waffle-mango-delight",
+    "subcategory": "Seasonal",
+    "brand": "waffle",
+    "weight": "",
+    "subcategoryId": "sub-seasonal",
+    "category": "Special Waffles",
+    "image": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400",
+    "categoryId": "cat-special-waffles",
+    "stock": 13,
+    "rating": 4.8,
+    "deliveryTime": "35 min",
+    "name": "Mango Delight Waffle",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 219,
+        "stock": 15,
+        "mrp": 252
+      },
+      {
+        "weight": "2pcs",
+        "price": 394,
+        "stock": 12,
+        "mrp": 453
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "app",
+    "price": 99,
+    "id": "waffle-mango-lassi",
+    "subcategory": "Cold Drinks",
+    "deliveryTime": "15 min",
+    "subcategoryId": "sub-cold-drinks",
+    "weight": "",
+    "category": "Beverages",
+    "image": "https://images.unsplash.com/photo-1527689638836-ee0090a5a9c3?w=400",
+    "categoryId": "cat-beverages-waffle",
+    "stock": 10,
+    "rating": 4.6,
+    "brand": "waffle",
+    "name": "Mango Lassi",
+    "unit": "ml",
+    "options": [
+      {
+        "weight": "200ml",
+        "price": 99,
+        "stock": 25,
+        "mrp": 114
+      },
+      {
+        "weight": "500ml",
+        "price": 198,
+        "stock": 20,
+        "mrp": 228
+      },
+      {
+        "weight": "1L",
+        "price": 346,
+        "stock": 15,
+        "mrp": 398
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "app",
+    "price": 69,
+    "id": "waffle-masala-chai",
+    "subcategory": "Hot Drinks",
+    "image": "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=400",
+    "subcategoryId": "sub-hot-drinks",
+    "deliveryTime": "10 min",
+    "category": "Beverages",
+    "brand": "waffle",
+    "categoryId": "cat-beverages-waffle",
+    "stock": 30,
+    "rating": 4.6,
+    "weight": "",
+    "name": "Masala Chai",
+    "unit": "ml",
+    "options": [
+      {
+        "weight": "200ml",
+        "price": 69,
+        "stock": 25,
+        "mrp": 79
+      },
+      {
+        "weight": "500ml",
+        "price": 138,
+        "stock": 20,
+        "mrp": 159
+      },
+      {
+        "weight": "1L",
+        "price": 242,
+        "stock": 15,
+        "mrp": 278
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-savory",
+    "price": 179,
+    "id": "waffle-nachos",
+    "subcategory": "Savory",
+    "image": "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=400",
+    "brand": "waffle",
+    "type": "kart",
+    "category": "Quick Bites",
+    "deliveryTime": "25 min",
+    "categoryId": "",
+    "stock": 10,
+    "rating": 4.5,
+    "weight": "",
+    "name": "Loaded Nachos",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 179,
+        "stock": 20,
+        "mrp": 206
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-signature",
+    "type": "app",
+    "id": "waffle-nutella",
+    "subcategory": "Signature",
+    "image": "https://images.unsplash.com/photo-1511381939415-e44015466834?w=400",
+    "category": "Chocolate Waffles",
+    "categoryId": "cat-chocolate-waffles",
+    "options": [
+      {
+        "price": 259,
+        "label": "Single"
+      },
+      {
+        "price": 459,
+        "label": "Double"
+      }
+    ],
+    "brand": "waffle",
+    "weight": "",
+    "price": 259,
+    "stock": 12,
+    "rating": 4.9,
+    "deliveryTime": "30 min",
+    "name": "Nutella Stuffed Waffle",
+    "unit": "pcs",
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-savory",
+    "price": 129,
+    "id": "waffle-pizza-pocket",
+    "subcategory": "Savory",
+    "type": "kart",
+    "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400",
+    "deliveryTime": "25 min",
+    "category": "Quick Bites",
+    "brand": "waffle",
+    "categoryId": "",
+    "stock": 18,
+    "rating": 4.2,
+    "weight": "",
+    "name": "Pizza Pocket",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 129,
+        "stock": 20,
+        "mrp": 148
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "app",
+    "price": 239,
+    "id": "waffle-red-velvet",
+    "subcategory": "Premium",
+    "brand": "waffle",
+    "subcategoryId": "sub-premium",
+    "weight": "",
+    "category": "Special Waffles",
+    "deliveryTime": "35 min",
+    "categoryId": "cat-special-waffles",
+    "stock": 10,
+    "rating": 4.8,
+    "image": "https://images.unsplash.com/photo-1551024601-bec56cb5a8ba?w=400",
+    "name": "Red Velvet Waffle",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 239,
+        "stock": 15,
+        "mrp": 275
+      },
+      {
+        "weight": "2pcs",
+        "price": 430,
+        "stock": 12,
+        "mrp": 494
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "subcategoryId": "sub-cold-drinks",
+    "price": 149,
+    "id": "waffle-strawberry-shake",
+    "subcategory": "Cold Drinks",
+    "weight": "",
+    "deliveryTime": "15 min",
+    "type": "app",
+    "category": "Beverages",
+    "image": "https://images.unsplash.com/photo-1553787499-6f5b4e88be48?w=400",
+    "categoryId": "cat-beverages-waffle",
+    "stock": 18,
+    "rating": 4.5,
+    "brand": "waffle",
+    "name": "Strawberry Shake",
+    "unit": "ml",
+    "options": [
+      {
+        "weight": "200ml",
+        "price": 149,
+        "stock": 25,
+        "mrp": 171
+      },
+      {
+        "weight": "500ml",
+        "price": 298,
+        "stock": 20,
+        "mrp": 343
+      },
+      {
+        "weight": "1L",
+        "price": 522,
+        "stock": 15,
+        "mrp": 600
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "app",
+    "price": 279,
+    "id": "waffle-tiramisu",
+    "subcategory": "Premium",
+    "deliveryTime": "35 min",
+    "image": "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=400",
+    "subcategoryId": "sub-premium",
+    "category": "Special Waffles",
+    "weight": "",
+    "categoryId": "cat-special-waffles",
+    "stock": 8,
+    "rating": 4.9,
+    "brand": "waffle",
+    "name": "Tiramisu Waffle",
+    "unit": "pcs",
+    "options": [
+      {
+        "weight": "1pc",
+        "price": 279,
+        "stock": 15,
+        "mrp": 321
+      },
+      {
+        "weight": "2pcs",
+        "price": 502,
+        "stock": 12,
+        "mrp": 577
+      }
+    ],
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
+  },
+  {
+    "type": "app",
+    "price": 249,
+    "id": "waffle-white-choc",
     "subcategory": "Signature",
     "brand": "waffle",
     "image": "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400",
+    "subcategoryId": "sub-signature",
+    "category": "Chocolate Waffles",
+    "weight": "",
+    "categoryId": "cat-chocolate-waffles",
+    "stock": 11,
     "rating": 4.7,
     "deliveryTime": "30 min",
-    "stock": 11,
-    "categoryId": "cat-chocolate-waffles",
-    "type": "app",
-    "subcategoryId": "sub-signature",
-    "weight": ""
-  },
-  {
-    "id": "waffle-red-velvet",
-    "name": "Red Velvet Waffle",
-    "price": 239,
-    "category": "Special Waffles",
-    "subcategory": "Premium",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1551024601-bec56cb5a8ba?w=400",
-    "rating": 4.8,
-    "deliveryTime": "35 min",
-    "stock": 10,
-    "categoryId": "cat-special-waffles",
-    "type": "app",
-    "subcategoryId": "sub-premium",
-    "weight": ""
-  },
-  {
-    "id": "waffle-mango-delight",
-    "name": "Mango Delight Waffle",
-    "price": 219,
-    "category": "Special Waffles",
-    "subcategory": "Seasonal",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400",
-    "rating": 4.8,
-    "deliveryTime": "35 min",
-    "stock": 13,
-    "categoryId": "cat-special-waffles",
-    "type": "app",
-    "subcategoryId": "sub-seasonal",
-    "weight": ""
-  },
-  {
-    "id": "waffle-berry-blast",
-    "name": "Berry Blast Waffle",
-    "price": 249,
-    "category": "Special Waffles",
-    "subcategory": "Seasonal",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1464305795204-6f83e4bbec86?w=400",
-    "rating": 4.6,
-    "deliveryTime": "35 min",
-    "stock": 11,
-    "categoryId": "cat-special-waffles",
-    "type": "app",
-    "subcategoryId": "sub-seasonal",
-    "weight": ""
-  },
-  {
-    "id": "waffle-tiramisu",
-    "name": "Tiramisu Waffle",
-    "price": 279,
-    "category": "Special Waffles",
-    "subcategory": "Premium",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=400",
-    "rating": 4.9,
-    "deliveryTime": "35 min",
-    "stock": 8,
-    "categoryId": "cat-special-waffles",
-    "type": "app",
-    "subcategoryId": "sub-premium",
-    "weight": ""
-  },
-  {
-    "id": "waffle-cookie-cream",
-    "name": "Cookies & Cream Waffle",
-    "price": 229,
-    "category": "Special Waffles",
-    "subcategory": "Premium",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400",
-    "rating": 4.7,
-    "deliveryTime": "35 min",
-    "stock": 14,
-    "categoryId": "cat-special-waffles",
-    "type": "app",
-    "subcategoryId": "sub-premium",
-    "weight": ""
-  },
-  {
-    "id": "waffle-cold-coffee",
-    "name": "Iced Cold Coffee",
-    "price": 129,
-    "category": "Beverages",
-    "subcategory": "Cold Drinks",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400",
-    "rating": 4.4,
-    "deliveryTime": "15 min",
-    "stock": 25,
-    "categoryId": "cat-beverages-waffle",
-    "type": "app",
-    "subcategoryId": "sub-cold-drinks",
-    "weight": ""
-  },
-  {
-    "id": "waffle-chocolate-shake",
-    "name": "Chocolate Milkshake",
-    "price": 159,
-    "category": "Beverages",
-    "subcategory": "Cold Drinks",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1572490122747-3968b75cc600?w=400",
-    "rating": 4.7,
-    "deliveryTime": "15 min",
-    "stock": 20,
-    "categoryId": "cat-beverages-waffle",
-    "type": "app",
-    "subcategoryId": "sub-cold-drinks",
-    "weight": ""
-  },
-  {
-    "id": "waffle-strawberry-shake",
-    "name": "Strawberry Shake",
-    "price": 149,
-    "category": "Beverages",
-    "subcategory": "Cold Drinks",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1553787499-6f5b4e88be48?w=400",
-    "rating": 4.5,
-    "deliveryTime": "15 min",
-    "stock": 18,
-    "categoryId": "cat-beverages-waffle",
-    "type": "app",
-    "subcategoryId": "sub-cold-drinks",
-    "weight": ""
-  },
-  {
-    "id": "waffle-mango-lassi",
-    "name": "Mango Lassi",
-    "price": 99,
-    "category": "Beverages",
-    "subcategory": "Cold Drinks",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1527689638836-ee0090a5a9c3?w=400",
-    "rating": 4.6,
-    "deliveryTime": "15 min",
-    "stock": 10,
-    "categoryId": "cat-beverages-waffle",
-    "type": "app",
-    "subcategoryId": "sub-cold-drinks",
-    "weight": ""
-  },
-  {
-    "id": "waffle-masala-chai",
-    "name": "Masala Chai",
-    "price": 69,
-    "category": "Beverages",
-    "subcategory": "Hot Drinks",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=400",
-    "rating": 4.6,
-    "deliveryTime": "10 min",
-    "stock": 30,
-    "categoryId": "cat-beverages-waffle",
-    "type": "app",
-    "subcategoryId": "sub-hot-drinks",
-    "weight": ""
-  },
-  {
-    "id": "waffle-green-tea",
-    "name": "Premium Green Tea",
-    "price": 89,
-    "category": "Beverages",
-    "subcategory": "Hot Drinks",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400",
-    "rating": 4.2,
-    "deliveryTime": "10 min",
-    "stock": 20,
-    "categoryId": "cat-beverages-waffle",
-    "type": "app",
-    "subcategoryId": "sub-hot-drinks",
-    "weight": ""
-  },
-  {
-    "id": "waffle-garlic-bread",
-    "name": "Cheesy Garlic Bread",
-    "price": 149,
-    "category": "Quick Bites",
-    "subcategory": "Savory",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1573140401552-3ecc0b83a8c7?w=400",
-    "rating": 4.4,
-    "deliveryTime": "20 min",
-    "stock": 15,
-    "categoryId": "",
-    "type": "kart",
-    "subcategoryId": "sub-savory",
-    "weight": ""
-  },
-  {
-    "id": "waffle-french-fries",
-    "name": "Peri Peri Fries",
-    "price": 99,
-    "category": "Quick Bites",
-    "subcategory": "Savory",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400",
-    "rating": 4.3,
-    "deliveryTime": "20 min",
-    "stock": 25,
-    "categoryId": "",
-    "type": "kart",
-    "subcategoryId": "sub-savory",
-    "weight": ""
-  },
-  {
-    "id": "waffle-nachos",
-    "name": "Loaded Nachos",
-    "price": 179,
-    "category": "Quick Bites",
-    "subcategory": "Savory",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=400",
-    "rating": 4.5,
-    "deliveryTime": "25 min",
-    "stock": 10,
-    "categoryId": "",
-    "type": "kart",
-    "subcategoryId": "sub-savory",
-    "weight": ""
-  },
-  {
-    "id": "waffle-pizza-pocket",
-    "name": "Pizza Pocket",
-    "price": 129,
-    "category": "Quick Bites",
-    "subcategory": "Savory",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400",
-    "rating": 4.2,
-    "deliveryTime": "25 min",
-    "stock": 18,
-    "categoryId": "",
-    "type": "kart",
-    "subcategoryId": "sub-savory",
-    "weight": ""
-  },
-  {
-    "id": "waffle-bruschetta",
-    "name": "Tomato Bruschetta",
-    "price": 159,
-    "category": "Quick Bites",
-    "subcategory": "Savory",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=400",
-    "rating": 4.3,
-    "deliveryTime": "20 min",
-    "stock": 10,
-    "categoryId": "",
-    "type": "kart",
-    "subcategoryId": "sub-savory",
-    "weight": ""
-  },
-  {
-    "id": "waffle-brownie-sundae",
-    "name": "Brownie Sundae",
-    "price": 199,
-    "category": "Desserts",
-    "subcategory": "Ice Cream",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400",
-    "rating": 4.8,
-    "deliveryTime": "20 min",
-    "stock": 14,
-    "categoryId": "",
-    "type": "kart",
-    "subcategoryId": "",
-    "weight": ""
-  },
-  {
-    "id": "waffle-icecream-scoop",
-    "name": "Vanilla Ice Cream",
-    "price": 89,
-    "category": "Desserts",
-    "subcategory": "Ice Cream",
-    "brand": "waffle",
-    "image": "https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=400",
-    "rating": 4.4,
-    "deliveryTime": "15 min",
-    "stock": 20,
+    "name": "White Chocolate Waffle",
+    "unit": "pcs",
     "options": [
       {
-        "label": "1 Scoop",
-        "price": 89
+        "weight": "1pc",
+        "price": 249,
+        "stock": 15,
+        "mrp": 286
       },
       {
-        "label": "2 Scoops",
-        "price": 149
-      },
-      {
-        "label": "3 Scoops",
-        "price": 199
+        "weight": "2pcs",
+        "price": 448,
+        "stock": 12,
+        "mrp": 515
       }
     ],
-    "categoryId": "",
-    "type": "kart",
-    "subcategoryId": "",
-    "weight": ""
-  },
-  {
-    "name": "Otatao",
-    "price": 2005088.0,
-    "category": "Vegetables",
-    "categoryId": "",
-    "subcategory": "Premium veggie",
-    "subcategoryId": "",
-    "type": "app",
-    "brand": "kart",
-    "image": "file:///data/user/0/host.exp.exponent/cache/ImagePicker/99.jpeg",
-    "rating": 0,
-    "deliveryTime": "20 min",
-    "stock": 10,
-    "weight": "",
-    "options": null,
-    "id": "otatao-1"
-  },
-  {
-    "name": "Otatatai",
-    "price": 55555.0,
-    "category": "Vegetables",
-    "categoryId": "",
-    "subcategory": "Premium veggies",
-    "subcategoryId": "",
-    "type": "kart",
-    "brand": "kart",
-    "image": "file:///data/user/0/host.exp.exponent/cache/ImagePicker/869e1bb5-590c-4d65-9740-a6c5f3d8fd3c.jpeg",
-    "rating": 0,
-    "deliveryTime": "20 min",
-    "stock": 10,
-    "weight": "",
-    "options": null,
-    "id": "otatatai-1"
-  },
-  {
-    "name": "Tamatar",
-    "price": 50.0,
-    "category": "Dairy",
-    "categoryId": "",
-    "subcategory": "Milk",
-    "subcategoryId": "",
-    "type": "kart",
-    "brand": "kart",
-    "image": "698c352c-1a8a-4213-a107-9032778267c9.jpeg",
-    "rating": 0,
-    "deliveryTime": "20 min",
-    "stock": 10,
-    "weight": "",
-    "options": null,
-    "id": "tamatar-1"
+    "maxQuantity": 10,
+    "isAvailable": true,
+    "showVariants": true,
+    "updatedAt": "2026-05-27T20:29:26.213036+00:00"
   }
 ]

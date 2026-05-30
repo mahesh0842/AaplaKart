@@ -83,14 +83,14 @@ export const geocodeAddress = async (addressString) => {
 
 export const getCurrentLocation = async () => {
   try {
-    const { status } = await Location.getForegroundPermissionsAsync();
-
-    if (status !== 'granted') {
-      return { success: false, error: 'Location permission not granted.' };
+    // Request permission first if not already granted
+    const permResult = await requestLocationPermission();
+    if (!permResult.granted) {
+      return { success: false, error: permResult.message || 'Location permission not granted.' };
     }
 
     const location = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
+      accuracy: Location.Accuracy.High,
     });
 
     return {

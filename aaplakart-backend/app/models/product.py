@@ -8,8 +8,11 @@ from pydantic import BaseModel, Field
 
 
 class ProductOption(BaseModel):
-    label: str
+    label: Optional[str] = None
+    weight: Optional[str] = None
     price: float
+    stock: Optional[int] = None
+    mrp: Optional[float] = None
 
 
 class ProductSchema(BaseModel):
@@ -20,14 +23,19 @@ class ProductSchema(BaseModel):
     categoryId: Optional[str] = ""
     subcategory: Optional[str] = ""
     subcategoryId: Optional[str] = ""
-    type: Optional[str] = "kart"  # "kart" | "app"
+    type: Optional[str] = "kart"
     brand: Optional[str] = "kart"
     image: Optional[str] = ""
     rating: Optional[float] = 0
     deliveryTime: Optional[str] = "20 min"
     stock: Optional[int] = 0
     weight: Optional[str] = ""
+    unit: Optional[str] = ""
     options: Optional[list[ProductOption]] = None
+    showVariants: Optional[bool] = False
+    maxQuantity: Optional[int] = 10
+    isAvailable: Optional[bool] = True
+    description: Optional[str] = ""
 
 
 class CreateProductRequest(BaseModel):

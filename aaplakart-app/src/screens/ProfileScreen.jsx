@@ -1,8 +1,8 @@
 // Screen: Profile — user info, menu, logout. Reuses MenuItem component.
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Container from '../components/common/Container';
 import MenuItem from '../components/common/MenuItem';
@@ -24,13 +24,21 @@ const ProfileScreen = ({
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const resolvedUserName = userName.trim() || 'AaplaKart User';
+  const isAuthenticatedRef = useRef(isAuthenticated);
+  isAuthenticatedRef.current = isAuthenticated;
 
-  useFocusEffect(
-    useCallback(() => {
+  // Auto-show login EVERY time Profile tab gains focus (not memoized)
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
       setSubScreen(null);
-    }, [])
-  );
+      if (!isAuthenticatedRef.current) {
+        onShowLogin?.();
+      }
+    });
+    return unsubscribe;
+  }, [navigation, onShowLogin]);
 
+  // Reset sub-screen on tab press
   useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
       setSubScreen(null);
@@ -132,25 +140,7 @@ const ProfileScreen = ({
               />
             </View>
           </>
-        ) : (
-          /* ── Logged Out: Login Prompt ───────────────────────────── */
-          <View style={styles.loginPromptCard}>
-            <View style={styles.loginAvatar}>
-              <Ionicons name="person-outline" size={40} color={COLORS.primary} />
-            </View>
-            <Text style={styles.loginTitle}>Sign in to your account</Text>
-            <Text style={styles.loginSubtitle}>
-              Log in to view orders, save addresses, and manage your profile.
-            </Text>
-            <Pressable
-              onPress={onShowLogin}
-              style={({ pressed }) => [styles.loginBtn, pressed && styles.loginBtnPressed]}
-            >
-              <Ionicons name="log-in-outline" size={20} color="#fff" />
-              <Text style={styles.loginBtnText}>Login / Sign Up</Text>
-            </Pressable>
-          </View>
-        )}
+        ) : null}
 
         <Text style={styles.footer}>AaplaKart v1.0.0</Text>
       </ScrollView>
@@ -182,24 +172,6 @@ const styles = StyleSheet.create({
     ...getShadowStyle(COLORS.shadow),
   },
   menuDivider: { height: 1, backgroundColor: '#fde6cf', marginHorizontal: 14 },
-  loginPromptCard: {
-    backgroundColor: COLORS.card, borderRadius: 28, padding: 40,
-    borderWidth: 1, borderColor: '#fde6cf', alignItems: 'center', marginBottom: 20, marginTop: 40,
-    ...getShadowStyle(COLORS.shadow),
-  },
-  loginAvatar: {
-    width: 80, height: 80, borderRadius: 24, backgroundColor: '#fff7ed',
-    alignItems: 'center', justifyContent: 'center', marginBottom: 16,
-  },
-  loginTitle: { fontSize: 22, fontWeight: '800', color: COLORS.text, textAlign: 'center' },
-  loginSubtitle: { marginTop: 8, fontSize: 14, color: COLORS.mutedText, textAlign: 'center', lineHeight: 20 },
-  loginBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    backgroundColor: COLORS.primary, borderRadius: 18, paddingVertical: 14, paddingHorizontal: 32,
-    marginTop: 24, width: '100%',
-  },
-  loginBtnPressed: { opacity: 0.8 },
-  loginBtnText: { fontSize: 16, fontWeight: '700', color: '#fff' },
   footer: { textAlign: 'center', fontSize: 12, color: COLORS.mutedText, marginTop: 4 },
 });
 

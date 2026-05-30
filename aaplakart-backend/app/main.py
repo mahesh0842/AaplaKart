@@ -23,6 +23,7 @@ from app.routes.shops import router as shops_router
 from app.routes.shops_public import router as shops_public_router
 from app.routes.delivery import router as delivery_router
 from app.routes.config import router as config_router
+from app.routes.admin_catalog import router as admin_catalog_router
 from app.services.websocket_manager import manager
 
 
@@ -81,19 +82,20 @@ app.include_router(shops_router, prefix="/api")
 app.include_router(shops_public_router, prefix="/api")
 app.include_router(delivery_router, prefix="/api")
 app.include_router(config_router, prefix="/api")
+app.include_router(admin_catalog_router, prefix="/api")
 
-# ── WebSocket endpoint for real-time order updates ──────────────
+# ── WebSocket endpoints for real-time order updates ─────────────
 from fastapi import WebSocket, WebSocketDisconnect
 
 
 @app.websocket("/ws/orders")
 async def websocket_orders(websocket: WebSocket):
+    """Global WebSocket — broadcasts ALL order updates.
+    Used by admin panel & delivery app."""
     await manager.connect(websocket)
     try:
         while True:
-            # Keep connection alive — wait for client pings
             data = await websocket.receive_text()
-            # Client can send: {"type": "ping"} — respond with pong
             try:
                 msg = json.loads(data)
                 if msg.get("type") == "ping":
@@ -104,6 +106,28 @@ async def websocket_orders(websocket: WebSocket):
         manager.disconnect(websocket)
     except Exception:
         manager.disconnect(websocket)
+
+
+@app.websocket("/ws/orders/{user_uid}")
+async def websocket_user_orders(websocket: WebSocket, user_uid: str):
+    """User-specific WebSocket — only sends updates for this user's orders.
+    Used by the customer app so each customer only gets relevant updates."""
+    from app.services.user_websocket_manager import user_manager as usr_mgr
+
+    await usr_mgr.connect(websocket, user_uid)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            try:
+                msg = json.loads(data)
+                if msg.get("type") == "ping":
+                    await websocket.send_text(json.dumps({"type": "pong"}))
+            except json.JSONDecodeError:
+                pass
+    except WebSocketDisconnect:
+        usr_mgr.disconnect(websocket)
+    except Exception:
+        usr_mgr.disconnect(websocket)
 
 
 @app.get("/health", tags=["System"])

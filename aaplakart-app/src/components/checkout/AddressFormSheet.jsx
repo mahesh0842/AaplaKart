@@ -8,10 +8,62 @@ import BottomSheet from '../common/BottomSheet';
 import LocationMap from '../common/LocationMap';
 import AutoLocationPicker from '../location/AutoLocationPicker';
 import { COLORS } from '../../utils/constants';
+import { MOCK_AUTH_STORAGE_KEY } from '../../utils/constants';
 import { useAddressStore } from '../../store/addressStore';
+import { useUserNameStore } from '../../store/userNameStore';
 import { geocodeAddress } from '../../services/locationService';
+import { updateMyProfile } from '../../services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LABEL_OPTIONS = ['Home', 'Office', 'Other'];
+
+// ── Helper: Save user's real name ONLY first time (when still default) ──
+// Once user has a real name, address saves will NOT overwrite it.
+// User must manually update name from Profile to change it.
+async function _saveUserNameToProfile(fullName) {
+  const name = (fullName || '').trim();
+  if (!name || name === 'AaplaKart User' || name.length < 2) return;
+
+  // ── Only update if current name is still the default ──
+  const currentStoreName = useUserNameStore.getState().displayName;
+  if (currentStoreName && currentStoreName !== 'AaplaKart User') {
+    return; // User already has a real name — don't overwrite
+  }
+
+  // Also check persisted session (covers case where store not yet synced)
+  try {
+    const raw = await AsyncStorage.getItem(MOCK_AUTH_STORAGE_KEY);
+    if (raw) {
+      const session = JSON.parse(raw);
+      const sessionName = session?.displayName?.trim();
+      if (sessionName && sessionName !== 'AaplaKart User') {
+        // Sync store just in case, then abort
+        useUserNameStore.getState().setDisplayName(sessionName);
+        return;
+      }
+    }
+  } catch {}
+
+  try {
+    // 1. Update backend (non-blocking)
+    updateMyProfile({ display_name: name }).catch(() => {});
+  } catch {}
+
+  try {
+    // 2. Update persisted session so name survives logout/login
+    const raw = await AsyncStorage.getItem(MOCK_AUTH_STORAGE_KEY);
+    if (raw) {
+      const session = JSON.parse(raw);
+      if (session) {
+        session.displayName = name;
+        await AsyncStorage.setItem(MOCK_AUTH_STORAGE_KEY, JSON.stringify(session));
+      }
+    }
+  } catch {}
+
+  // 3. Update global Zustand store → Profile tab reflects IMMEDIATELY
+  useUserNameStore.getState().setDisplayName(name);
+}
 
 const AddressFormSheet = ({ visible, onClose, onAddressSelected, phoneNumber = '', editingAddress = null }) => {
   const addresses = useAddressStore((state) => state.addresses);
@@ -106,6 +158,18 @@ const AddressFormSheet = ({ visible, onClose, onAddressSelected, phoneNumber = '
         setGeoError(null);
       } else {
         setGeoError(result.error);
+        // Geocode fail — warn user before saving without coordinates
+        const proceed = await new Promise((resolve) => {
+          Alert.alert(
+            'Location Not Found',
+            'We could not pinpoint your address on the map. Delivery partner may not find your exact location. Use "Auto-detect Location" for accurate delivery.\n\nSave address anyway?',
+            [
+              { text: 'Cancel', onPress: () => resolve(false), style: 'cancel' },
+              { text: 'Save Anyway', onPress: () => resolve(true) },
+            ]
+          );
+        });
+        if (!proceed) { setIsGeocoding(false); return; }
         lat = null;
         lng = null;
       }
@@ -127,6 +191,9 @@ const AddressFormSheet = ({ visible, onClose, onAddressSelected, phoneNumber = '
       const allAddresses = useAddressStore.getState().addresses;
       onAddressSelected(allAddresses[allAddresses.length - 1]);
     }
+
+    // ── Save user's real name immediately (from address fullName) ──
+    _saveUserNameToProfile(fullName);
 
     setMode('select');
     onClose();

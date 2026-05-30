@@ -72,6 +72,8 @@ def init_firebase() -> None:
         return
 
     try:
+        import os
+        os.environ["GOOGLE_CLOUD_PROJECT"] = settings.firebase_project_id
         cred = credentials.Certificate(cred_dict)
         _app = firebase_admin.initialize_app(cred)
         _firestore_client = firestore.client()

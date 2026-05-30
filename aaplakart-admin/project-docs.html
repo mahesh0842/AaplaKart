@@ -51,7 +51,7 @@ tr:hover { background: #f9fafb; }
 
 <div class="header">
   <h1>📦 AaplaKart — Complete Project Documentation</h1>
-  <p>4 Components • 60+ API Endpoints • WebSocket • React Native • FastAPI</p>
+  <p>4 Components • 60+ API Endpoints • WebSocket • React Native • FastAPI &nbsp;|&nbsp; <strong>Updated: May 29, 2026</strong></p>
 </div>
 
 <!-- Stats -->
@@ -301,12 +301,14 @@ tr:hover { background: #f9fafb; }
   </table>
 
   <h3>📁 Key Files</h3>
-  <div class="code">src/store/authStore.js      — Auth with persist (skipHydration)<br>src/store/deliveryStore.js  — Orders, shop location, status update<br>src/services/api.js          — HTTP client<br>src/services/realtime.js     — 5s polling engine (NOT WebSocket!)<br>src/components/DeliveryMap.jsx — MapMyIndia map + route<br>src/components/NavigationOverlay.jsx — In-app nav (Mappls SDK)</div>
+  <div class="code">src/store/authStore.js      — Auth with persist (skipHydration)<br>src/store/deliveryStore.js  — Orders, shop location, status update (backend-first, demo fallback)<br>src/services/api.js          — HTTP client (dynamic API_BASE via expo-constants)<br>src/services/realtime.js     — 5s polling engine<br>src/components/DeliveryMap.jsx — Google Maps + route polyline + directions<br>src/components/OrderCard.jsx   — Order preview with accept/reject buttons</div>
+
+  <div class="note">✅ <strong>Updated May 29:</strong> Migrated from MapMyIndia/Mappls to Google Maps. NavigationOverlay.jsx deleted. Google Maps API key stored in .env as EXPO_PUBLIC_GOOGLE_MAPS_API_KEY. Dynamic API base URL via Constants.expoConfig.hostUri.</div>
 
   <h3>📱 Screens</h3>
-  <div class="code">LoginScreen — Phone + OTP (123456)<br>DashboardScreen — Stats (active/delivered) + orders list<br>OrderDetailScreen — Map + items + status buttons<br>AssignedOrdersScreen — All orders list</div>
+  <div class="code">LoginScreen — Phone + OTP (123456) → delivery-dev-* token<br>DashboardScreen — Stats (active/delivered) + orders list (5s polling)<br>OrderDetailScreen — Google Map + items + status buttons (coords required; shows fallback card if missing)<br>AssignedOrdersScreen — All orders list (5s polling)</div>
 
-  <div class="note">⚠️ Delivery app uses <b>5s polling (NOT WebSocket)</b>. Backend's WebSocket (/ws/orders) is unused by delivery app.</div>
+  <div class="note">⚠️ Delivery app uses <b>5s polling + backend-first data fetching</b>. Backend's WebSocket (/ws/orders) is available but unused by delivery app. Falls back to DEMO_ORDERS only if backend is unreachable.</div>
 </div>
 </div>
 
@@ -345,7 +347,7 @@ tr:hover { background: #f9fafb; }
   </table>
 
   <h3>📁 Files</h3>
-  <div class="code">index.html — Full SPA (~1500 lines, all UI + logic)<br>api.js — HTTP client with auto-detected base URL<br>styles.css — All styles</div>
+  <div class="code">index.html — Full SPA (~1500 lines, all UI + logic)<br>api.js — HTTP client with auto-detected base URL + Firestore CRUD helpers<br>admin.js — Tab rendering + XSS protection (escapeHtml sanitizer)<br>styles.css — All styles (responsive improvements pending)</div>
 
   <h3>📋 Admin Tabs</h3>
   <div class="code">📊 Dashboard — Stats + system health<br>📦 Products — CRUD, search, filter, stock toggle<br>📋 Orders — Status filter, pagination, status update<br>🏷️ Categories — Section/category CRUD<br>🎯 Promos — CRUD + toggle active<br>🏪 Shops — Shop CRUD with location<br>🔬 System Health — DB, Firebase, Redis checks<br>⚙️ Config — App configuration<br>👥 Users — User list</div>
@@ -383,16 +385,16 @@ tr:hover { background: #f9fafb; }
   <h2>🏗️ Complete Architecture</h2>
 
   <h3>📱 Main App (Customer)</h3>
-  <div class="code">Expo SDK 54 • React 19.1 • React Navigation 7 (Bottom Tabs)<br>Zustand 5.0.13 • AsyncStorage • Firebase JS SDK<br>react-native-maps • Razorpay (WebView)<br><br>9 Screens: Home → Categories → Waffle → Cart → Profile<br>                    → Checkout → Orders → Address → Info<br><br>Order polling: 30s interval on OrdersScreen</div>
+  <div class="code">Expo SDK 54 • React 19.1 • React Navigation 7 (Bottom Tabs)<br>Zustand 5.0.13 • AsyncStorage • Firebase JS SDK<br>react-native-maps • Razorpay (WebView)<br><br>9 Screens: Home → Categories → Waffle → Cart → Profile<br>                    → Checkout → Orders → Address → Info<br><br>Order polling: 30s interval on OrdersScreen<br>✅ Zustand 5.0.13 (fixed React 19 useSyncExternalStore infinite loop)</div>
 
   <h3>🚚 Delivery App (Partner)</h3>
-  <div class="code">Expo SDK 54 • React 19.1 • React Navigation 7 (Native Stack)<br>Zustand 5.0.12 • AsyncStorage<br>react-native-maps + MapMyIndia (Mappls SDK)<br><br>4 Screens: Login → Dashboard → OrderDetail → AssignedOrders<br><br>Order polling: 5s interval (no WebSocket!)<br>MapMyIndia: In-app navigation with Mappls Direction Widget</div>
+  <div class="code">Expo SDK 54 • React 19.1 • React Navigation 7 (Native Stack)<br>Zustand 5.0.12 • AsyncStorage<br>react-native-maps (Google Maps)<br><br>4 Screens: Login → Dashboard → OrderDetail → AssignedOrders<br><br>Order polling: 5s interval (backend-first, demo fallback)<br>Maps: Google Maps with Directions API (migrated from MapMyIndia May 27)<br>✅ Backend token handling fixed (delivery-dev-* tokens in auth_middleware)<br>✅ Dynamic API_BASE via expo-constants (no hardcoded localhost)</div>
 
   <h3>🗄️ Backend (FastAPI)</h3>
   <div class="code">FastAPI • SQLite (dev) / PostgreSQL (prod)<br>SQLAlchemy async • Firebase Admin SDK<br>Razorpay API • Redis (optional)<br>WebSocket (ws/orders) • loguru logging<br><br>11 Route Modules: auth, orders, products, categories,<br>addresses, payments, admin, delivery, shops,<br>shops_public, config<br><br>Data Sources: SQLite DB + JSON files (products/categories/promos)</div>
 
   <h3>🖥️ Admin Panel (Web)</h3>
-  <div class="code">Vanilla HTML/CSS/JS (single-page app)<br>Python HTTP server (port 3000)<br><br>9 Tabs: Dashboard, Products, Orders, Categories,<br>            Promos, Shops, Health, Config, Users<br><br>WebSocket connected (real-time updates)<br>30s polling fallback if WS fails</div>
+  <div class="code">Vanilla HTML/CSS/JS (single-page app)<br>Python HTTP server (port 3000)<br><br>10 Tabs: Dashboard, Products, Orders, Categories,<br>            Promos, Shops, Health, API Perf, Config, Users<br><br>WebSocket connected (real-time updates)<br>30s polling fallback if WS fails<br>✅ XSS protection: escapeHtml() sanitizer on user data</div>
 
   <h3>🔗 Service Links</h3>
   <table>

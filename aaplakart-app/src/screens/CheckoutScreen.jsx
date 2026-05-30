@@ -1,12 +1,10 @@
 // GUI category: Screen. Full checkout flow — address, delivery time, payment, and confirmation.
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
 import Container from '../components/common/Container';
 import AddressFormSheet from '../components/checkout/AddressFormSheet';
-import DeliveryTimePicker from '../components/checkout/DeliveryTimePicker';
 import PaymentMethodSelector from '../components/checkout/PaymentMethodSelector';
 import OrderConfirmation from '../components/checkout/OrderConfirmation';
 import RazorpayCheckout from '../components/checkout/RazorpayCheckout';
@@ -35,12 +33,12 @@ const INITIAL_ADDRESS = {
   pincode: '',
 };
 
-const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuthenticated = false }) => {
+const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuthenticated = false, onUpdateUserName }) => {
   const insets = useSafeAreaInsets();
   const [flowStep, setFlowStep] = useState('address');
   const [address, setAddress] = useState(INITIAL_ADDRESS);
   const [deliverySlot, setDeliverySlot] = useState('asap');
-  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [paymentMethod, setPaymentMethod] = useState('upi');
   const [placing, setPlacing] = useState(false);
   const [lastOrder, setLastOrder] = useState(null);
   const [coordinates, setCoordinates] = useState({ latitude: null, longitude: null });
@@ -57,6 +55,18 @@ const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuth
   const clearCart = useCartStore((state) => state.clearCart);
   const placeOrder = useOrdersStore((state) => state.placeOrder);
   const addresses = useAddressStore((state) => state.addresses);
+
+  const isAuthenticatedRef = useRef(isAuthenticated);
+  isAuthenticatedRef.current = isAuthenticated;
+  const onShowLoginRef = useRef(onShowLogin);
+  onShowLoginRef.current = onShowLogin;
+
+  // Require login upfront — don't let unauthenticated users fill checkout
+  useEffect(() => {
+    if (!isAuthenticatedRef.current) {
+      onShowLoginRef.current?.();
+    }
+  }, []);
 
   // Auto-select first saved address on mount
   useEffect(() => {
@@ -132,10 +142,6 @@ const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuth
       Alert.alert('Incomplete Address', 'Please fill in all address fields including a valid 6-digit pincode.');
       return;
     }
-    setFlowStep('time');
-  };
-
-  const handleTimeNext = () => {
     setFlowStep('payment');
   };
 
@@ -153,8 +159,8 @@ const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuth
       return;
     }
 
-    // ── Online Payment (Razorpay WebView — Expo Go compatible) ──
-    if (paymentMethod === 'online') {
+    // ── UPI Payment (Razorpay WebView — Expo Go compatible) ──
+    if (paymentMethod === 'upi') {
       setRzpProcessing(true);
       try {
         const rzpOrder = await createRzOrder(toPaise(total), `receipt_${Date.now()}`);
@@ -178,16 +184,27 @@ const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuth
         setRzpProcessing(false);
         const msg = (err?.message || '').toLowerCase();
         if (msg.includes('timeout') || msg.includes('network') || msg.includes('abort')) {
-          Alert.alert('Connection Issue', 'Unable to connect to payment gateway. Please check your internet and try again.',
-            [{ text: 'Try Again', onPress: () => handlePlaceOrder() }, { text: 'Cancel' }]);
+          Alert.alert(
+            'Connection Issue',
+            'Unable to connect to payment gateway. Check your internet and try again.',
+            [
+              { text: 'Try Again', onPress: () => handlePlaceOrder() },
+              { text: 'Pay with COD', onPress: () => { setPaymentMethod('cod'); handlePlaceOrder(); } },
+              { text: 'Cancel', style: 'cancel' },
+            ],
+          );
         } else {
-          Alert.alert('Payment Error', err?.message || 'Could not initiate payment.');
+          Alert.alert(
+            'Payment Error',
+            err?.message || 'Could not initiate payment.',
+            [{ text: 'Try Again', onPress: () => handlePlaceOrder() }, { text: 'Cancel', style: 'cancel' }],
+          );
         }
         return;
       }
     }
 
-    // ── COD / UPI — direct order placement ──
+    // ── COD placement (UPI handled above via WebView) ──
     await _finalizeOrder();
   };
 
@@ -196,7 +213,7 @@ const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuth
     setFlowStep('address');
     setAddress(INITIAL_ADDRESS);
     setDeliverySlot('asap');
-    setPaymentMethod('cod');
+    setPaymentMethod('upi');
     setCoordinates({ latitude: null, longitude: null });
     setSelectedAddressId(null);
     onClose();
@@ -213,26 +230,42 @@ const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuth
         razorpay_signature: paymentData.razorpay_signature,
       });
       if (!verification.verified) {
-        Alert.alert('Payment Failed', 'Verification failed.');
+        Alert.alert(
+          'Payment Verification Failed',
+          'The payment could not be verified. Please try again.',
+          [{ text: 'Retry', onPress: () => handlePlaceOrder() }, { text: 'Cancel', style: 'cancel' }],
+        );
         setRzpProcessing(false);
         return;
       }
       await _finalizeOrder(paymentData);
     } catch (err) {
       setRzpProcessing(false);
-      Alert.alert('Verification Error', err?.message || 'Could not verify payment.');
+      Alert.alert(
+        'Verification Error',
+        'Could not verify your payment. Please try again.',
+        [{ text: 'Retry', onPress: () => handlePlaceOrder() }, { text: 'Cancel', style: 'cancel' }],
+      );
     }
   };
 
   const handleRazorpayFailure = (error) => {
     setRzpVisible(false);
-    Alert.alert('Payment Failed', error?.description || error?.reason || 'Payment not completed.');
+    Alert.alert(
+      'Payment Failed',
+      error?.description || error?.reason || 'Payment was not completed.',
+      [
+        { text: 'Try Again', onPress: () => handlePlaceOrder() },
+        { text: 'Pay with COD', onPress: () => { setPaymentMethod('cod'); handlePlaceOrder(); } },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+    );
   };
 
   const handleRazorpayClose = () => {
+    // Silent close — user intentionally dismissed, no alert needed
     if (rzpProcessing) return;
     setRzpVisible(false);
-    Alert.alert('Payment Cancelled', 'You cancelled the payment. Your order has not been placed.');
   };
 
   // ── Finalize order (common for all payment methods) ───────────
@@ -283,7 +316,7 @@ const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuth
           const backendOrder = await createOrder({
             id: order.id,  // Send local order ID so backend uses same ID
             items: items.map((i) => ({
-              product_id: i.id,
+              product_id: i.productId || i.id,
               name: i.name,
               price: i.price,
               quantity: i.quantity,
@@ -323,6 +356,12 @@ const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuth
       clearCart();
       setLastOrder(order);
       setFlowStep('confirmation');
+
+      // ── Save user's real name from address (first-time or update) ──
+      const realName = (address.fullName || '').trim();
+      if (realName && realName !== 'AaplaKart User' && realName.length >= 2) {
+        onUpdateUserName?.(realName);
+      }
     } catch (error) {
       Alert.alert('Order Failed', error?.message || 'Something went wrong while placing your order.');
     } finally {
@@ -330,6 +369,16 @@ const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuth
       setRzpProcessing(false);
     }
   };
+
+  // ── Auto-close confirmation after 5 seconds ──
+  useEffect(() => {
+    if (flowStep === 'confirmation' && lastOrder) {
+      const timer = setTimeout(() => {
+        handleContinueShopping();
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [flowStep, lastOrder, handleContinueShopping]);
 
   // ── Confirmation screen ──
   if (flowStep === 'confirmation' && lastOrder) {
@@ -340,52 +389,20 @@ const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuth
     );
   }
 
-  // ── Progress indicator ──
-  const steps = [
-    { id: 'address', label: 'Address', icon: 'location-outline' },
-    { id: 'time', label: 'Time', icon: 'time-outline' },
-    { id: 'payment', label: 'Payment', icon: 'card-outline' },
-  ];
-  const currentStepIndex = steps.findIndex((s) => s.id === flowStep);
-
   return (
     <Container edges={['top', 'left', 'right', 'bottom']}>
       <View style={styles.header}>
         <Pressable
           accessibilityLabel="Go back"
           onPress={() => {
-            if (flowStep === 'time') { setFlowStep('address'); }
-            else if (flowStep === 'payment') { setFlowStep('time'); }
+            if (flowStep === 'payment') { setFlowStep('address'); }
             else { onBack ? onBack() : onClose(); }
           }}
           style={styles.backButton}
         >
           <Ionicons name="chevron-back" size={24} color={COLORS.text} />
         </Pressable>
-        <Text style={styles.title}>Checkout</Text>
         <View style={styles.backButton} />
-      </View>
-
-      {/* Step progress */}
-      <View style={styles.progressRow}>
-        {steps.map((step, index) => {
-          const isActive = index === currentStepIndex;
-          const isDone = index < currentStepIndex;
-          return (
-            <React.Fragment key={step.id}>
-              <View style={[styles.progressDot, isActive && styles.progressDotActive, isDone && styles.progressDotDone]}>
-                <Ionicons
-                  name={isDone ? 'checkmark' : step.icon}
-                  size={14}
-                  color={isDone || isActive ? '#fff' : COLORS.mutedText}
-                />
-              </View>
-              {index < steps.length - 1 && (
-                <View style={[styles.progressLine, isDone && styles.progressLineDone]} />
-              )}
-            </React.Fragment>
-          );
-        })}
       </View>
 
       <ScrollView
@@ -463,7 +480,9 @@ const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuth
                     <Text style={styles.summaryItemName} numberOfLines={1}>
                       {item.name}
                     </Text>
-                    <Text style={styles.summaryItemQty}>x{item.quantity}</Text>
+                    <Text style={styles.summaryItemQty}>
+                      {item.weight ? `${item.weight} × ${item.quantity}` : `×${item.quantity}`}
+                    </Text>
                   </View>
                   <Text style={styles.summaryItemPrice}>
                     {formatCurrency(item.price * item.quantity)}
@@ -500,12 +519,16 @@ const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuth
           </>
         )}
 
-        {flowStep === 'time' && (
-          <DeliveryTimePicker selected={deliverySlot} onSelect={setDeliverySlot} />
-        )}
-
         {flowStep === 'payment' && (
-          <PaymentMethodSelector selected={paymentMethod} onSelect={setPaymentMethod} />
+          <>
+            {paymentMethod === 'upi' && (
+              <View style={styles.secureBadge}>
+                <Ionicons name="shield-checkmark" size={15} color="#16a34a" />
+                <Text style={styles.secureBadgeText}>Secure UPI</Text>
+              </View>
+            )}
+            <PaymentMethodSelector selected={paymentMethod} onSelect={setPaymentMethod} />
+          </>
         )}
       </ScrollView>
 
@@ -513,18 +536,15 @@ const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuth
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
         <Pressable
           accessibilityLabel={
-            flowStep === 'address' ? 'Continue to delivery time' :
-            flowStep === 'time' ? 'Continue to payment' :
-            'Place order'
+            flowStep === 'address' ? 'Continue to payment' : 'Place order'
           }
           onPress={
-            flowStep === 'address' ? handleAddressNext :
-            flowStep === 'time' ? handleTimeNext :
-            handlePlaceOrder
+            flowStep === 'address' ? handleAddressNext : handlePlaceOrder
           }
           disabled={placing || rzpProcessing}
           style={({ pressed }) => [
             styles.placeOrderButton,
+            paymentMethod === 'upi' && styles.payUPIButton,
             pressed && styles.buttonPressed,
             (placing || rzpProcessing) && styles.buttonDisabled,
           ]}
@@ -533,12 +553,10 @@ const CheckoutScreen = ({ onClose, onBack, onShowLogin, phoneNumber = '', isAuth
             {placing || rzpProcessing
               ? 'Processing...'
               : flowStep === 'address'
-              ? `Continue • ${formatCurrency(total)}`
-              : flowStep === 'time'
-              ? `Deliver ${selectedSlot?.label || 'ASAP'} • ${formatCurrency(total)}`
-              : paymentMethod === 'online'
-              ? `Pay ₹${formatCurrency(total)}`
-              : `Place Order • ${formatCurrency(total)}`}
+              ? 'Continue'
+              : paymentMethod === 'upi'
+              ? 'Pay'
+              : 'Place Order'}
           </Text>
         </Pressable>
       </View>
@@ -692,6 +710,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 16,
   },
+  payUPIButton: {
+    backgroundColor: '#16a34a',
+  },
+
+  // ── Secure badge ──
+  secureBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#f0fdf4',
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#bbf7d0',
+    marginBottom: 12,
+    alignSelf: 'center',
+  },
+  secureBadgeText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#16a34a',
+  },
   buttonPressed: {
     opacity: 0.92,
   },
@@ -734,74 +775,95 @@ const styles = StyleSheet.create({
   progressLineDone: {
     backgroundColor: COLORS.accent,
   },
+  progressItem: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  progressLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: COLORS.mutedText,
+  },
+  progressLabelActive: {
+    color: COLORS.primary,
+  },
+  progressLabelDone: {
+    color: COLORS.accent,
+  },
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: COLORS.text,
+    marginBottom: 10,
+  },
   // ── Address card (saved address) ──
   addressCard: {
     backgroundColor: COLORS.background,
-    borderRadius: 16,
-    padding: 14,
+    borderRadius: 18,
+    padding: 18,
     borderWidth: 1,
     borderColor: COLORS.border,
-    marginBottom: 16,
+    marginBottom: 18,
   },
   addressCardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: 10,
   },
   labelBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
     backgroundColor: COLORS.card,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
   labelBadgeText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
     color: COLORS.primaryDark,
   },
   addressActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
   },
   editBtn: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.card,
   },
   changeBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 8,
     backgroundColor: COLORS.primary + '14',
   },
   changeBtnText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: COLORS.primary,
   },
   addrName: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '700',
     color: COLORS.text,
-    marginBottom: 2,
+    marginBottom: 3,
   },
   addrLine: {
-    fontSize: 12,
+    fontSize: 13,
     color: COLORS.mutedText,
   },
   addrLandmark: {
-    marginTop: 2,
-    fontSize: 11,
+    marginTop: 3,
+    fontSize: 12,
     color: COLORS.primaryDark,
     fontWeight: '500',
   },

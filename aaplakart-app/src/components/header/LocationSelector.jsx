@@ -8,7 +8,7 @@ const LocationSelector = ({ location }) => (
   <View style={styles.container}>
     <Text style={styles.label}>Delivering to</Text>
     <View style={styles.row}>
-      <Text style={styles.location}>{location}</Text>
+      <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">{location}</Text>
       <Ionicons name="chevron-down" size={16} color={COLORS.text} />
     </View>
   </View>
@@ -17,6 +17,7 @@ const LocationSelector = ({ location }) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    minWidth: 0,
   },
   label: {
     fontSize: 10,
@@ -32,6 +33,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.text,
     marginRight: 2,
+    flexShrink: 1,
   },
 });
 
